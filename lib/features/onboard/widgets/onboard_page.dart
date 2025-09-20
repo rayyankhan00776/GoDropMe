@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
 import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/routes/routes.dart';
 
 /// A single onboarding page widget.
 ///
@@ -88,7 +89,7 @@ class OnboardPage extends StatelessWidget {
               child: CustomButton(
                 text: 'Get Started',
                 onTap: () {
-                  Get.offAllNamed('/login_and_register');
+                  Get.offAllNamed(AppRoutes.optionScreen);
                 },
                 height: 50,
                 width: screenWidth - 118,
