@@ -14,4 +14,14 @@ class AppStrings {
 
   static const onboardButton = 'Get Started';
   static const onboardSkip = 'Skip';
+
+  // Option screen strings
+  static const optionHeading = 'GoDropMe';
+  static const optionLine1 = 'Your App for Fair Deals';
+  static const optionLine2 = 'Choose Rides that are Right for You';
+  static const continueWithPhone = 'Continue with Phone';
+  static const continueWithGoogle = 'Continue with Google';
+  static const optionTermsPrefix = 'By joining our app you agree with our ';
+  static const optionTermsText = 'Terms and Conditions';
+  static const optionPrivacyText = 'Privacy Policy';
 }

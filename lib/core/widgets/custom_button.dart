@@ -14,6 +14,8 @@ class CustomButton extends StatelessWidget {
   final double width;
   final Gradient? gradient;
   final BorderRadius? borderRadius;
+  final Widget? leading;
+  final Color? textColor;
 
   const CustomButton({
     required this.text,
@@ -22,6 +24,8 @@ class CustomButton extends StatelessWidget {
     this.width = double.infinity,
     this.gradient,
     this.borderRadius,
+    this.leading,
+    this.textColor,
     super.key,
   });
 
@@ -39,6 +43,7 @@ class CustomButton extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: AppColors.buttonGradient,
               ),
+          color: gradient == null ? null : null,
           borderRadius: borderRadius ?? BorderRadius.circular(40),
           boxShadow: [
             BoxShadow(
@@ -54,13 +59,20 @@ class CustomButton extends StatelessWidget {
             borderRadius: borderRadius ?? BorderRadius.circular(40),
             onTap: onTap,
             child: Center(
-              child: Text(
-                text,
-                style: AppTypography.onboardButton.copyWith(
-                  color: AppColors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (leading != null) ...[leading!, const SizedBox(width: 12)],
+                  Text(
+                    text,
+                    style: AppTypography.onboardButton.copyWith(
+                      color: textColor ?? AppColors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

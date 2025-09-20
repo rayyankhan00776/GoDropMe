@@ -19,6 +19,7 @@ dependencies:
 
   # State Management Packages
   get: ^4.6.5
+  flutter_svg: ^1.1.6
 
   # Product Specific Packages
   # add to be when needed
@@ -37,6 +38,8 @@ flutter:
     - assets/
     - assets/images/
     - assets/images/onboarding/
+    - assets/images/svg/
+    - assets/images/logo/
   #---------------------- ./ LOCAL ASSETS END ----------------------#
 
   #---------------------- LOCAL FONTS ----------------------#

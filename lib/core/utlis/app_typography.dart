@@ -24,4 +24,29 @@ class AppTypography {
     fontSize: 17,
     color: AppColors.darkGray,
   );
+
+  // Option screen typography
+  static const TextStyle optionHeading = TextStyle(
+    fontSize: 28,
+    fontWeight: FontWeight.w700,
+    color: AppColors.black,
+  );
+
+  static const TextStyle optionLinePrimary = TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.w600,
+    color: AppColors.black,
+  );
+
+  static const TextStyle optionLineSecondary = TextStyle(
+    fontSize: 21,
+    fontWeight: FontWeight.w500,
+    color: AppColors.darkGray,
+  );
+
+  static const TextStyle optionTerms = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.darkGray,
+  );
 }
