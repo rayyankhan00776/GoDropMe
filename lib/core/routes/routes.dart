@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:godropme/features/onboard/binding/onboard_binding.dart';
 import 'package:godropme/features/onboard/pages/onboard_screen.dart';
 import 'package:godropme/features/Reg-option/pages/option_screen.dart';
+import 'package:godropme/features/Reg-option/binding/option_binding.dart';
 
 // Add more imports for other screens as you create them
 
@@ -16,7 +17,11 @@ class AppRoutes {
       page: () => const OnboardScreen(),
       binding: OnboardBinding(),
     ),
-    GetPage(name: optionScreen, page: () => const OptionScreen()),
+    GetPage(
+      name: optionScreen,
+      page: () => const OptionScreen(),
+      binding: OptionBinding(),
+    ),
     // Add more GetPage entries here as you add screens
   ];
 }
