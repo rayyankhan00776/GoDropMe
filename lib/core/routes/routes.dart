@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:godropme/features/onboard/binding/onboard_binding.dart';
 import 'package:godropme/features/onboard/pages/onboard_screen.dart';
-import 'package:godropme/features/register/pages/option_screen.dart';
+import 'package:godropme/features/Reg-option/pages/option_screen.dart';
 
 // Add more imports for other screens as you create them
 

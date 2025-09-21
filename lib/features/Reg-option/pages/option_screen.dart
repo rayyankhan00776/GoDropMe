@@ -1,7 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'package:godropme/features/register/widgets/option_content.dart';
+import 'package:godropme/features/Reg-option/widgets/option_content.dart';
 
 class OptionScreen extends StatelessWidget {
   const OptionScreen({super.key});
