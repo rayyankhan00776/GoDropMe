@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/onboard/onboard_constants.dart';
+import 'package:godropme/features/onboard/constants/onboard_constants.dart';
 
 class OnboardController extends GetxController {
   final pageIndex = 0.obs;
