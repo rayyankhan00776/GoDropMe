@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:godropme/core/utils/responsive.dart';
 import 'components/option_header.dart';
 import 'components/option_illustration.dart';
 import 'components/option_actions.dart';
@@ -27,16 +28,16 @@ class OptionContent extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           const OptionHeader(),
-          const SizedBox(height: 6),
+          SizedBox(height: Responsive.scaleClamped(context, 6, 6, 14)),
           const OptionIllustration(),
-          const SizedBox(height: 194),
+          SizedBox(height: Responsive.scaleClamped(context, 194, 120, 260)),
 
           OptionActions(
             onContinuePhone: onContinuePhone,
             onContinueGoogle: onContinueGoogle,
           ),
 
-          const SizedBox(height: 5),
+          SizedBox(height: Responsive.scaleClamped(context, 5, 4, 12)),
 
           OptionTerms(onTermsTap: onTermsTap, onPrivacyTap: onPrivacyTap),
         ],

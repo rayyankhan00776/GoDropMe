@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:math' as math;
+import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/routes/routes.dart';
@@ -34,9 +36,13 @@ class OnboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = Responsive.screenWidth(context);
     // Page layout: image/title/subtitle in Expanded to keep them centered,
-    // and the primary button anchored near the bottom with 20px padding.
+    // and the primary button anchored near the bottom. Sizes are responsive
+    // but clamped so visual design remains unchanged on medium screens.
+    final screenHeight = Responsive.screenHeight(context);
+    final imageSize = math.min(screenWidth * 0.75, 280.0);
+    final bottomButtonPadding = math.min(screenHeight * 0.08, 60.0);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Column(
@@ -48,8 +54,8 @@ class OnboardPage extends StatelessWidget {
               children: [
                 Center(
                   child: SizedBox(
-                    width: 280,
-                    height: 280,
+                    width: imageSize,
+                    height: imageSize,
                     child: Image.asset(image, fit: BoxFit.contain),
                   ),
                 ),
@@ -85,7 +91,7 @@ class OnboardPage extends StatelessWidget {
 
           if (showButton)
             Padding(
-              padding: const EdgeInsets.only(bottom: 60.0),
+              padding: EdgeInsets.only(bottom: bottomButtonPadding),
               child: CustomButton(
                 text: 'Get Started',
                 onTap: () {

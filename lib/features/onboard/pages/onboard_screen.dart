@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/features/onboard/controllers/onboard_controller.dart';
+import 'package:godropme/features/onboard/onboard_constants.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utlis/app_strings.dart';
 import 'package:godropme/core/utlis/app_typography.dart';
@@ -13,9 +14,8 @@ class OnboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Instantiate and register the OnboardController using GetX.
-    // Controller exposes pageIndex and pageOffset used by child widgets.
-    final OnboardController ctrl = Get.put(OnboardController());
+    // Controller is provided by the route binding; find the instance here.
+    final OnboardController ctrl = Get.find();
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -64,7 +64,9 @@ class OnboardScreen extends StatelessWidget {
                     child: SafeArea(
                       top: true,
                       child: TextButton(
-                        onPressed: () => ctrl.jumpToPage(2),
+                        onPressed:
+                            () =>
+                                ctrl.jumpToPage(OnboardConstants.pageCount - 1),
                         child: Text(
                           AppStrings.onboardSkip,
                           style: AppTypography.onboardSkip,

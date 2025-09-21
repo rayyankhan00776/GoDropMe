@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/features/Reg-option/widgets/option_content.dart';
 import 'package:godropme/features/Reg-option/controllers/option_controller.dart';
+import 'package:godropme/core/utils/responsive.dart';
 
 class OptionScreen extends StatelessWidget {
   const OptionScreen({super.key});
@@ -20,8 +21,8 @@ class OptionScreen extends StatelessWidget {
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight:
-                  MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.vertical,
+                  Responsive.screenHeight(context) -
+                  Responsive.paddingVertical(context),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.max,

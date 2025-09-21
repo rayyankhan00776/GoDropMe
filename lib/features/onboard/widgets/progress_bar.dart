@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/features/onboard/controllers/onboard_controller.dart';
 import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/core/utils/responsive.dart';
 
 /// Animated, tappable progress bar for onboarding.
 /// It responds smoothly to the PageView scroll via [OnboardController.pageOffset].
@@ -22,7 +23,14 @@ class ProgressBar extends StatelessWidget {
       child: Center(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final totalWidth = 160.0; // visual width of the pill
+            // Make pill width responsive: prefer 40% of available width but
+            // clamp between 120 and 220 to preserve original visual weight.
+            final maxAvailable = constraints.maxWidth;
+            final preferred = maxAvailable * 0.4;
+            final totalWidth = preferred.clamp(
+              Responsive.scaleClamped(context, 120, 120, 220),
+              220.0,
+            );
 
             return SizedBox(
               width: totalWidth,

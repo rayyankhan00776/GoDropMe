@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:godropme/features/onboard/onboard_constants.dart';
 
 class OnboardController extends GetxController {
   final pageIndex = 0.obs;
@@ -29,7 +30,10 @@ class OnboardController extends GetxController {
   }
 
   void next() {
-    final nextPage = (pageIndex.value + 1).clamp(0, 2);
+    final nextPage = (pageIndex.value + 1).clamp(
+      0,
+      OnboardConstants.pageCount - 1,
+    );
     jumpToPage(nextPage);
   }
 }
