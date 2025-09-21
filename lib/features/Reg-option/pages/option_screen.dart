@@ -16,26 +16,29 @@ class OptionScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight:
-                  Responsive.screenHeight(context) -
-                  Responsive.paddingVertical(context),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Use a static layout: header + illustration take flexible space,
+            // actions stay anchored near the bottom. This prevents scrolling
+            // while remaining responsive across screen sizes.
+
+            return Column(
               children: [
-                OptionContent(
-                  onContinuePhone: ctrl.continueWithPhone,
-                  onContinueGoogle: ctrl.continueWithGoogle,
-                  onTermsTap: ctrl.openTerms,
-                  onPrivacyTap: ctrl.openPrivacy,
+                // Keep the main content flexible so it can shrink/grow as needed.
+                Expanded(
+                  child: OptionContent(
+                    onContinuePhone: ctrl.continueWithPhone,
+                    onContinueGoogle: ctrl.continueWithGoogle,
+                    onTermsTap: ctrl.openTerms,
+                    onPrivacyTap: ctrl.openPrivacy,
+                  ),
                 ),
+
+                // Add a small safe gap from bottom based on available height.
+                SizedBox(height: Responsive.scaleClamped(context, 12, 8, 28)),
               ],
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

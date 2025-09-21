@@ -92,13 +92,38 @@ class OnboardPage extends StatelessWidget {
           if (showButton)
             Padding(
               padding: EdgeInsets.only(bottom: bottomButtonPadding),
-              child: CustomButton(
-                text: 'Get Started',
-                onTap: () {
-                  Get.offAllNamed(AppRoutes.optionScreen);
+              child: Builder(
+                builder: (context) {
+                  // Compute responsive button size. Use baseline values that
+                  // preserve the original design on typical phones but scale
+                  // down on very small screens and slightly up on larger ones.
+                  final btnHeight = Responsive.scaleClamped(
+                    context,
+                    58,
+                    44,
+                    72,
+                  );
+                  // Keep some horizontal margin; on very small screens prefer
+                  // a percent-based width but ensure a readable minimum.
+                  final horizontalMargin = Responsive.scaleClamped(
+                    context,
+                    35,
+                    16,
+                    60,
+                  );
+                  final btnWidth = (Responsive.screenWidth(context) -
+                          horizontalMargin * 2)
+                      .clamp(180.0, Responsive.screenWidth(context));
+
+                  return CustomButton(
+                    text: 'Get Started',
+                    onTap: () {
+                      Get.offAllNamed(AppRoutes.optionScreen);
+                    },
+                    height: btnHeight,
+                    width: btnWidth,
+                  );
                 },
-                height: 58,
-                width: screenWidth - 70,
               ),
             ),
         ],
