@@ -3,12 +3,14 @@ import 'package:godropme/features/onboard/binding/onboard_binding.dart';
 import 'package:godropme/features/onboard/pages/onboard_screen.dart';
 import 'package:godropme/features/Reg-option/pages/option_screen.dart';
 import 'package:godropme/features/Reg-option/binding/option_binding.dart';
+import 'package:godropme/features/phoneVerfication/pages/phone_Screen.dart';
 
 // Add more imports for other screens as you create them
 
 class AppRoutes {
   static const String onboard = '/onboard';
   static const String optionScreen = '/option_screen';
+  static const String phoneScreen = '/phone_screen';
   // static const String register = '/register'; // Example for future screens
 
   static final routes = [
@@ -21,6 +23,11 @@ class AppRoutes {
       name: optionScreen,
       page: () => const OptionScreen(),
       binding: OptionBinding(),
+    ),
+    GetPage(
+      name: '/phone_screen',
+      page: () => const PhoneScreen(),
+      // binding: PhoneBinding(), // Uncomment and create PhoneBinding if needed
     ),
     // Add more GetPage entries here as you add screens
   ];
