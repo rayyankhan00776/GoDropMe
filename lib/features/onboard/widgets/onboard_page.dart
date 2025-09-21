@@ -91,8 +91,8 @@ class OnboardPage extends StatelessWidget {
                 onTap: () {
                   Get.offAllNamed(AppRoutes.optionScreen);
                 },
-                height: 50,
-                width: screenWidth - 118,
+                height: 58,
+                width: screenWidth - 70,
               ),
             ),
         ],

@@ -44,7 +44,7 @@ class CustomButton extends StatelessWidget {
                 colors: AppColors.buttonGradient,
               ),
           color: gradient == null ? null : null,
-          borderRadius: borderRadius ?? BorderRadius.circular(40),
+          borderRadius: borderRadius ?? BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF756AED).withOpacity(0.25),
@@ -56,7 +56,7 @@ class CustomButton extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: borderRadius ?? BorderRadius.circular(40),
+            borderRadius: borderRadius ?? BorderRadius.circular(20),
             onTap: onTap,
             child: Center(
               child: Row(

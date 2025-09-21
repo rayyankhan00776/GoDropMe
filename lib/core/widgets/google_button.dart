@@ -26,9 +26,9 @@ class GoogleButton extends StatelessWidget {
       height: height,
       child: Material(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(20),
         child: InkWell(
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(20),
           onTap: onTap,
           child: Container(
             decoration: BoxDecoration(
