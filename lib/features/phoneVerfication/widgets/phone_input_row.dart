@@ -38,7 +38,7 @@ class PhoneInputRow extends StatelessWidget {
             width: height * 0.6,
             height: height * 0.6,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 15),
           // country code removed (we show +92 inside the text field)
           Expanded(
             child: PhoneTextField(
