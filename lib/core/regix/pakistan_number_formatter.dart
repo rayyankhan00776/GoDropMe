@@ -6,27 +6,30 @@ class PakistanPhoneNumberFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    // Ensure the phone number starts with +92 and contains only digits
-    String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-    if (newText.isEmpty) {
-      newText = '+92';
-    } else if (newText.startsWith('92')) {
-      newText = '+$newText';
-    } else if (newText.startsWith('0')) {
-      newText = '+92${newText.substring(1)}';
-    } else {
-      newText = '+92$newText';
+    // Keep only digits from the raw input
+    final rawDigits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    // Normalize to national part (without country code)
+    String national = rawDigits;
+    if (national.startsWith('92')) {
+      national = national.substring(2);
+    } else if (national.startsWith('0')) {
+      national = national.substring(1);
     }
 
-    // Handle backspace correctly
-    if (newValue.selection.baseOffset < oldValue.selection.baseOffset &&
-        newText.length > 3) {
-      newText = newText.substring(0, newText.length - 1);
+    // Enforce maximum of 10 digits for the national part
+    if (national.length > 10) {
+      national = national.substring(0, 10);
     }
 
-    return newValue.copyWith(
+    // Build the displayed value: always show +92 prefix when there is any input,
+    // otherwise keep just '+92' as the starter for clarity.
+    final newText = '+92${national}';
+
+    return TextEditingValue(
       text: newText,
       selection: TextSelection.collapsed(offset: newText.length),
+      composing: TextRange.empty,
     );
   }
 }

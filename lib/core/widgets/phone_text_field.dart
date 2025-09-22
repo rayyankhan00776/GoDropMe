@@ -13,11 +13,19 @@ typedef PhoneValidator = String? Function(String? value);
 // - 3XXXXXXXXX (local without leading 0)
 String? pakistanPhoneValidator(String? value) {
   if (value == null || value.trim().isEmpty) return 'Please enter phone number';
-  final cleaned = value.trim().replaceAll(RegExp(r'[^0-9+]'), '');
-  final intl = RegExp(r'^\+92[3][0-9]{9}\$');
-  final local = RegExp(r'^0?3[0-9]{9}\$');
-  if (intl.hasMatch(cleaned) || local.hasMatch(cleaned)) return null;
-  return 'Enter a valid Pakistani mobile number';
+  final cleaned = value.trim();
+  // Allow inputs like: +923XXXXXXXXX, 03XXXXXXXXX, 3XXXXXXXXX, or just digits where user typed national part
+  final onlyDigits = cleaned.replaceAll(RegExp(r'[^0-9]'), '');
+
+  // Normalize to national form: ensure it starts with 3 and has 10 digits total (3XXXXXXXXX)
+  String national = onlyDigits;
+  if (national.startsWith('92')) national = national.substring(2);
+  if (national.startsWith('0')) national = national.substring(1);
+
+  if (national.isEmpty) return 'Please enter phone number';
+  if (!national.startsWith('3')) return 'Please add a valid Phone Number';
+  if (national.length != 10) return 'Enter a valid Pakistani mobile number';
+  return null;
 }
 
 class PhoneTextField extends StatelessWidget {
