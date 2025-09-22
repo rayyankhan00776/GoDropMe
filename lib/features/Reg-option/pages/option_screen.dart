@@ -2,7 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/Reg-option/widgets/option_content.dart';
+import 'package:godropme/features/Reg-option/widgets/option_header.dart';
+import 'package:godropme/features/Reg-option/widgets/option_illustration.dart';
+import 'package:godropme/features/Reg-option/widgets/option_actions.dart';
+import 'package:godropme/features/Reg-option/widgets/option_terms.dart';
 import 'package:godropme/features/Reg-option/controllers/option_controller.dart';
 import 'package:godropme/core/utils/responsive.dart';
 
@@ -26,11 +29,47 @@ class OptionScreen extends StatelessWidget {
               children: [
                 // Keep the main content flexible so it can shrink/grow as needed.
                 Expanded(
-                  child: OptionContent(
-                    onContinuePhone: ctrl.continueWithPhone,
-                    onContinueGoogle: ctrl.continueWithGoogle,
-                    onTermsTap: ctrl.openTerms,
-                    onPrivacyTap: ctrl.openPrivacy,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        const OptionHeader(),
+                        SizedBox(
+                          height: Responsive.scaleClamped(context, 6, 6, 14),
+                        ),
+
+                        Expanded(
+                          child: Center(
+                            child: SingleChildScrollView(
+                              physics: const ClampingScrollPhysics(),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [const OptionIllustration()],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        OptionActions(
+                          onContinuePhone: ctrl.continueWithPhone,
+                          onContinueGoogle: ctrl.continueWithGoogle,
+                        ),
+
+                        SizedBox(
+                          height: Responsive.scaleClamped(context, 5, 4, 12),
+                        ),
+
+                        OptionTerms(
+                          onTermsTap: ctrl.openTerms,
+                          onPrivacyTap: ctrl.openPrivacy,
+                        ),
+
+                        SizedBox(
+                          height: MediaQuery.of(context).viewPadding.bottom + 8,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
