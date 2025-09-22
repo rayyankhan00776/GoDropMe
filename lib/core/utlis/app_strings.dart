@@ -24,4 +24,9 @@ class AppStrings {
   static const optionTermsPrefix = 'By joining our app you agree with our ';
   static const optionTermsText = 'Terms and Conditions';
   static const optionPrivacyText = 'Privacy Policy';
+
+  // Phone verification strings
+  static const phoneTitle = 'Join us via phone number';
+  static const phoneSubtitle = "We'll text a code to verify your phone";
+  static const phoneHint = 'e.g. 3012345678';
 }

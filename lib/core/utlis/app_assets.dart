@@ -7,4 +7,6 @@ class AppAssets {
   // Option screen assets
   static const optionIllustration = 'assets/images/svg/option_screen.svg';
   static const google = 'assets/images/logo/google.png';
+  // Flags
+  static const flag = 'assets/images/flag/flag.png';
 }

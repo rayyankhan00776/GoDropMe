@@ -39,7 +39,7 @@ class AppTypography {
   );
 
   static const TextStyle optionLineSecondary = TextStyle(
-    fontSize: 21,
+    fontSize: 19,
     fontWeight: FontWeight.w500,
     color: AppColors.darkGray,
   );
