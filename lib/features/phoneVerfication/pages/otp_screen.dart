@@ -4,6 +4,7 @@ import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/features/phoneVerfication/widgets/otpWidgets/otp_actions.dart';
 import 'package:godropme/features/phoneVerfication/widgets/otpWidgets/otp_header.dart';
 import 'package:godropme/features/phoneVerfication/widgets/otpWidgets/otp_text_field.dart';
+import 'package:godropme/features/phoneVerfication/widgets/otpWidgets/otp_error_dialog.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -35,21 +36,13 @@ class _OtpScreenState extends State<OtpScreen> {
   void _submitOtp() {
     final code = _codeControllers.map((c) => c.text.trim()).join();
     if (code.length < 6 || code.contains('')) {
-      // show simple inline error using a dialog for now
       showDialog(
         context: context,
         builder:
-            (_) => AlertDialog(
-              title: const Text('Invalid code'),
-              content: const Text(
-                'Please enter the 6-digit verification code.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
+            (_) => const OtpErrorDialog(
+              title: 'Invalid code',
+              message: 'Please enter the 6-digit verification code.',
+              buttonText: 'OK',
             ),
       );
       return;

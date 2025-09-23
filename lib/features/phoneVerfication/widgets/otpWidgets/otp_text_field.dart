@@ -13,13 +13,13 @@ class OtpTextField extends StatefulWidget {
   // Use onChanged to handle navigation between fields.
 
   const OtpTextField({
-    Key? key,
+    super.key,
     required this.controller,
     this.autoFocus = false,
     this.fieldNumber = 0,
     this.focusNode,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<OtpTextField> createState() => _OtpTextFieldState();
