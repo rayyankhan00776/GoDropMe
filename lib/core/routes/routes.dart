@@ -5,6 +5,8 @@ import 'package:godropme/features/Reg-option/pages/option_screen.dart';
 import 'package:godropme/features/Reg-option/binding/option_binding.dart';
 import 'package:godropme/features/phoneVerfication/pages/otp_screen.dart';
 import 'package:godropme/features/phoneVerfication/pages/phone_Screen.dart';
+import 'package:godropme/features/phoneVerfication/binding/phone_binding.dart';
+import 'package:godropme/features/phoneVerfication/binding/otp_binding.dart';
 
 // Add more imports for other screens as you create them
 
@@ -27,14 +29,14 @@ class AppRoutes {
       binding: OptionBinding(),
     ),
     GetPage(
-      name: '/phone_screen',
+      name: phoneScreen,
       page: () => const PhoneScreen(),
-      // binding: PhoneBinding(), // Uncomment and create PhoneBinding if needed
+      binding: PhoneBinding(),
     ),
     GetPage(
-      name: '/otp_screen',
-      page: () => const OtpScreen(), //
-      // binding: OTPBinding(), // Uncomment and create OTPBinding if needed
+      name: otpScreen,
+      page: () => const OtpScreen(),
+      binding: OtpBinding(),
     ),
   ];
 }

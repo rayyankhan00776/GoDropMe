@@ -57,55 +57,39 @@ class _OtpTextFieldState extends State<OtpTextField> {
     return SizedBox(
       width: 56,
       height: 56,
-      child: Focus(
+      child: TextFormField(
+        controller: widget.controller,
         focusNode: _focusNode,
-        onKey: (node, event) {
-          // Only handle key down events
-          if (event is RawKeyDownEvent) {
-            // Handle backspace: if this field is already empty, move focus to previous
-            if (event.logicalKey == LogicalKeyboardKey.backspace) {
-              if (widget.controller.text.isEmpty) {
-                FocusScope.of(context).previousFocus();
-                return KeyEventResult.handled;
-              }
-            }
-          }
-          return KeyEventResult.ignored;
-        },
-        child: TextFormField(
-          controller: widget.controller,
-          focusNode: _focusNode,
-          autofocus: widget.autoFocus,
-          textAlign: TextAlign.center,
-          keyboardType: TextInputType.number,
-          maxLength: 1,
-          onTapOutside: (event) => FocusScope.of(context).unfocus(),
-          style: AppTypography.onboardTitle.copyWith(fontSize: 22),
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: InputDecoration(
-            counterText: "",
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: AppColors.lightGray, width: 2),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
-            ),
+        autofocus: widget.autoFocus,
+        textAlign: TextAlign.center,
+        keyboardType: TextInputType.number,
+        maxLength: 1,
+        onTapOutside: (event) => FocusScope.of(context).unfocus(),
+        style: AppTypography.onboardTitle.copyWith(fontSize: 22),
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: InputDecoration(
+          counterText: "",
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: AppColors.lightGray, width: 2),
           ),
-          onChanged: (value) {
-            widget.onChanged?.call(value);
-            // If user entered a character, move to next field
-            if (_previousText.isEmpty && value.isNotEmpty) {
-              FocusScope.of(context).nextFocus();
-            }
-            // If user deleted (previous had a char and now empty), move to previous
-            if (_previousText.isNotEmpty && value.isEmpty) {
-              FocusScope.of(context).previousFocus();
-            }
-            _previousText = value;
-          },
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: AppColors.primary, width: 2),
+          ),
         ),
+        onChanged: (value) {
+          widget.onChanged?.call(value);
+          // If user entered a character, move to next field
+          if (_previousText.isEmpty && value.isNotEmpty) {
+            FocusScope.of(context).nextFocus();
+          }
+          // If user deleted (previous had a char and now empty), move to previous
+          if (_previousText.isNotEmpty && value.isEmpty) {
+            FocusScope.of(context).previousFocus();
+          }
+          _previousText = value;
+        },
       ),
     );
   }
