@@ -24,7 +24,7 @@ class PakistanPhoneNumberFormatter extends TextInputFormatter {
 
     // Build the displayed value: always show +92 prefix when there is any input,
     // otherwise keep just '+92' as the starter for clarity.
-    final newText = '+92${national}';
+    final newText = '+92$national';
 
     return TextEditingValue(
       text: newText,

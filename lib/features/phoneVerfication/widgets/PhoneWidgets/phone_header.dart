@@ -18,7 +18,7 @@ class PhoneHeader extends StatelessWidget {
             title ?? AppStrings.phoneTitle,
             style: AppTypography.optionHeading,
           ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 2),
         if ((subtitle ?? AppStrings.phoneSubtitle).isNotEmpty)
           Text(
             subtitle ?? AppStrings.phoneSubtitle,

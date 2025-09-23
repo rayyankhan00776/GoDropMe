@@ -2,10 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/phoneVerfication/widgets/phone_header.dart';
-import 'package:godropme/features/phoneVerfication/widgets/phone_input_row.dart';
+import 'package:godropme/core/routes/routes.dart';
+import 'package:godropme/features/phoneVerfication/pages/otp_screen.dart';
+import 'package:godropme/features/phoneVerfication/widgets/PhoneWidgets/phone_header.dart';
+import 'package:godropme/features/phoneVerfication/widgets/PhoneWidgets/phone_input_row.dart';
 import 'package:godropme/core/widgets/phone_text_field.dart';
-import 'package:godropme/features/phoneVerfication/widgets/phone_actions.dart';
+import 'package:godropme/features/phoneVerfication/widgets/PhoneWidgets/phone_actions.dart';
 import 'package:godropme/core/utils/responsive.dart';
 
 class PhoneScreen extends StatefulWidget {
@@ -31,8 +33,12 @@ class _PhoneScreenState extends State<PhoneScreen> {
   void _onNextPressed() {
     final valid = _formKey.currentState?.validate() ?? false;
     if (valid) {
-      debugPrint('Next tapped');
-      // TODO: navigate to OTP screen
+      try {
+        Get.toNamed(AppRoutes.otpScreen);
+      } catch (e) {
+        debugPrint('Named route failed, falling back to direct navigation: $e');
+        Get.to(() => const OtpScreen());
+      }
     } else {
       setState(() {});
     }
@@ -55,9 +61,8 @@ class _PhoneScreenState extends State<PhoneScreen> {
             horizontal: Responsive.scaleClamped(context, 16, 12, 24),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 8),
-              const SizedBox(height: 8),
               PhoneHeader(),
               const SizedBox(height: 24),
               Form(
