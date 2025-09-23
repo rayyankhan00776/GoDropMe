@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/core/utlis/app_typography.dart';
+import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/theme/colors.dart';
 
 /// A white-background button used for "Continue with Google".

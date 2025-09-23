@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
-import 'package:godropme/core/utlis/app_strings.dart';
+import 'package:godropme/core/utils/app_strings.dart';
 
 class OtpActions extends StatelessWidget {
   final VoidCallback onNext;

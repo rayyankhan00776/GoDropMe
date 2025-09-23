@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/core/utlis/app_assets.dart';
+import 'package:godropme/core/utils/app_assets.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
 import 'package:godropme/core/widgets/google_button.dart';
-import 'package:godropme/core/utlis/app_strings.dart';
+import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/utils/responsive.dart';
 
 class OptionActions extends StatelessWidget {

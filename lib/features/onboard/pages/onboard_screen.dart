@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 import 'package:godropme/features/onboard/controllers/onboard_controller.dart';
 import 'package:godropme/features/onboard/constants/onboard_constants.dart';
 import 'package:godropme/core/theme/colors.dart';
-import 'package:godropme/core/utlis/app_strings.dart';
-import 'package:godropme/core/utlis/app_typography.dart';
-import 'package:godropme/core/utlis/app_assets.dart';
+import 'package:godropme/core/utils/app_strings.dart';
+import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/app_assets.dart';
 import 'package:godropme/features/onboard/widgets/onboard_page.dart';
 import 'package:godropme/features/onboard/widgets/progress_bar.dart';
 

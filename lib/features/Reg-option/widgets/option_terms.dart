@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:godropme/core/utlis/app_strings.dart';
-import 'package:godropme/core/utlis/app_typography.dart';
+import 'package:godropme/core/utils/app_strings.dart';
+import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/theme/colors.dart';
 
 class OptionTerms extends StatelessWidget {

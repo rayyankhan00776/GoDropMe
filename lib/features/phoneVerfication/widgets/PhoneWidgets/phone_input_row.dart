@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/widgets/phone_text_field.dart';
 import 'package:godropme/core/regix/pakistan_number_formatter.dart';
-import 'package:godropme/core/utlis/app_assets.dart';
+import 'package:godropme/core/utils/app_assets.dart';
 
 class PhoneInputRow extends StatelessWidget {
   final TextEditingController controller;
