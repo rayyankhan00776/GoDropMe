@@ -76,7 +76,7 @@ class _OtpScreenState extends State<OtpScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               OtpHeader(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 30),
 
               // OTP input row — responsive sizing to avoid overflow on small screens
               LayoutBuilder(
@@ -89,8 +89,8 @@ class _OtpScreenState extends State<OtpScreen> {
                   // compute box size so 6 boxes + gaps fit into available width
                   final totalGaps = gap * (6 - 1);
                   final boxSize = ((availableWidth - totalGaps) / 6).clamp(
-                    40.0,
-                    56.0,
+                    44.0,
+                    72.0,
                   );
 
                   return Row(

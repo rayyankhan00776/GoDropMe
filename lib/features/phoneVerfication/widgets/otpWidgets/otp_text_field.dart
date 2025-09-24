@@ -20,7 +20,8 @@ class OtpTextField extends StatefulWidget {
     this.fieldNumber = 0,
     this.focusNode,
     this.onChanged,
-    this.size = 56,
+    // Increase default size a bit to make boxes taller on medium/large screens
+    this.size = 64,
   });
 
   @override
@@ -66,16 +67,18 @@ class _OtpTextFieldState extends State<OtpTextField> {
         focusNode: _focusNode,
         autofocus: widget.autoFocus,
         textAlign: TextAlign.center,
+        textAlignVertical: TextAlignVertical.center,
         keyboardType: TextInputType.number,
         maxLength: 1,
         onTapOutside: (event) => FocusScope.of(context).unfocus(),
         // Scale font size proportionally so the digit fits well on small boxes
         style: AppTypography.onboardTitle.copyWith(
-          fontSize: (boxSize * 0.39).clamp(14.0, 22.0),
+          fontSize: (boxSize * 0.39).clamp(14.0, 26.0),
         ),
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         decoration: InputDecoration(
           counterText: "",
+          contentPadding: EdgeInsets.zero,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(color: AppColors.lightGray, width: 2),
