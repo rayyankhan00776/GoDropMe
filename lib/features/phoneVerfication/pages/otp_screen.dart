@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:godropme/core/routes/routes.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/features/phoneVerfication/widgets/otpWidgets/otp_actions.dart';
 import 'package:godropme/features/phoneVerfication/widgets/otpWidgets/otp_header.dart';
@@ -34,21 +35,25 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void _submitOtp() {
-    final code = _codeControllers.map((c) => c.text.trim()).join();
-    if (code.length < 6 || code.contains('')) {
-      showDialog(
-        context: context,
-        builder:
-            (_) => const OtpErrorDialog(
-              title: 'Invalid code',
-              message: 'Please enter the 6-digit verification code.',
-              buttonText: 'OK',
-            ),
-      );
+    // For now skip backend verification. If all fields are filled, navigate
+    // to the DOP option screen. The button is already enabled only when
+    // each field has one character, so this is a safe local bypass.
+    final allFilled = _codeControllers.every((c) => c.text.trim().isNotEmpty);
+
+    if (allFilled) {
+      Get.offNamed(AppRoutes.dopOption);
       return;
     }
-    // TODO: verify code with backend; for now just pop
-    Navigator.of(context).pop();
+
+    showDialog(
+      context: context,
+      builder:
+          (_) => const OtpErrorDialog(
+            title: 'Invalid code',
+            message: 'Please enter the 6-digit verification code.',
+            buttonText: 'OK',
+          ),
+    );
   }
 
   @override
@@ -94,6 +99,9 @@ class _OtpScreenState extends State<OtpScreen> {
               OtpActions(
                 onNext: _submitOtp,
                 height: Responsive.scaleClamped(context, 64, 48, 80),
+                enabled: _codeControllers.every(
+                  (c) => c.text.trim().length == 1,
+                ),
               ),
             ],
           ),

@@ -9,4 +9,5 @@ class AppAssets {
   static const google = 'assets/images/logo/google.png';
   // Flags
   static const flag = 'assets/images/flag/flag.png';
+  static const dopIllustration = 'assets/images/svg/dop_option.svg';
 }

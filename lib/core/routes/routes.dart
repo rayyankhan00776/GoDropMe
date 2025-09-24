@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:godropme/features/DriverOrParentOption/pages/DOP_option_screen.dart';
 import 'package:godropme/features/onboard/binding/onboard_binding.dart';
 import 'package:godropme/features/onboard/pages/onboard_screen.dart';
 import 'package:godropme/features/Reg-option/pages/option_screen.dart';
@@ -15,6 +16,7 @@ class AppRoutes {
   static const String optionScreen = '/option_screen';
   static const String phoneScreen = '/phone_screen';
   static const String otpScreen = '/otp_screen';
+  static const String dopOption = '/dop_option';
   // static const String register = '/register'; // Example for future screens
 
   static final routes = [
@@ -37,6 +39,11 @@ class AppRoutes {
       name: otpScreen,
       page: () => const OtpScreen(),
       binding: OtpBinding(),
+    ),
+    GetPage(
+      name: dopOption,
+      page: () => const DopOptionScreen(),
+      // binding: DopOptionBinding(), // Uncomment and create binding if needed
     ),
   ];
 }

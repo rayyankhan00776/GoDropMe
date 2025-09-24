@@ -27,7 +27,7 @@ class AppTypography {
 
   // Option screen typography
   static const TextStyle optionHeading = TextStyle(
-    fontSize: 28,
+    fontSize: 27,
     fontWeight: FontWeight.w700,
     color: AppColors.black,
   );
