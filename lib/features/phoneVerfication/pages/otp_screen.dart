@@ -78,21 +78,40 @@ class _OtpScreenState extends State<OtpScreen> {
               OtpHeader(),
               const SizedBox(height: 24),
 
-              // OTP input row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(
-                  6,
-                  (i) => OtpTextField(
-                    controller: _codeControllers[i],
-                    autoFocus: i == 0,
-                    focusNode: _focusNodes[i],
-                    fieldNumber: i,
-                    onChanged: (_) {
-                      setState(() {});
-                    },
-                  ),
-                ),
+              // OTP input row — responsive sizing to avoid overflow on small screens
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  // total horizontal padding already added by parent; compute
+                  // available width for 6 boxes and spacing between them.
+                  final availableWidth = constraints.maxWidth;
+                  // desired spacing between boxes
+                  const gap = 8.0;
+                  // compute box size so 6 boxes + gaps fit into available width
+                  final totalGaps = gap * (6 - 1);
+                  final boxSize = ((availableWidth - totalGaps) / 6).clamp(
+                    40.0,
+                    56.0,
+                  );
+
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(6, (i) {
+                      return SizedBox(
+                        width: boxSize,
+                        child: OtpTextField(
+                          controller: _codeControllers[i],
+                          autoFocus: i == 0,
+                          focusNode: _focusNodes[i],
+                          fieldNumber: i,
+                          size: boxSize,
+                          onChanged: (_) {
+                            setState(() {});
+                          },
+                        ),
+                      );
+                    }),
+                  );
+                },
               ),
 
               const Spacer(),

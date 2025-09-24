@@ -71,6 +71,12 @@ class PhoneTextField extends StatelessWidget {
         border: InputBorder.none,
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        // When this widget is embedded in a custom container (showContainer == false)
+        // we want to suppress the TextFormField's default error text so it doesn't
+        // add extra vertical space. The calling parent (PhoneInputRow) manages
+        // a fixed error area instead.
+        errorStyle:
+            showContainer ? null : const TextStyle(height: 0, fontSize: 0),
       ),
       validator: validator ?? pakistanPhoneValidator,
     );

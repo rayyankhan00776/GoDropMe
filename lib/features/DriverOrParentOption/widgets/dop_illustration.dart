@@ -21,7 +21,11 @@ class DopIllustration extends StatelessWidget {
                 : Responsive.screenHeight(context);
 
         // Prefer width-driven size but cap it by available height (80%).
-        final widthDriven = (screenWidth * 0.75).clamp(180.0, 360.0);
+        // Allow the max to grow on large screens so the illustration
+        // becomes bigger on wide displays while keeping small-screen
+        // behavior intact.
+        final maxClamp = math.max(360.0, screenWidth * 0.45);
+        final widthDriven = (screenWidth * 0.75).clamp(180.0, maxClamp);
         final heightCap = math.max(120.0, maxHeight * 0.8);
         final illustrationSize = math.min(widthDriven, heightCap);
 

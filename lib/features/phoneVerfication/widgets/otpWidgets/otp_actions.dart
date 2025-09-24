@@ -18,16 +18,19 @@ class OtpActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        CustomButton(
-          text: AppStrings.otpverify,
-          onTap: enabled ? onNext : null,
-          height: height,
-          width: double.infinity,
-          borderRadius: BorderRadius.circular(12),
-          textColor: Colors.white,
-          // Visually indicate disabled state
-          gradient: enabled ? null : null,
-          // Optionally, you can add opacity or color change for disabled
+        GestureDetector(
+          onTap: onNext,
+          child: Opacity(
+            opacity: enabled ? 1.0 : 0.55,
+            child: CustomButton(
+              text: AppStrings.otpverify,
+              onTap: enabled ? onNext : onNext,
+              height: height,
+              width: double.infinity,
+              borderRadius: BorderRadius.circular(12),
+              textColor: Colors.white,
+            ),
+          ),
         ),
         const SizedBox(height: 12),
       ],

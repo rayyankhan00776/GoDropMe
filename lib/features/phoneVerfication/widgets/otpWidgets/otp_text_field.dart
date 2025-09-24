@@ -9,6 +9,7 @@ class OtpTextField extends StatefulWidget {
   final int fieldNumber;
   final FocusNode? focusNode;
   final ValueChanged<String>? onChanged;
+  final double size;
   // No longer support raw key events here to avoid Focus reparenting issues.
   // Use onChanged to handle navigation between fields.
 
@@ -19,6 +20,7 @@ class OtpTextField extends StatefulWidget {
     this.fieldNumber = 0,
     this.focusNode,
     this.onChanged,
+    this.size = 56,
   });
 
   @override
@@ -54,9 +56,11 @@ class _OtpTextFieldState extends State<OtpTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final boxSize = widget.size;
+
     return SizedBox(
-      width: 56,
-      height: 56,
+      width: boxSize,
+      height: boxSize,
       child: TextFormField(
         controller: widget.controller,
         focusNode: _focusNode,
@@ -65,7 +69,10 @@ class _OtpTextFieldState extends State<OtpTextField> {
         keyboardType: TextInputType.number,
         maxLength: 1,
         onTapOutside: (event) => FocusScope.of(context).unfocus(),
-        style: AppTypography.onboardTitle.copyWith(fontSize: 22),
+        // Scale font size proportionally so the digit fits well on small boxes
+        style: AppTypography.onboardTitle.copyWith(
+          fontSize: (boxSize * 0.39).clamp(14.0, 22.0),
+        ),
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         decoration: InputDecoration(
           counterText: "",
