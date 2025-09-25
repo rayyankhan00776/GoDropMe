@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/core/routes/routes.dart';
-import 'package:godropme/features/phoneVerfication/pages/otp_screen.dart';
+// ...existing imports
 import 'package:godropme/features/phoneVerfication/widgets/PhoneWidgets/phone_header.dart';
 import 'package:godropme/features/phoneVerfication/widgets/PhoneWidgets/phone_input_row.dart';
 import 'package:godropme/core/widgets/phone_text_field.dart';
@@ -33,12 +33,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
   void _onNextPressed() {
     final valid = _formKey.currentState?.validate() ?? false;
     if (valid) {
-      try {
-        Get.toNamed(AppRoutes.otpScreen);
-      } catch (e) {
-        debugPrint('Named route failed, falling back to direct navigation: $e');
-        Get.to(() => const OtpScreen());
-      }
+      Get.toNamed(AppRoutes.otpScreen);
     } else {
       setState(() {});
     }
