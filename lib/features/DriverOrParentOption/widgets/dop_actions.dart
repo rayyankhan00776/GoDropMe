@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
 import 'package:godropme/core/utils/responsive.dart';

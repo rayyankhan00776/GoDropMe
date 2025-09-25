@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:godropme/features/DriverOrParentOption/binding/dop_binding.dart';
 import 'package:godropme/features/DriverOrParentOption/pages/DOP_option_screen.dart';
 import 'package:godropme/features/onboard/binding/onboard_binding.dart';
 import 'package:godropme/features/onboard/pages/onboard_screen.dart';
@@ -43,7 +44,7 @@ class AppRoutes {
     GetPage(
       name: dopOption,
       page: () => const DopOptionScreen(),
-      // binding: DopOptionBinding(), // Uncomment and create binding if needed
+      binding: DopBinding(),
     ),
   ];
 }
