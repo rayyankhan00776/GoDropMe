@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:godropme/features/DriverOrParentOption/widgets/dop_header.dart';
 import 'package:godropme/features/DriverOrParentOption/widgets/dop_illustration.dart';
 import 'package:godropme/features/DriverOrParentOption/widgets/dop_actions.dart';
+import 'package:godropme/features/DriverOrParentOption/controllers/dop_controller.dart';
 import 'package:godropme/core/utils/responsive.dart';
 
 class DopOptionScreen extends StatelessWidget {
@@ -50,8 +51,16 @@ class DopOptionScreen extends StatelessWidget {
                         ),
 
                         DopActions(
-                          onContinueParent: () {},
-                          onContinueDriver: () {},
+                          onContinueParent: () {
+                            final c = Get.find<DopOptionController>();
+                            c.selectParent();
+                            c.continueWithSelection();
+                          },
+                          onContinueDriver: () {
+                            final c = Get.find<DopOptionController>();
+                            c.selectDriver();
+                            c.continueWithSelection();
+                          },
                         ),
 
                         SizedBox(

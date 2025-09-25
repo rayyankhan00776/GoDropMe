@@ -1,4 +1,4 @@
-package com.example.godropme
+package com.example.godropmee
 
 import io.flutter.embedding.android.FlutterActivity
 

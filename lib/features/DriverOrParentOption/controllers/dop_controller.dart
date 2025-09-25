@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:godropme/core/routes/routes.dart';
 
 /// Simple controller for the Driver or Parent option screen.
 ///
@@ -35,8 +36,17 @@ class DopOptionController extends GetxController {
       return;
     }
 
-    // TODO: integrate navigation to the next screen when ready. Keep this
-    // offline for now and just log the choice.
-    debugPrint('DopOptionController: continuing as ${selected.value}');
+    // Navigate to the appropriate flow based on selection. For driver,
+    // route to the driver name collection screen. For parent flow we can
+    // extend this later when parent routes are available.
+    if (isDriverSelected) {
+      Get.toNamed(AppRoutes.driverName);
+      return;
+    }
+
+    // Parent selection — no dedicated parent route yet; just log for now.
+    debugPrint(
+      'DopOptionController: continuing as ${selected.value} (no parent route configured)',
+    );
   }
 }

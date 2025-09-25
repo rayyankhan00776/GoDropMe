@@ -36,4 +36,9 @@ class AppStrings {
   // Driver or Parent selection strings
   static const dopheading = 'Are you a Parent or a Driver?';
   static const dopsubheading = 'You can change the mode later';
+
+  // Driver name collection strings
+  static const driverNameTitle = 'Welcome to GoDropMe!';
+  static const driverNameSubtitle = 'Please introduce yourself';
+  static const driverNameButton = 'Next';
 }

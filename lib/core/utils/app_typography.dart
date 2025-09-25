@@ -45,7 +45,7 @@ class AppTypography {
   );
 
   static const TextStyle optionTerms = TextStyle(
-    fontSize: 12,
+    fontSize: 15,
     fontWeight: FontWeight.w400,
     color: AppColors.darkGray,
   );
