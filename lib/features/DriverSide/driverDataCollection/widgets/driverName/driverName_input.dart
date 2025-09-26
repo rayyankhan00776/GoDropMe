@@ -8,44 +8,58 @@ import 'package:godropme/core/widgets/custom_text_field.dart';
 class DrivernameInput extends StatelessWidget {
   final TextEditingController controller;
   final double height;
+  final TextValidator? validator;
+  final bool showError;
 
   const DrivernameInput({
     required this.controller,
-    this.height = 64,
+    this.height = 69,
+    this.validator,
+    this.showError = false,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    // final String? errorText = validator?.call(controller.text);
+    // Use provided validator or fallback to non-empty check
+    final TextValidator localValidator =
+        validator ??
+        (v) => v == null || v.trim().isEmpty ? 'Please enter full name' : null;
+
+    // Compute current validation text from controller value so we can
+    // display a fixed-height error area beneath the input like PhoneInputRow.
+    final String? errorText = localValidator.call(controller.text);
+    final String? displayError = showError ? errorText : null;
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CustomTextField(
           controller: controller,
           hintText: 'Full Name',
           height: height,
           borderColor: const Color(0xFF756AED), // primary
-          validator:
-              (v) =>
-                  v == null || v.trim().isEmpty
-                      ? 'Please enter full name'
-                      : null,
+          validator: localValidator,
         ),
         const SizedBox(height: 6),
-        // SizedBox(
-        //   height: 18,
-        //   child: Align(
-        //     alignment: Alignment.center,
-        //     child: Text(
-        //       errorText ?? '',
-        //       style: AppTypography.optionLineSecondary.copyWith(
-        //         color:
-        //             errorText != null ? AppColors.accent : Colors.transparent,
-        //         fontSize: 12,
-        //       ),
-        //     ),
-        //   ),
-        // ),
+
+        // Fixed-height area for validation messages so showing an error does
+        // not resize surrounding widgets. Matches PhoneInputRow behavior.
+        SizedBox(
+          height: 18,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              displayError ?? '',
+              style: TextStyle(
+                color: displayError != null
+                    ? const Color(0xFFFF6B6B)
+                    : Colors.transparent,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }

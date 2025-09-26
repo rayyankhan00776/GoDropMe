@@ -21,6 +21,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
   final _controller = TextEditingController();
   final String _selectedCode = '+92';
   final _formKey = GlobalKey<FormState>();
+  bool _submitted = false;
 
   @override
   void dispose() {
@@ -31,11 +32,10 @@ class _PhoneScreenState extends State<PhoneScreen> {
   // Using centralized validator from PhoneTextField (pakistanPhoneValidator)
 
   void _onNextPressed() {
+    setState(() => _submitted = true);
     final valid = _formKey.currentState?.validate() ?? false;
     if (valid) {
       Get.toNamed(AppRoutes.otpScreen);
-    } else {
-      setState(() {});
     }
   }
 
@@ -67,6 +67,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                   selectedCode: _selectedCode,
                   validator: pakistanPhoneValidator,
                   height: Responsive.scaleClamped(context, 56, 44, 66),
+                  showError: _submitted,
                 ),
               ),
               const Spacer(),

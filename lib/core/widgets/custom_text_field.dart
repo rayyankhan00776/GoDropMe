@@ -39,6 +39,11 @@ class CustomTextField extends StatelessWidget {
       controller: controller,
       keyboardType: TextInputType.text,
       style: AppTypography.optionLineSecondary.copyWith(color: AppColors.black),
+      // Keep the text vertically centered inside the fixed-height container
+      // so validation state changes won't adjust the container size.
+      textAlignVertical: TextAlignVertical.center,
+      expands: false,
+      maxLines: 1,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: AppTypography.optionTerms.copyWith(
@@ -46,9 +51,17 @@ class CustomTextField extends StatelessWidget {
         ),
         border: InputBorder.none,
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        // Remove inner content padding so the surrounding Container fully
+        // controls sizing. Also hide any inline error text by making it
+        // transparent; we show errors in an external fixed area below.
+        contentPadding: EdgeInsets.zero,
+        errorStyle: const TextStyle(height: 0, color: Colors.transparent),
+        errorMaxLines: 1,
       ),
       validator: validator ?? nonEmptyValidator,
+      // Prevent the TextFormField from showing its own inline error text —
+      // we render validation messages in an external fixed box instead.
+      autovalidateMode: AutovalidateMode.disabled,
     );
 
     if (!showContainer) return input;
@@ -60,6 +73,7 @@ class CustomTextField extends StatelessWidget {
         border: Border.all(color: borderColor, width: 2),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12),
+      alignment: Alignment.center,
       child: Row(children: [Expanded(child: input)]),
     );
   }

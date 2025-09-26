@@ -14,6 +14,7 @@ class PhoneInputRow extends StatelessWidget {
   final ValueChanged<String>? onCodeChanged;
   final double height;
   final PhoneValidator? validator;
+  final bool showError;
 
   const PhoneInputRow({
     required this.controller,
@@ -21,6 +22,7 @@ class PhoneInputRow extends StatelessWidget {
     this.onCodeChanged,
     this.height = 56,
     this.validator,
+    this.showError = false,
     super.key,
   });
 
@@ -29,6 +31,7 @@ class PhoneInputRow extends StatelessWidget {
     // Compute current validation message without calling FormState so we can
     // render a fixed-size error area below the input and avoid layout jumps.
     final String? errorText = validator?.call(controller.text);
+    final String? displayError = showError ? errorText : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,10 +84,11 @@ class PhoneInputRow extends StatelessWidget {
           child: Align(
             alignment: Alignment.center,
             child: Text(
-              errorText ?? '',
+              displayError ?? '',
               style: AppTypography.optionLineSecondary.copyWith(
-                color:
-                    errorText != null ? AppColors.accent : Colors.transparent,
+                color: displayError != null
+                    ? AppColors.accent
+                    : Colors.transparent,
                 fontSize: 12,
               ),
             ),

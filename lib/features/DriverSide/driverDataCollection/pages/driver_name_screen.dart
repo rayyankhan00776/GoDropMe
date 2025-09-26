@@ -17,12 +17,20 @@ class DriverNameScreen extends StatefulWidget {
 class _DriverNameScreenState extends State<DriverNameScreen> {
   final _formKey = GlobalKey<FormState>();
   final _textController = TextEditingController();
+  bool _submitted = false;
 
   @override
   void initState() {
     super.initState();
     // Ensure binding is initialized (safe if already added to routes)
     DriverNameBinding().dependencies();
+
+    // When the user has already submitted and there is an error, we want to
+    // update the spacing as they type so the error area can disappear and
+    // spacing shrink without needing another button press.
+    _textController.addListener(() {
+      if (_submitted) setState(() {});
+    });
   }
 
   @override
@@ -55,23 +63,46 @@ class _DriverNameScreenState extends State<DriverNameScreen> {
 
               Form(
                 key: _formKey,
-                child: DrivernameInput(controller: _textController),
+                child: DrivernameInput(
+                  controller: _textController,
+                  showError: _submitted,
+                ),
               ),
 
-              const SizedBox(height: 24),
+              // Compute whether the driver name input currently has an error
+              // that should be shown (only after user pressed Next).
+              Builder(
+                builder: (context) {
+                  String? validator(String? v) => v == null || v.trim().isEmpty
+                      ? 'Please enter full name'
+                      : null;
+                  final String? errorText = _submitted
+                      ? validator(_textController.text)
+                      : null;
+                  final double gap = errorText != null ? 27.0 : 10.0;
 
-              DrivernameAction(
-                onNext: () async {
-                  final valid = _formKey.currentState?.validate() ?? false;
-                  if (!valid) return;
+                  return Column(
+                    children: [
+                      SizedBox(height: gap),
 
-                  final c = Get.find<DriverNameController>();
-                  c.setName(_textController.text.trim());
-                  await c.saveName();
-                  // For now just go back once saved
-                  Get.back();
+                      DrivernameAction(
+                        onNext: () async {
+                          setState(() => _submitted = true);
+                          final valid =
+                              _formKey.currentState?.validate() ?? false;
+                          if (!valid) return;
+
+                          final c = Get.find<DriverNameController>();
+                          c.setName(_textController.text.trim());
+                          await c.saveName();
+                          // For now just go back once saved
+                          Get.back();
+                        },
+                        height: Responsive.scaleClamped(context, 64, 48, 80),
+                      ),
+                    ],
+                  );
                 },
-                height: Responsive.scaleClamped(context, 64, 48, 80),
               ),
             ],
           ),
