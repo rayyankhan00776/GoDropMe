@@ -31,7 +31,7 @@ class VehicleSelectionItem extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 26,
-              backgroundColor: AppColors.lightGray.withOpacity(0.15),
+              backgroundColor: AppColors.transparent,
               child: SvgPicture.asset(
                 asset,
                 width: 48,

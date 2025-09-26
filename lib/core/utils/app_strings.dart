@@ -46,4 +46,7 @@ class AppStrings {
   static const chooseVehicleTitle = 'Choose your vehicle';
   static const vehicleCar = 'Car';
   static const vehicleRickshaw = 'Rikshaw';
+
+  // Personal info collection strings
+  static const personalInfoTitle = 'Personal Information';
 }

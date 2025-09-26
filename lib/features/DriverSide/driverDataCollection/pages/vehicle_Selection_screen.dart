@@ -1,7 +1,9 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:godropme/core/routes/routes.dart';
 import 'package:godropme/core/widgets/custom_Appbar.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/controllers/vehicle_selection_controller.dart';
 import 'package:godropme/core/utils/app_assets.dart';
 import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/utils/app_typography.dart';
@@ -13,6 +15,7 @@ class VehicleSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<VehicleSelectionController>();
     return Scaffold(
       appBar: const CustomBlurAppBar(),
       body: Padding(
@@ -24,7 +27,7 @@ class VehicleSelectionScreen extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
-                onPressed: () => Get.back(),
+                onPressed: () => Get.offNamed(AppRoutes.driverName),
                 icon: const Icon(
                   Icons.arrow_back_ios,
                   size: 25,
@@ -53,13 +56,21 @@ class VehicleSelectionScreen extends StatelessWidget {
                 VehicleSelectionItem(
                   asset: AppAssets.carSvg,
                   label: AppStrings.vehicleCar,
-                  onTap: () {},
+                  onTap: () {
+                    controller.select(AppStrings.vehicleCar);
+                    // Navigate to personal info screen
+                    Get.offNamed(AppRoutes.personalInfo);
+                  },
                 ),
                 const SizedBox(height: 12),
                 VehicleSelectionItem(
                   asset: AppAssets.rickshawSvg,
                   label: AppStrings.vehicleRickshaw,
-                  onTap: () {},
+                  onTap: () {
+                    controller.select(AppStrings.vehicleRickshaw);
+                    // Navigate to personal info screen
+                    Get.offNamed(AppRoutes.personalInfo);
+                  },
                 ),
               ],
             ),

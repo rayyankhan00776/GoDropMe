@@ -24,6 +24,7 @@ class AppColors {
   static const Color accent = Color(0xFFFC6752);
 
   // Neutral Colors
+  static const Color lightGreen = Color.fromARGB(255, 24, 146, 146);
   static const Color black = Color(0xFF383838);
   static const Color darkGray = Color(0xFF50565A);
   static const Color gray = Color(0xFF77808D);
@@ -33,6 +34,7 @@ class AppColors {
   // Semantic Colors
   static const Color success = Color(0xFF34DFDD);
   static const Color warning = Color(0xFFFFB461);
+  static const Color transparent = Colors.transparent;
 
   // Other Gradients
   static const List<Color> gradientBlue = [
