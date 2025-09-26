@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:godropme/core/routes/routes.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverName/driverName_action.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverName/driverName_header.dart';
@@ -96,7 +97,7 @@ class _DriverNameScreenState extends State<DriverNameScreen> {
                           c.setName(_textController.text.trim());
                           await c.saveName();
                           // For now just go back once saved
-                          Get.back();
+                          Get.offNamed(AppRoutes.vehicleSelection);
                         },
                         height: Responsive.scaleClamped(context, 64, 48, 80),
                       ),

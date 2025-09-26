@@ -41,4 +41,9 @@ class AppStrings {
   static const driverNameTitle = 'Welcome to GoDropMe!';
   static const driverNameSubtitle = 'Please introduce yourself';
   static const driverNameButton = 'Next';
+
+  // Vehicle selection
+  static const chooseVehicleTitle = 'Choose your vehicle';
+  static const vehicleCar = 'Car';
+  static const vehicleRickshaw = 'Rikshaw';
 }

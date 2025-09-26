@@ -10,4 +10,7 @@ class AppAssets {
   // Flags
   static const flag = 'assets/images/flag/flag.png';
   static const dopIllustration = 'assets/images/svg/dop_option.svg';
+  // Vehicle selection svgs
+  static const carSvg = 'assets/images/svg/car.svg';
+  static const rickshawSvg = 'assets/images/svg/rikshaw.svg';
 }
