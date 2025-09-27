@@ -54,8 +54,16 @@ class AppStrings {
   static const personalInfoHelpLine2 = 'No filter, sunglasses or masks';
   static const personalInfoTakeNewPicture = 'Take a new picture';
 
+  // Personal info helper texts
+  static const personalInfoImageLabel = 'Personal information';
+  static const personalInfoCnicNote =
+      'Please fill the name according to the CNIC';
+
   // Personal info form hints
   static const firstNameHint = 'First Name';
   static const surNameHint = 'Sur Name';
   static const lastNameHint = 'Last Name';
+
+  // Validation messages
+  static const firstNameRequired = 'Please enter first name';
 }

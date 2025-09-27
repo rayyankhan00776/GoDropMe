@@ -6,14 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="344f2811-d295-41ea-8c46-120907b8900d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Flutter/Debug.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Flutter/Debug.xcconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Flutter/Release.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Flutter/Release.xcconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/widgets/custom_image_container.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/widgets/custom_image_container.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/core/routes/routes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/routes/routes.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/core/utils/app_strings.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/utils/app_strings.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/personal_info_Screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/personal_info_Screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/widgets/personalInfo/personalinfo_help_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/widgets/personalInfo/personalinfo_help_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/widgets/personalInfo/personalinfo_form.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/widgets/personalInfo/personalinfo_form.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,9 +35,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="33HW1hOennBef5AQ92qTeO4ZBaw" />
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1" />
@@ -55,20 +51,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/muhammadrayyan/fluuter app/portfolio/FYP/godropmee"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/muhammadrayyan/fluuter app/portfolio/FYP/godropmee&quot;
   }
-}]]></component>
+}</component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="344f2811-d295-41ea-8c46-120907b8900d" name="Changes" comment="" />

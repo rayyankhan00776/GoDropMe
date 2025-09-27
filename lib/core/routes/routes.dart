@@ -5,6 +5,7 @@ import 'package:godropme/features/DriverSide/driverDataCollection/pages/driver_l
 import 'package:godropme/features/DriverSide/driverDataCollection/pages/driver_name_screen.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/binding/driver_name_binding.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/pages/personal_info_Screen.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/binding/personal_info_binding.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/pages/vehicle_Selection_screen.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/binding/vehicle_selection_binding.dart';
 import 'package:godropme/features/onboard/binding/onboard_binding.dart';
@@ -69,7 +70,7 @@ class AppRoutes {
     GetPage(
       name: personalInfo,
       page: () => const PersonalInfoScreen(),
-      // binding: PersonalInfoBinding(), // Uncomment and create binding if needed
+      binding: PersonalInfoBinding(),
     ),
     GetPage(
       name: driverLicence,
