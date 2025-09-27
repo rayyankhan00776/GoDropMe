@@ -49,4 +49,13 @@ class AppStrings {
 
   // Personal info collection strings
   static const personalInfoTitle = 'Personal Information';
+  static const help = 'Help';
+  static const personalInfoHelpLine1 = 'Take a clear picture in a good light';
+  static const personalInfoHelpLine2 = 'No filter, sunglasses or masks';
+  static const personalInfoTakeNewPicture = 'Take a new picture';
+
+  // Personal info form hints
+  static const firstNameHint = 'First Name';
+  static const surNameHint = 'Sur Name';
+  static const lastNameHint = 'Last Name';
 }

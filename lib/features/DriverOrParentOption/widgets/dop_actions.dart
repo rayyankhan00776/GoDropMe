@@ -36,7 +36,7 @@ class DopActions extends StatelessWidget {
             width: buttonWidth,
             // Use default gradient from CustomButton (primary colors)
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
           // White button variant: use CustomButton but override decoration via
           // providing a plain container via gradient=null and textColor.
           SizedBox(

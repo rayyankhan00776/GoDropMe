@@ -60,7 +60,7 @@ class _DriverNameScreenState extends State<DriverNameScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DrivernameHeader(),
-              const SizedBox(height: 30),
+              SizedBox(height: Responsive.scaleClamped(context, 30, 18, 40)),
 
               Form(
                 key: _formKey,
@@ -84,7 +84,9 @@ class _DriverNameScreenState extends State<DriverNameScreen> {
 
                   return Column(
                     children: [
-                      SizedBox(height: gap),
+                      SizedBox(
+                        height: Responsive.scaleClamped(context, gap, 8, 40),
+                      ),
 
                       DrivernameAction(
                         onNext: () async {

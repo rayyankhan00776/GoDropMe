@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/responsive.dart';
 
 class DopHeader extends StatelessWidget {
   final String? title;
@@ -31,7 +32,7 @@ class DopHeader extends StatelessWidget {
                   ),
                 ),
               ),
-            const SizedBox(height: 6),
+            SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
             if ((subtitle ?? AppStrings.dopsubheading).isNotEmpty)
               SizedBox(
                 width: maxW,

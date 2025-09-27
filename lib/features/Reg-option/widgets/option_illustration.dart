@@ -20,10 +20,9 @@ class OptionIllustration extends StatelessWidget {
     // maxHeight offered by the parent and limit the artwork accordingly.
     return LayoutBuilder(
       builder: (context, constraints) {
-        final maxHeight =
-            constraints.maxHeight.isFinite
-                ? constraints.maxHeight
-                : Responsive.screenHeight(context);
+        final maxHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : Responsive.screenHeight(context);
         // Prefer width-driven size but cap it by available height (60%).
         final widthDriven = (screenWidth * 0.65).clamp(220.0, 340.0);
         final heightCap = math.max(120.0, maxHeight * 0.6);
@@ -39,7 +38,7 @@ class OptionIllustration extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
             Text(
               AppStrings.optionLine1,
               textAlign: TextAlign.center,
@@ -47,7 +46,7 @@ class OptionIllustration extends StatelessWidget {
                 fontSize: headingFontSize,
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
             Text(
               AppStrings.optionLine2,
               textAlign: TextAlign.center,

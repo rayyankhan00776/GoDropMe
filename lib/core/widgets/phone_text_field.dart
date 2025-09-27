@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/responsive.dart';
 
 typedef PhoneValidator = String? Function(String? value);
 
@@ -75,8 +76,9 @@ class PhoneTextField extends StatelessWidget {
         // we want to suppress the TextFormField's default error text so it doesn't
         // add extra vertical space. The calling parent (PhoneInputRow) manages
         // a fixed error area instead.
-        errorStyle:
-            showContainer ? null : const TextStyle(height: 0, fontSize: 0),
+        errorStyle: showContainer
+            ? null
+            : const TextStyle(height: 0, fontSize: 0),
       ),
       validator: validator ?? pakistanPhoneValidator,
     );
@@ -84,15 +86,20 @@ class PhoneTextField extends StatelessWidget {
     if (!showContainer) return input;
 
     return Container(
-      height: height,
+      height: Responsive.scaleClamped(context, height, 40, 80),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.primary, width: 2),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: Responsive.scaleClamped(context, 8, 6, 14),
+      ),
       child: Row(
         children: [
-          if (prefix != null) ...[prefix!, const SizedBox(width: 8)],
+          if (prefix != null) ...[
+            prefix!,
+            SizedBox(width: Responsive.scaleClamped(context, 8, 6, 14)),
+          ],
           Expanded(child: input),
         ],
       ),

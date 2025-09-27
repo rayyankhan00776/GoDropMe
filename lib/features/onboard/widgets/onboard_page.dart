@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:math' as math;
 import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/routes/routes.dart';
@@ -59,7 +60,7 @@ class OnboardPage extends StatelessWidget {
                     child: Image.asset(image, fit: BoxFit.contain),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: Responsive.scaleClamped(context, 16, 12, 24)),
                 Text(
                   title,
                   style:
@@ -72,7 +73,7 @@ class OnboardPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 if (subtitle.isNotEmpty) ...[
-                  const SizedBox(height: 8),
+                  SizedBox(height: Responsive.scaleClamped(context, 8, 6, 12)),
                   Text(
                     subtitle,
                     style:
@@ -111,12 +112,12 @@ class OnboardPage extends StatelessWidget {
                     16,
                     60,
                   );
-                  final btnWidth = (Responsive.screenWidth(context) -
-                          horizontalMargin * 2)
-                      .clamp(180.0, Responsive.screenWidth(context));
+                  final btnWidth =
+                      (Responsive.screenWidth(context) - horizontalMargin * 2)
+                          .clamp(180.0, Responsive.screenWidth(context));
 
                   return CustomButton(
-                    text: 'Get Started',
+                    text: AppStrings.onboardButton,
                     onTap: () {
                       Get.offAllNamed(AppRoutes.optionScreen);
                     },

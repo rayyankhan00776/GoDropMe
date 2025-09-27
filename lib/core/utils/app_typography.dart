@@ -49,4 +49,17 @@ class AppTypography {
     fontWeight: FontWeight.w400,
     color: AppColors.darkGray,
   );
+
+  // Personal info helper styles
+  static const TextStyle personalInfoHelper = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    color: AppColors.black,
+  );
+
+  static const TextStyle helpButton = TextStyle(
+    color: AppColors.primary,
+    fontSize: 21,
+    fontWeight: FontWeight.w500,
+  );
 }

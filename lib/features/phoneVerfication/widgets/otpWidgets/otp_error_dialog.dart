@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
 
 /// A small reusable alert dialog used by the OTP flow.
@@ -58,7 +59,7 @@ class OtpErrorDialog extends StatelessWidget {
                     color: AppColors.white,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: Responsive.scaleClamped(context, 12, 8, 18)),
                 Expanded(
                   child: Text(
                     title,
@@ -70,14 +71,14 @@ class OtpErrorDialog extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
             Text(
               message,
               style: AppTypography.onboardSubtitle.copyWith(
                 color: AppColors.darkGray,
               ),
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: Responsive.scaleClamped(context, 18, 12, 28)),
             SizedBox(
               height: 52,
               child: CustomButton(

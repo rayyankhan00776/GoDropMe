@@ -9,6 +9,7 @@ import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/vehicleSelection/vehicle_selection_item.dart';
+import 'package:godropme/core/utils/responsive.dart';
 
 class VehicleSelectionScreen extends StatelessWidget {
   const VehicleSelectionScreen({super.key});
@@ -37,7 +38,7 @@ class VehicleSelectionScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 8),
+            SizedBox(height: Responsive.scaleClamped(context, 8, 6, 12)),
 
             // Title (shifted slightly to the right)
             Padding(
@@ -48,7 +49,7 @@ class VehicleSelectionScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 18),
+            SizedBox(height: Responsive.scaleClamped(context, 18, 12, 28)),
 
             // Vehicle options as vertical tiles (no border)
             Column(
@@ -62,7 +63,7 @@ class VehicleSelectionScreen extends StatelessWidget {
                     Get.offNamed(AppRoutes.personalInfo);
                   },
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
                 VehicleSelectionItem(
                   asset: AppAssets.rickshawSvg,
                   label: AppStrings.vehicleRickshaw,

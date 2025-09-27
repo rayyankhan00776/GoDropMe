@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
 import 'package:godropme/core/utils/app_strings.dart';
 
@@ -22,7 +23,7 @@ class DrivernameAction extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           textColor: Colors.white,
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
       ],
     );
   }

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/widgets/phone_text_field.dart';
 import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/regix/pakistan_number_formatter.dart';
@@ -50,7 +51,7 @@ class PhoneInputRow extends StatelessWidget {
                 width: height * 0.6,
                 height: height * 0.6,
               ),
-              const SizedBox(width: 15),
+              SizedBox(width: Responsive.scaleClamped(context, 15, 8, 28)),
               // country code removed (we show +92 inside the text field)
               Expanded(
                 child: PhoneTextField(
@@ -78,7 +79,7 @@ class PhoneInputRow extends StatelessWidget {
         // Fixed-height area for validation messages so showing an error does
         // not resize surrounding widgets. We intentionally keep the height
         // small and consistent with typical form error text.
-        const SizedBox(height: 6),
+        SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
         SizedBox(
           height: 18,
           child: Align(

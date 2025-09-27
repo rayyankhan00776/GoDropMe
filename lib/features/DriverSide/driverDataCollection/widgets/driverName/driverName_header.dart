@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/responsive.dart';
 
 class DrivernameHeader extends StatelessWidget {
   final String? title;
@@ -19,7 +20,7 @@ class DrivernameHeader extends StatelessWidget {
             title ?? AppStrings.driverNameTitle,
             style: AppTypography.optionHeading,
           ),
-        const SizedBox(height: 2),
+        SizedBox(height: Responsive.scaleClamped(context, 2, 1, 6)),
         if ((subtitle ?? AppStrings.driverNameSubtitle).isNotEmpty)
           Text(
             subtitle ?? AppStrings.driverNameSubtitle,

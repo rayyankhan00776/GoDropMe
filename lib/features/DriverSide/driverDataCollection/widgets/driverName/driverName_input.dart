@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:godropme/core/utils/responsive.dart';
 // import 'package:godropme/core/theme/colors.dart';
 // import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/widgets/custom_text_field.dart';
@@ -41,7 +42,7 @@ class DrivernameInput extends StatelessWidget {
           borderColor: const Color(0xFF756AED), // primary
           validator: localValidator,
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
 
         // Fixed-height area for validation messages so showing an error does
         // not resize surrounding widgets. Matches PhoneInputRow behavior.

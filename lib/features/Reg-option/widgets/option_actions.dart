@@ -32,7 +32,7 @@ class OptionActions extends StatelessWidget {
             height: buttonHeight,
             width: buttonWidth,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
           GoogleButton(
             text: AppStrings.continueWithGoogle,
             onTap: onContinueGoogle,

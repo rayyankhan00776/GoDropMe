@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/responsive.dart';
 
 class PhoneHeader extends StatelessWidget {
   final String? title;
@@ -18,7 +19,7 @@ class PhoneHeader extends StatelessWidget {
             title ?? AppStrings.phoneTitle,
             style: AppTypography.optionHeading,
           ),
-        const SizedBox(height: 2),
+        SizedBox(height: Responsive.scaleClamped(context, 2, 1, 6)),
         if ((subtitle ?? AppStrings.phoneSubtitle).isNotEmpty)
           Text(
             subtitle ?? AppStrings.phoneSubtitle,

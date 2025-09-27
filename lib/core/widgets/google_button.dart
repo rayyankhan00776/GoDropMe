@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/theme/colors.dart';
 
 /// A white-background button used for "Continue with Google".
@@ -47,7 +48,12 @@ class GoogleButton extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (leading != null) ...[leading!, const SizedBox(width: 12)],
+                  if (leading != null) ...[
+                    leading!,
+                    SizedBox(
+                      width: Responsive.scaleClamped(context, 12, 8, 20),
+                    ),
+                  ],
                   Text(
                     text,
                     style: AppTypography.onboardButton.copyWith(

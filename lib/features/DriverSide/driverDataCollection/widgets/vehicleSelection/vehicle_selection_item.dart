@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/responsive.dart';
 
 class VehicleSelectionItem extends StatelessWidget {
   final String asset;
@@ -39,7 +40,7 @@ class VehicleSelectionItem extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: Responsive.scaleClamped(context, 12, 8, 20)),
             Expanded(
               child: Text(label, style: AppTypography.optionLineSecondary),
             ),
