@@ -7,11 +7,43 @@ import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/utils/app_strings.dart';
+import 'package:image_picker/image_picker.dart';
 
-class PersonalinfoHelpScreen extends StatelessWidget {
+class PersonalinfoHelpScreen extends StatefulWidget {
   final String imagePath;
 
   const PersonalinfoHelpScreen({super.key, required this.imagePath});
+
+  @override
+  State<PersonalinfoHelpScreen> createState() => _PersonalinfoHelpScreenState();
+}
+
+class _PersonalinfoHelpScreenState extends State<PersonalinfoHelpScreen> {
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _takeNewPicture() async {
+    try {
+      final XFile? file = await _picker.pickImage(
+        source: ImageSource.camera,
+        preferredCameraDevice: CameraDevice.front,
+        imageQuality: 85,
+        maxWidth: 1200,
+        maxHeight: 1600,
+      );
+
+      if (file != null) {
+        // Return the file path to the caller
+        if (mounted) Navigator.of(context).pop(file.path);
+      }
+    } catch (e) {
+      // If permission denied or camera error, show a simple snackbar and stay
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Unable to open camera: $e')));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +111,7 @@ class PersonalinfoHelpScreen extends StatelessWidget {
             // Image preview container (re-using CustomImageContainer in read-only mode)
             Center(
               child: CustomImageContainer(
-                imagePath: imagePath,
+                imagePath: widget.imagePath,
                 width: 280,
                 height: 280,
                 onTap: null,
@@ -92,7 +124,7 @@ class PersonalinfoHelpScreen extends StatelessWidget {
             // Take a new picture button
             CustomButton(
               text: AppStrings.personalInfoTakeNewPicture,
-              onTap: () {},
+              onTap: _takeNewPicture,
               height: 59,
               borderRadius: BorderRadius.circular(12),
             ),

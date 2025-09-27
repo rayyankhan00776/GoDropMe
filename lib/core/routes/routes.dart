@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:godropme/features/DriverOrParentOption/binding/dop_binding.dart';
 import 'package:godropme/features/DriverOrParentOption/pages/DOP_option_screen.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/pages/driver_licence_screen.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/pages/driver_name_screen.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/binding/driver_name_binding.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/pages/personal_info_Screen.dart';
@@ -26,6 +27,7 @@ class AppRoutes {
   static const String driverName = '/driver_name';
   static const String vehicleSelection = '/vehicle_selection';
   static const String personalInfo = '/personal_info';
+  static const String driverLicence = '/driver_licence';
   // static const String register = '/register'; // Example for future screens
 
   static final routes = [
@@ -67,6 +69,11 @@ class AppRoutes {
     GetPage(
       name: personalInfo,
       page: () => const PersonalInfoScreen(),
+      // binding: PersonalInfoBinding(), // Uncomment and create binding if needed
+    ),
+    GetPage(
+      name: driverLicence,
+      page: () => const DriverLicenceScreen(),
       // binding: PersonalInfoBinding(), // Uncomment and create binding if needed
     ),
   ];

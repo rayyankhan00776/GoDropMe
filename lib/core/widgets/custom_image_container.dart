@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 /// A small reusable image container used across the app.
@@ -35,7 +37,12 @@ class CustomImageContainer extends StatelessWidget {
           borderRadius: borderRadius ?? BorderRadius.circular(7),
           image: imagePath != null
               ? DecorationImage(
-                  image: AssetImage(imagePath!),
+                  // If the path looks like an asset path (starts with 'assets/'),
+                  // use AssetImage. Otherwise assume it's a file path from the
+                  // camera and use FileImage.
+                  image: imagePath!.startsWith('assets/')
+                      ? AssetImage(imagePath!) as ImageProvider
+                      : FileImage(File(imagePath!)),
                   fit: BoxFit.cover,
                 )
               : null,

@@ -9,10 +9,10 @@ import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/utils/app_assets.dart';
 import 'package:godropme/core/widgets/custom_Appbar.dart';
 import 'package:godropme/core/utils/responsive.dart';
-import 'package:godropme/core/widgets/custom_image_container.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/personalinfo/personalinfo_help_screen.dart';
-import 'package:godropme/core/widgets/custom_text_field.dart';
 import 'package:godropme/core/widgets/progress_next_bar.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/widgets/personalInfo/personalinfo_image.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/widgets/personalInfo/personalinfo_form.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   const PersonalInfoScreen({super.key});
@@ -22,6 +22,19 @@ class PersonalInfoScreen extends StatefulWidget {
 }
 
 class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  String? _selectedImagePath;
+  bool _submitted = false;
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,34 +94,33 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
-                    child: CustomImageContainer(
-                      imagePath: null,
-                      onTap: () {
-                        Get.to(
-                          () => const PersonalinfoHelpScreen(
+                    child: PersonalinfoImage(
+                      imagePath: _selectedImagePath,
+                      onTap: () async {
+                        final result = await Get.to(
+                          () => PersonalinfoHelpScreen(
                             imagePath: AppAssets.samplePerson,
                           ),
                         );
+
+                        if (result is String && mounted) {
+                          setState(() {
+                            _selectedImagePath = result;
+                          });
+                        }
                       },
+                      showError: _submitted && _selectedImagePath == null,
                     ),
                   ),
                   SizedBox(
                     height: Responsive.scaleClamped(context, 24, 16, 36),
                   ),
-                  // Form fields for personal info (name, email, phone)
-                  CustomTextField(
-                    hintText: AppStrings.firstNameHint,
-                    borderColor: AppColors.gray,
-                  ),
-                  SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
-                  CustomTextField(
-                    hintText: AppStrings.surNameHint,
-                    borderColor: AppColors.gray,
-                  ),
-                  SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
-                  CustomTextField(
-                    hintText: AppStrings.lastNameHint,
-                    borderColor: AppColors.gray,
+                  // Form fields for personal info (first name optional, last name required)
+                  PersonalinfoForm(
+                    formKey: _formKey,
+                    firstNameController: _firstNameController,
+                    lastNameController: _lastNameController,
+                    showSubmittedErrors: _submitted,
                   ),
                 ],
               ),
@@ -120,7 +132,18 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           ProgressNextBar(
             currentStep: 1,
             totalSteps: 4,
-            onNext: null,
+            onNext: () async {
+              setState(() => _submitted = true);
+
+              final bool formValid = _formKey.currentState?.validate() ?? false;
+              final bool hasImage = _selectedImagePath != null;
+
+              if (!formValid || !hasImage) return;
+
+              // All good: save data or navigate to the next screen
+              // For now just navigate to Driver Licence step
+              Get.toNamed(AppRoutes.driverLicence);
+            },
             onPrevious: null,
             previousBackgroundColor: Colors.grey.shade100,
             previousIconColor: Colors.grey.shade400,
