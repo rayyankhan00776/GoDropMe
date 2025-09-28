@@ -66,4 +66,7 @@ class AppStrings {
 
   // Validation messages
   static const firstNameRequired = 'Please enter first name';
+
+  // Driver licence collection strings
+  static const driverLicenceTitle = 'Driver Licence';
 }

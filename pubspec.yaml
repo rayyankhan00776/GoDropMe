@@ -43,7 +43,7 @@ flutter:
     - assets/images/svg/
     - assets/images/logo/
     - assets/images/flag/
-    - assets/images/realpictures/
+    - assets/images/sample/
   #---------------------- ./ LOCAL ASSETS END ----------------------#
 
   #---------------------- LOCAL FONTS ----------------------#

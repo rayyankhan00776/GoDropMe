@@ -14,5 +14,5 @@ class AppAssets {
   static const carSvg = 'assets/images/svg/car.svg';
   static const rickshawSvg = 'assets/images/svg/rikshaw.svg';
   // Real pictures
-  static const samplePerson = 'assets/images/realpictures/men.jpeg';
+  static const samplePerson = 'assets/images/sample/men.jpeg';
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/core/theme/button_dimensions.dart';
 
 /// A white-background button used for "Continue with Google".
 class GoogleButton extends StatelessWidget {
@@ -15,7 +16,7 @@ class GoogleButton extends StatelessWidget {
     required this.text,
     this.leading,
     this.onTap,
-    this.height = 56,
+    this.height = AppButtonDimensions.primaryHeight,
     this.width = double.infinity,
     super.key,
   });
@@ -27,14 +28,16 @@ class GoogleButton extends StatelessWidget {
       height: height,
       child: Material(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppButtonDimensions.borderRadius),
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppButtonDimensions.borderRadius),
           onTap: onTap,
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(
+                AppButtonDimensions.borderRadius,
+              ),
               border: Border.all(color: Colors.black54, width: 0.5),
               boxShadow: [
                 BoxShadow(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
+import 'package:godropme/core/theme/button_dimensions.dart';
 
 /// A reusable bottom bar that shows a step indicator (e.g. "1 of 4"),
 /// a small previous/rounded icon button and a primary Next button.
@@ -120,7 +121,9 @@ class ProgressNextBar extends StatelessWidget {
               text: 'Next',
               onTap: onNext,
               height: 53,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(
+                AppButtonDimensions.borderRadius,
+              ),
               // ensure primary color gradient is used by overriding gradient
               gradient: const LinearGradient(
                 colors: [AppColors.primaryLight, AppColors.primary],

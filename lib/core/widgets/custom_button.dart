@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/core/theme/button_dimensions.dart';
 
 /// A reusable button widget for the app.
 ///
@@ -21,7 +22,7 @@ class CustomButton extends StatelessWidget {
   const CustomButton({
     required this.text,
     this.onTap,
-    this.height = 56,
+    this.height = AppButtonDimensions.primaryHeight,
     this.width = double.infinity,
     this.gradient,
     this.borderRadius,
@@ -45,7 +46,9 @@ class CustomButton extends StatelessWidget {
                 colors: AppColors.buttonGradient,
               ),
           color: gradient == null ? null : null,
-          borderRadius: borderRadius ?? BorderRadius.circular(20),
+          borderRadius:
+              borderRadius ??
+              BorderRadius.circular(AppButtonDimensions.borderRadius),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF756AED).withOpacity(0.25),

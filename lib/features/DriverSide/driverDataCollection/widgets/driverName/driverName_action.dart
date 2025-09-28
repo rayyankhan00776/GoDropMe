@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
 import 'package:godropme/core/utils/app_strings.dart';
+import 'package:godropme/core/theme/button_dimensions.dart';
 
 class DrivernameAction extends StatelessWidget {
   final VoidCallback onNext;
@@ -20,7 +21,7 @@ class DrivernameAction extends StatelessWidget {
           onTap: onNext,
           height: height,
           width: double.infinity,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppButtonDimensions.borderRadius),
           textColor: Colors.white,
         ),
         SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),

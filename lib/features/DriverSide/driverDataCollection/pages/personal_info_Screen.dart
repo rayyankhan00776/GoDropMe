@@ -54,10 +54,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // allow scaffold to resize when keyboard appears
-      resizeToAvoidBottomInset: true,
+      // keep bottom action stable when keyboard appears
+      resizeToAvoidBottomInset: false,
       appBar: const CustomBlurAppBar(),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Flexible(
             child: SingleChildScrollView(
@@ -165,34 +166,42 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
             ),
           ),
 
-          // Reusable progress + next bar. No navigation wired; callbacks left null so
-          // the user can provide their own handlers later.
-          ProgressNextBar(
-            currentStep: 1,
-            totalSteps: 4,
-            onNext: () async {
-              setState(() => _submitted = true);
+          // Reusable progress + next bar pinned to bottom with 20px padding
+          SafeArea(
+            top: false,
+            left: false,
+            right: false,
+            bottom: true,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: ProgressNextBar(
+                currentStep: 1,
+                totalSteps: 4,
+                onNext: () async {
+                  setState(() => _submitted = true);
 
-              final bool formValid = _formKey.currentState?.validate() ?? false;
-              final bool hasImage = _selectedImagePath != null;
+                  final bool formValid =
+                      _formKey.currentState?.validate() ?? false;
+                  final bool hasImage = _selectedImagePath != null;
 
-              if (!formValid || !hasImage) return;
+                  if (!formValid || !hasImage) return;
 
-              // Sync values into the controller and save (stub)
-              _piController.setFirstName(_firstNameController.text.trim());
-              _piController.setSurName(_surNameController.text.trim());
-              _piController.setLastName(_lastNameController.text.trim());
-              _piController.setImagePath(_selectedImagePath);
-              await _piController.savePersonalInfo();
+                  // Sync values into the controller and save (stub)
+                  _piController.setFirstName(_firstNameController.text.trim());
+                  _piController.setSurName(_surNameController.text.trim());
+                  _piController.setLastName(_lastNameController.text.trim());
+                  _piController.setImagePath(_selectedImagePath);
+                  await _piController.savePersonalInfo();
 
-              // Navigate to next screen
-              Get.toNamed(AppRoutes.driverName);
-            },
-            onPrevious: null,
-            previousBackgroundColor: Colors.grey.shade100,
-            previousIconColor: Colors.grey.shade400,
+                  // Navigate to next screen
+                  Get.toNamed(AppRoutes.driverLicence);
+                },
+                onPrevious: null,
+                previousBackgroundColor: Colors.grey.shade100,
+                previousIconColor: Colors.grey.shade400,
+              ),
+            ),
           ),
-          SizedBox(height: Responsive.scaleClamped(context, 20, 14, 30)),
         ],
       ),
     );
