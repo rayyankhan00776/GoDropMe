@@ -7,8 +7,9 @@ import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/widgets/custom_Appbar.dart';
 import 'package:godropme/core/widgets/progress_next_bar.dart';
-import 'package:godropme/core/widgets/custom_image_container.dart';
-import 'package:godropme/core/widgets/custom_text_field.dart';
+// ...existing widget imports moved to modular widgets
+import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverLicense/licence_image_row.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverLicense/driverlicence_form.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/controllers/driver_licence_controller.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverLicense/licence_image_help_screen.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverLicense/selfie_with_licence_help_screen.dart';
@@ -117,96 +118,37 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                       height: Responsive.scaleClamped(context, 18, 12, 24),
                     ),
 
-                    // Two image containers in a row: licence image and selfie with licence
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CustomImageContainer(
-                                  imagePath: _licenceImagePath,
-                                  width: double.infinity,
-                                  height: 140,
-                                  onTap: () async {
-                                    final result = await Get.to(
-                                      () => LicenceImageHelpScreen(
-                                        imagePath:
-                                            _licenceImagePath ??
-                                            'assets/images/sample/driverLicence.jpg',
-                                      ),
-                                    );
-
-                                    if (result is String && mounted) {
-                                      setState(
-                                        () => _licenceImagePath = result,
-                                      );
-                                      _dlController.setLicenceImagePath(result);
-                                    }
-                                  },
-                                ),
-                                SizedBox(
-                                  height: Responsive.scaleClamped(
-                                    context,
-                                    8,
-                                    6,
-                                    12,
-                                  ),
-                                ),
-                                Text(
-                                  'Licence',
-                                  style: AppTypography.optionTerms,
-                                ),
-                              ],
-                            ),
+                    LicenceImageRow(
+                      licenceImagePath: _licenceImagePath,
+                      selfieImagePath: _selfieImagePath,
+                      onLicenceTap: () async {
+                        final result = await Get.to(
+                          () => LicenceImageHelpScreen(
+                            imagePath:
+                                _licenceImagePath ??
+                                'assets/images/sample/driverLicence.jpg',
                           ),
+                        );
 
-                          SizedBox(width: 12),
-
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CustomImageContainer(
-                                  imagePath: _selfieImagePath,
-                                  width: double.infinity,
-                                  height: 140,
-                                  onTap: () async {
-                                    final result = await Get.to(
-                                      () => SelfieWithLicenceHelpScreen(
-                                        imagePath:
-                                            _selfieImagePath ??
-                                            'assets/images/sample/manwithdrivinglicence.jpg',
-                                      ),
-                                    );
-
-                                    if (result is String && mounted) {
-                                      setState(() => _selfieImagePath = result);
-                                      _dlController.setSelfieWithLicencePath(
-                                        result,
-                                      );
-                                    }
-                                  },
-                                ),
-                                SizedBox(
-                                  height: Responsive.scaleClamped(
-                                    context,
-                                    8,
-                                    6,
-                                    12,
-                                  ),
-                                ),
-                                Text(
-                                  'Selfie with Licence',
-                                  style: AppTypography.optionTerms,
-                                ),
-                              ],
-                            ),
+                        if (result is String && mounted) {
+                          setState(() => _licenceImagePath = result);
+                          _dlController.setLicenceImagePath(result);
+                        }
+                      },
+                      onSelfieTap: () async {
+                        final result = await Get.to(
+                          () => SelfieWithLicenceHelpScreen(
+                            imagePath:
+                                _selfieImagePath ??
+                                'assets/images/sample/manwithdrivinglicence.jpg',
                           ),
-                        ],
-                      ),
+                        );
+
+                        if (result is String && mounted) {
+                          setState(() => _selfieImagePath = result);
+                          _dlController.setSelfieWithLicencePath(result);
+                        }
+                      },
                     ),
 
                     SizedBox(
@@ -222,79 +164,11 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                       ),
                     ),
 
-                    // Form fields: Licence number and expiry date
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomTextField(
-                              controller: _licenceNumberController,
-                              hintText: AppStrings.driverLicenceNumberHint,
-                              borderColor: AppColors.gray,
-                              validator: (v) => v == null || v.trim().isEmpty
-                                  ? 'Please enter licence number'
-                                  : null,
-                            ),
-                            SizedBox(
-                              height: Responsive.scaleClamped(
-                                context,
-                                12,
-                                8,
-                                18,
-                              ),
-                            ),
-                            CustomTextField(
-                              controller: _expiryDateController,
-                              hintText: AppStrings.driverLicenceExpiryHint,
-                              borderColor: AppColors.gray,
-                              validator: (v) => v == null || v.trim().isEmpty
-                                  ? 'Please enter expiry date'
-                                  : null,
-                            ),
-                            SizedBox(
-                              height: Responsive.scaleClamped(
-                                context,
-                                6,
-                                4,
-                                12,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 18,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  _submitted &&
-                                          (_licenceNumberController
-                                                  .text
-                                                  .isEmpty ||
-                                              _expiryDateController
-                                                  .text
-                                                  .isEmpty)
-                                      ? 'Please complete all fields and add images'
-                                      : '',
-                                  style: TextStyle(
-                                    color:
-                                        _submitted &&
-                                            (_licenceNumberController
-                                                    .text
-                                                    .isEmpty ||
-                                                _expiryDateController
-                                                    .text
-                                                    .isEmpty)
-                                        ? const Color(0xFFFF6B6B)
-                                        : Colors.transparent,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    DriverLicenceForm(
+                      formKey: _formKey,
+                      licenceNumberController: _licenceNumberController,
+                      expiryDateController: _expiryDateController,
+                      showSubmittedErrors: _submitted,
                     ),
                   ],
                 ),

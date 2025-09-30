@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/core/widgets/custom_Appbar.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
-import 'package:godropme/core/widgets/custom_image_container.dart';
+import 'dart:io';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/utils/responsive.dart';
@@ -104,12 +104,15 @@ class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
             SizedBox(height: Responsive.scaleClamped(context, 60, 36, 100)),
 
             Center(
-              child: CustomImageContainer(
-                imagePath: widget.imagePath,
-                width: 300,
-                height: 200,
-                onTap: null,
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 300,
+                  height: 200,
+                  child: widget.imagePath.startsWith('assets/')
+                      ? Image.asset(widget.imagePath, fit: BoxFit.contain)
+                      : Image.file(File(widget.imagePath), fit: BoxFit.contain),
+                ),
               ),
             ),
 
