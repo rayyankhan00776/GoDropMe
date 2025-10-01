@@ -14,7 +14,7 @@ class DrivernameInput extends StatelessWidget {
 
   const DrivernameInput({
     required this.controller,
-    this.height = 69,
+    this.height = 56,
     this.validator,
     this.showError = false,
     super.key,

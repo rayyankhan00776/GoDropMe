@@ -26,7 +26,7 @@ class CustomTextField extends StatelessWidget {
     this.controller,
     this.hintText,
     this.validator,
-    this.height = 64,
+    this.height = 56,
     this.showContainer = true,
     this.borderColor = AppColors.primary,
     this.hintColor,
