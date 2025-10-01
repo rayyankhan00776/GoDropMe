@@ -24,7 +24,12 @@ class PersonalinfoImage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CustomImageContainer(imagePath: imagePath, onTap: onTap),
+        CustomImageContainer(
+          width: 190,
+          height: 140,
+          imagePath: imagePath,
+          onTap: onTap,
+        ),
 
         SizedBox(height: Responsive.scaleClamped(context, 8, 6, 12)),
 

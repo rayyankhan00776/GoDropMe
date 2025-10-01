@@ -29,7 +29,7 @@ String? pakistanPhoneValidator(String? value) {
   return null;
 }
 
-class PhoneTextField extends StatelessWidget {
+class CustonPhoneTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;
   final Widget? prefix;
@@ -39,8 +39,9 @@ class PhoneTextField extends StatelessWidget {
   final bool showContainer;
   final Color? hintColor;
   final Color? textColor;
+  final Color? borderColor;
 
-  const PhoneTextField({
+  const CustonPhoneTextField({
     this.controller,
     this.hintText,
     this.prefix,
@@ -50,6 +51,7 @@ class PhoneTextField extends StatelessWidget {
     this.showContainer = true,
     this.hintColor,
     this.textColor,
+    this.borderColor = AppColors.primary,
     super.key,
   });
 
@@ -60,13 +62,13 @@ class PhoneTextField extends StatelessWidget {
       inputFormatters: inputFormatters,
       keyboardType: TextInputType.phone,
       style: AppTypography.optionLineSecondary.copyWith(
-        color: textColor ?? AppColors.white,
+        color: textColor ?? AppColors.black,
       ),
       decoration: InputDecoration(
         hintText: hintText,
         // allow overriding hint color; default to a lighter black and slightly larger size
         hintStyle: AppTypography.optionTerms.copyWith(
-          color: hintColor ?? AppColors.black.withOpacity(0.5),
+          color: hintColor ?? AppColors.darkGray,
           fontSize: (AppTypography.optionTerms.fontSize ?? 12) + 1,
         ),
         border: InputBorder.none,
@@ -89,7 +91,7 @@ class PhoneTextField extends StatelessWidget {
       height: Responsive.scaleClamped(context, height, 40, 80),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary, width: 2),
+        border: Border.all(color: borderColor ?? AppColors.primary, width: 2),
       ),
       padding: EdgeInsets.symmetric(
         horizontal: Responsive.scaleClamped(context, 8, 6, 14),

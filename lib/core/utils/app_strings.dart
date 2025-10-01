@@ -80,5 +80,5 @@ class AppStrings {
       'Remove hats, sunglasses and ensure good lighting';
   static const driverLicenceTakeNewPicture = 'Take a picture';
   static const driverLicenceNumberHint = 'Licence Number';
-  static const driverLicenceExpiryHint = 'Expiry Date';
+  static const driverLicenceExpiryHint = 'Expiry Date (DD/MM/YYYY)';
 }

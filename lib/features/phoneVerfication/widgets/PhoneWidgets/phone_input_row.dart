@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/responsive.dart';
-import 'package:godropme/core/widgets/phone_text_field.dart';
+import 'package:godropme/core/widgets/custom_phone_text_field.dart';
 import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/regix/pakistan_number_formatter.dart';
 import 'package:godropme/core/utils/app_assets.dart';
@@ -54,7 +54,7 @@ class PhoneInputRow extends StatelessWidget {
               SizedBox(width: Responsive.scaleClamped(context, 15, 8, 28)),
               // country code removed (we show +92 inside the text field)
               Expanded(
-                child: PhoneTextField(
+                child: CustonPhoneTextField(
                   controller: controller,
                   hintText: 'e.g. 3001234567',
                   hintColor: AppColors.black.withOpacity(0.6),

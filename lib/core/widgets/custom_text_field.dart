@@ -12,7 +12,7 @@ String? nonEmptyValidator(String? v) {
 }
 
 /// A small, reusable text field that mirrors the visual style of
-/// `PhoneTextField` but for general text input.
+/// `CustonPhoneTextField` but for general text input.
 class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;

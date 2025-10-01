@@ -6,7 +6,7 @@ import 'package:godropme/core/routes/routes.dart';
 // ...existing imports
 import 'package:godropme/features/phoneVerfication/widgets/PhoneWidgets/phone_header.dart';
 import 'package:godropme/features/phoneVerfication/widgets/PhoneWidgets/phone_input_row.dart';
-import 'package:godropme/core/widgets/phone_text_field.dart';
+import 'package:godropme/core/widgets/custom_phone_text_field.dart';
 import 'package:godropme/features/phoneVerfication/widgets/PhoneWidgets/phone_actions.dart';
 import 'package:godropme/core/utils/responsive.dart';
 
@@ -29,7 +29,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
     super.dispose();
   }
 
-  // Using centralized validator from PhoneTextField (pakistanPhoneValidator)
+  // Using centralized validator from CustonPhoneTextField (pakistanPhoneValidator)
 
   void _onNextPressed() {
     setState(() => _submitted = true);
