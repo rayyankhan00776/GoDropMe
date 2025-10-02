@@ -68,6 +68,8 @@ class AppStrings {
   static const firstNameRequired = 'Please enter first name';
 
   // Driver licence collection strings
+  static const driverLicenseNote =
+      'Please fill the Details according to the License';
   static const driverLicenceTitle = 'Driver Licence';
   static const driverLicenseSelfieLabel = 'Selfie with Licence';
   static const driverLicenceHelpLine1 =
@@ -88,4 +90,6 @@ class AppStrings {
   static const cnicBackHint = 'CNIC Number (back)';
   static const idFrontTitle = 'ID Front Side';
   static const idBackTitle = 'ID Back Side';
+  static const driverIdentificationNote =
+      'Please fill the Details according to the CNIC';
 }

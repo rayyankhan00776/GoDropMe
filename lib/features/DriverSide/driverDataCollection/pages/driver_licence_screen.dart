@@ -159,7 +159,7 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0, bottom: 6.0),
                       child: Text(
-                        AppStrings.personalInfoCnicNote,
+                        AppStrings.driverLicenseNote,
                         style: AppTypography.optionTerms,
                       ),
                     ),
