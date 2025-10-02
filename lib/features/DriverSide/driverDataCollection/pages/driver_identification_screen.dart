@@ -1,0 +1,172 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:godropme/core/widgets/custom_Appbar.dart';
+import 'package:godropme/core/widgets/progress_next_bar.dart';
+import 'package:godropme/core/utils/app_strings.dart';
+import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverIdentification/driver_identification_image_row.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverIdentification/driver_identification_form.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverIdentification/identification_image_help_screen.dart';
+import 'package:godropme/core/utils/app_assets.dart';
+import 'package:godropme/core/routes/routes.dart';
+
+class DriverIdentificationScreen extends StatefulWidget {
+  const DriverIdentificationScreen({super.key});
+
+  @override
+  State<DriverIdentificationScreen> createState() =>
+      _DriverIdentificationScreenState();
+}
+
+class _DriverIdentificationScreenState
+    extends State<DriverIdentificationScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _cnicController = TextEditingController();
+  final TextEditingController _expiryController = TextEditingController();
+  String? _frontImagePath;
+  String? _backImagePath;
+  bool _submitted = false;
+
+  @override
+  void dispose() {
+    _cnicController.dispose();
+    _expiryController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const CustomBlurAppBar(),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Get.back(),
+                          icon: Icon(Icons.arrow_back, color: Colors.black),
+                        ),
+                        SizedBox(
+                          width: Responsive.scaleClamped(context, 8, 6, 12),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(
+                      height: Responsive.scaleClamped(context, 8, 6, 12),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        AppStrings.driverIdentificationTitle,
+                        style: AppTypography.optionHeading,
+                      ),
+                    ),
+
+                    SizedBox(
+                      height: Responsive.scaleClamped(context, 18, 12, 24),
+                    ),
+
+                    DriverIdentificationImageRow(
+                      frontImagePath: _frontImagePath,
+                      backImagePath: _backImagePath,
+                      onFrontTap: () async {
+                        final res = await Get.to(
+                          () => IdentificationImageHelpScreen(
+                            imagePath: _frontImagePath ?? AppAssets.cnicFront,
+                            title: AppStrings.idFrontTitle,
+                          ),
+                        );
+                        if (res is String && mounted) {
+                          setState(() => _frontImagePath = res);
+                        }
+                      },
+                      onBackTap: () async {
+                        final res = await Get.to(
+                          () => IdentificationImageHelpScreen(
+                            imagePath: _backImagePath ?? AppAssets.cnicBack,
+                            title: AppStrings.idBackTitle,
+                          ),
+                        );
+                        if (res is String && mounted) {
+                          setState(() => _backImagePath = res);
+                        }
+                      },
+                    ),
+
+                    SizedBox(
+                      height: Responsive.scaleClamped(context, 12, 8, 18),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, bottom: 6.0),
+                      child: Text(
+                        AppStrings.personalInfoCnicNote,
+                        style: AppTypography.optionTerms,
+                      ),
+                    ),
+
+                    DriverIdentificationForm(
+                      formKey: _formKey,
+                      cnicController: _cnicController,
+                      expiryController: _expiryController,
+                      showSubmittedErrors: _submitted,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          SafeArea(
+            top: false,
+            left: false,
+            right: false,
+            bottom: true,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: ProgressNextBar(
+                currentStep: 3,
+                totalSteps: 4,
+                onNext: () async {
+                  setState(() => _submitted = true);
+
+                  final bool formValid =
+                      _formKey.currentState?.validate() ?? false;
+                  final bool hasImages =
+                      _frontImagePath != null && _backImagePath != null;
+                  if (!formValid || !hasImages) return;
+
+                  // Temporarily navigate back to driver licence (will be updated later)
+                  Get.toNamed(AppRoutes.driverLicence);
+                },
+                onPrevious: () {
+                  Get.offNamed(AppRoutes.driverLicence);
+                },
+                previousBackgroundColor: Colors.grey.shade300,
+                previousIconColor: Colors.grey.shade900,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -15,4 +15,9 @@ class AppAssets {
   static const rickshawSvg = 'assets/images/svg/rikshaw.svg';
   // Real pictures
   static const samplePerson = 'assets/images/sample/men.jpeg';
+  static const driverLicense = 'assets/images/sample/driverLicence.jpg';
+  static const selfieWithDrivingLicense =
+      'assets/images/sample/manwithdrivinglicence.jpg';
+  static const cnicFront = "assets/images/sample/cnicFront.png";
+  static const cnicBack = "assets/images/sample/cnicBack.png";
 }

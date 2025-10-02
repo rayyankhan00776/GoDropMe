@@ -1,10 +1,12 @@
 import 'package:get/get.dart';
 import 'package:godropme/features/DriverOrParentOption/binding/dop_binding.dart';
 import 'package:godropme/features/DriverOrParentOption/pages/DOP_option_screen.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/pages/driver_identification_screen.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/pages/driver_licence_screen.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/pages/driver_name_screen.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/binding/driver_name_binding.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/binding/driver_licence_binding.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/binding/driver_identification_binding.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/pages/personal_info_Screen.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/binding/personal_info_binding.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/pages/vehicle_Selection_screen.dart';
@@ -30,6 +32,7 @@ class AppRoutes {
   static const String vehicleSelection = '/vehicle_selection';
   static const String personalInfo = '/personal_info';
   static const String driverLicence = '/driver_licence';
+  static const String driverIdentification = '/driver_identification';
   // static const String register = '/register'; // Example for future screens
 
   static final routes = [
@@ -77,6 +80,11 @@ class AppRoutes {
       name: driverLicence,
       page: () => const DriverLicenceScreen(),
       binding: DriverLicenceBinding(),
+    ),
+    GetPage(
+      name: driverIdentification,
+      page: () => const DriverIdentificationScreen(),
+      binding: DriverIdentificationBinding(),
     ),
   ];
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/core/routes/routes.dart';
 import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/core/utils/app_assets.dart';
 import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/utils/responsive.dart';
@@ -125,8 +126,7 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                         final result = await Get.to(
                           () => LicenceImageHelpScreen(
                             imagePath:
-                                _licenceImagePath ??
-                                'assets/images/sample/driverLicence.jpg',
+                                _licenceImagePath ?? AppAssets.driverLicense,
                           ),
                         );
 
@@ -140,7 +140,7 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                           () => SelfieWithLicenceHelpScreen(
                             imagePath:
                                 _selfieImagePath ??
-                                'assets/images/sample/manwithdrivinglicence.jpg',
+                                AppAssets.selfieWithDrivingLicense,
                           ),
                         );
 
@@ -207,7 +207,7 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                   await _dlController.saveDriverLicence();
 
                   // Navigate to next step (vehicle selection)
-                  Get.toNamed(AppRoutes.vehicleSelection);
+                  Get.toNamed(AppRoutes.driverIdentification);
                 },
                 onPrevious: () {
                   Get.offNamed(AppRoutes.personalInfo);
