@@ -53,9 +53,15 @@ class CustomTextField extends StatelessWidget {
         isDense: true,
         // Remove inner content padding so the surrounding Container fully
         // controls sizing. Also hide any inline error text by making it
-        // transparent; we show errors in an external fixed area below.
+        // transparent and collapsed so it doesn't reserve vertical space
+        // (validation messages are shown externally in a fixed area).
+        isCollapsed: true,
         contentPadding: EdgeInsets.zero,
-        errorStyle: const TextStyle(height: 0, color: Colors.transparent),
+        errorStyle: const TextStyle(
+          height: 0,
+          color: Colors.transparent,
+          fontSize: 0,
+        ),
         errorMaxLines: 1,
       ),
       validator: validator ?? nonEmptyValidator,

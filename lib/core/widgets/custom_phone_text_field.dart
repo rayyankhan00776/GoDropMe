@@ -73,11 +73,17 @@ class CustonPhoneTextField extends StatelessWidget {
         ),
         border: InputBorder.none,
         isDense: true,
+        // Collapse the decoration so the TextFormField won't reserve extra
+        // vertical space for inline errors. We still suppress the inline
+        // error style (transparent + zero height/size) because errors are
+        // rendered externally in a fixed area beneath the input.
+        isCollapsed: true,
         contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        // We intentionally suppress the TextFormField's inline error text so
-        // validation messages are rendered externally (fixed summary area)
-        // to avoid layout shifts.
-        errorStyle: const TextStyle(height: 0, color: Colors.transparent),
+        errorStyle: const TextStyle(
+          height: 0,
+          color: Colors.transparent,
+          fontSize: 0,
+        ),
       ),
       validator: validator ?? pakistanPhoneValidator,
     );

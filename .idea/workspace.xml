@@ -6,16 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="344f2811-d295-41ea-8c46-120907b8900d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/realpictures/men.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/utils/app_assets.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/utils/app_assets.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/utils/app_strings.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/utils/app_strings.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/widgets/custom_button.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/widgets/custom_button.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/widgets/google_button.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/widgets/google_button.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/widgets/progress_next_bar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/widgets/progress_next_bar.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/driver_licence_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/driver_licence_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/personal_info_Screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/personal_info_Screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/widgets/driverName/driverName_action.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/widgets/driverName/driverName_action.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/core/widgets/custom_phone_text_field.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/widgets/custom_phone_text_field.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/core/widgets/custom_text_field.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/widgets/custom_text_field.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/driver_name_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/driver_name_screen.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

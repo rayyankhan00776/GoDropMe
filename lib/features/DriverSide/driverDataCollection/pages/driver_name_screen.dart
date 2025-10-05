@@ -6,7 +6,7 @@ import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driver
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverName/driverName_header.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverName/driverName_input.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/controllers/driver_name_controller.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/binding/driver_name_binding.dart';
+// binding is provided via route configuration; do not register it here.
 
 class DriverNameScreen extends StatefulWidget {
   const DriverNameScreen({super.key});
@@ -23,8 +23,7 @@ class _DriverNameScreenState extends State<DriverNameScreen> {
   @override
   void initState() {
     super.initState();
-    // Ensure binding is initialized (safe if already added to routes)
-    DriverNameBinding().dependencies();
+    // Binding is provided by the route; avoid registering dependencies here.
 
     // When the user has already submitted and there is an error, we want to
     // update the spacing as they type so the error area can disappear and
