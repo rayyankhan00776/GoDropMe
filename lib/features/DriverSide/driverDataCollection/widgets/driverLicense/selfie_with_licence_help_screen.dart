@@ -132,11 +132,8 @@ class _SelfieWithLicenceHelpScreenState
                   width: 280,
                   height: 280,
                   child: _currentImagePath.startsWith('assets/')
-                      ? Image.asset(_currentImagePath, fit: BoxFit.contain)
-                      : Image.file(
-                          File(_currentImagePath),
-                          fit: BoxFit.contain,
-                        ),
+                      ? Image.asset(_currentImagePath, fit: BoxFit.cover)
+                      : Image.file(File(_currentImagePath), fit: BoxFit.cover),
                 ),
               ),
             ),

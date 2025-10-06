@@ -39,19 +39,19 @@ class PersonalinfoImage extends StatelessWidget {
 
         SizedBox(height: Responsive.scaleClamped(context, 6, 4, 8)),
 
-        SizedBox(
-          height: 18,
-          child: Align(
-            alignment: Alignment.center,
-            child: Text(
-              showError ? errorText : '',
-              style: TextStyle(
-                color: showError ? const Color(0xFFFF6B6B) : Colors.transparent,
-                fontSize: 12,
+        // Only reserve vertical space for the error when there IS an error,
+        // so normal layout matches other screens' spacing before the note.
+        if (showError)
+          SizedBox(
+            height: 18,
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                errorText,
+                style: const TextStyle(color: Color(0xFFFF6B6B), fontSize: 12),
               ),
             ),
           ),
-        ),
       ],
     );
   }

@@ -143,7 +143,9 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                       ),
                     ),
 
-                    SizedBox(height: Responsive.scaleClamped(context, 8, 7, 8)),
+                    SizedBox(
+                      height: Responsive.scaleClamped(context, 8, 6, 12),
+                    ),
                     // CNIC note above the form
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0, bottom: 6.0),

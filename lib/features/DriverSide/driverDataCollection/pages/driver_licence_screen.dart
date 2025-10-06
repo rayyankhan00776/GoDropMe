@@ -152,7 +152,7 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                     ),
 
                     SizedBox(
-                      height: Responsive.scaleClamped(context, 12, 8, 18),
+                      height: Responsive.scaleClamped(context, 8, 6, 12),
                     ),
 
                     // Note explaining the images

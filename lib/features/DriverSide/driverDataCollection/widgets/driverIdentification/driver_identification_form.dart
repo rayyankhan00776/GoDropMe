@@ -80,57 +80,66 @@ class DriverIdentificationForm extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // CNIC (13 digits) formatted as XXXXX-XXXXXXX-X
-            CustonPhoneTextField(
-              controller: cnicController,
-              hintText: AppStrings.cnicFrontHint,
-              borderColor: AppColors.gray,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                // limit raw digits to 13 before formatting
-                LengthLimitingTextInputFormatter(13),
-                CnicInputFormatter(),
-              ],
-              validator: (v) {
-                final digitsOnly = (v ?? '').replaceAll(RegExp(r'[^0-9]'), '');
-                if (digitsOnly.length != 13) return 'CNIC must be 13 digits';
-                if (int.tryParse(digitsOnly) == null) {
-                  return 'CNIC must be numeric';
-                }
-                return null;
-              },
+            SizedBox(
+              width: double.infinity,
+              child: CustonPhoneTextField(
+                controller: cnicController,
+                hintText: AppStrings.cnicFrontHint,
+                borderColor: AppColors.gray,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  // limit raw digits to 13 before formatting
+                  LengthLimitingTextInputFormatter(13),
+                  CnicInputFormatter(),
+                ],
+                validator: (v) {
+                  final digitsOnly = (v ?? '').replaceAll(
+                    RegExp(r'[^0-9]'),
+                    '',
+                  );
+                  if (digitsOnly.length != 13) return 'CNIC must be 13 digits';
+                  if (int.tryParse(digitsOnly) == null) {
+                    return 'CNIC must be numeric';
+                  }
+                  return null;
+                },
+              ),
             ),
             SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
             // Expiry date
-            CustonPhoneTextField(
-              controller: expiryController,
-              hintText: AppStrings.driverLicenceExpiryHint,
-              borderColor: AppColors.gray,
-              inputFormatters: [
-                DateInputFormatter(),
-                LengthLimitingTextInputFormatter(10),
-              ],
-              validator: (v) {
-                final val = v?.trim() ?? '';
-                if (val.isEmpty) return 'Please enter expiry date';
-                if (val.length != 10) return 'Enter date as DD-MM-YYYY';
-                final parts = val.split('-');
-                if (parts.length != 3) return 'Enter date as DD-MM-YYYY';
-                final day = int.tryParse(parts[0]);
-                final month = int.tryParse(parts[1]);
-                final year = int.tryParse(parts[2]);
-                if (day == null || month == null || year == null) {
-                  return 'Enter date as DD-MM-YYYY';
-                }
-                if (parts[0].length != 2 ||
-                    parts[1].length != 2 ||
-                    parts[2].length != 4) {
-                  return 'Enter date as DD-MM-YYYY';
-                }
-                if (month < 1 || month > 12) return 'Enter valid month';
-                if (day < 1 || day > 31) return 'Enter valid day';
-                return null;
-              },
+            SizedBox(
+              width: double.infinity,
+              child: CustonPhoneTextField(
+                controller: expiryController,
+                hintText: AppStrings.driverLicenceExpiryHint,
+                borderColor: AppColors.gray,
+                inputFormatters: [
+                  DateInputFormatter(),
+                  LengthLimitingTextInputFormatter(10),
+                ],
+                validator: (v) {
+                  final val = v?.trim() ?? '';
+                  if (val.isEmpty) return 'Please enter expiry date';
+                  if (val.length != 10) return 'Enter date as DD-MM-YYYY';
+                  final parts = val.split('-');
+                  if (parts.length != 3) return 'Enter date as DD-MM-YYYY';
+                  final day = int.tryParse(parts[0]);
+                  final month = int.tryParse(parts[1]);
+                  final year = int.tryParse(parts[2]);
+                  if (day == null || month == null || year == null) {
+                    return 'Enter date as DD-MM-YYYY';
+                  }
+                  if (parts[0].length != 2 ||
+                      parts[1].length != 2 ||
+                      parts[2].length != 4) {
+                    return 'Enter date as DD-MM-YYYY';
+                  }
+                  if (month < 1 || month > 12) return 'Enter valid month';
+                  if (day < 1 || day > 31) return 'Enter valid day';
+                  return null;
+                },
+              ),
             ),
             SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
 

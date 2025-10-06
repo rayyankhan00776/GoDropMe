@@ -130,11 +130,8 @@ class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
                   width: 300,
                   height: 200,
                   child: _currentImagePath.startsWith('assets/')
-                      ? Image.asset(_currentImagePath, fit: BoxFit.contain)
-                      : Image.file(
-                          File(_currentImagePath),
-                          fit: BoxFit.contain,
-                        ),
+                      ? Image.asset(_currentImagePath, fit: BoxFit.cover)
+                      : Image.file(File(_currentImagePath), fit: BoxFit.cover),
                 ),
               ),
             ),

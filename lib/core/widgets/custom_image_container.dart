@@ -43,7 +43,7 @@ class CustomImageContainer extends StatelessWidget {
                   image: imagePath!.startsWith('assets/')
                       ? AssetImage(imagePath!) as ImageProvider
                       : FileImage(File(imagePath!)),
-                  fit: BoxFit.fitHeight,
+                      fit: BoxFit.cover,
                 )
               : null,
         ),

@@ -60,60 +60,66 @@ class DriverLicenceForm extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CustonPhoneTextField(
-              controller: licenceNumberController,
-              hintText: AppStrings.driverLicenceNumberHint,
-              borderColor: AppColors.gray,
-              // allow only digits and limit to 5 characters
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(5),
-              ],
-              // simple validator: ensure exactly 5 numeric digits (no regex)
-              validator: (v) {
-                final val = v?.trim() ?? '';
-                if (val.length != 5) return 'Licence number must be 5 digits';
-                if (int.tryParse(val) == null) {
-                  return 'Licence number must be numeric';
-                }
-                return null;
-              },
+            SizedBox(
+              width: double.infinity,
+              child: CustonPhoneTextField(
+                controller: licenceNumberController,
+                hintText: AppStrings.driverLicenceNumberHint,
+                borderColor: AppColors.gray,
+                // allow only digits and limit to 5 characters
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(5),
+                ],
+                // simple validator: ensure exactly 5 numeric digits (no regex)
+                validator: (v) {
+                  final val = v?.trim() ?? '';
+                  if (val.length != 5) return 'Licence number must be 5 digits';
+                  if (int.tryParse(val) == null) {
+                    return 'Licence number must be numeric';
+                  }
+                  return null;
+                },
+              ),
             ),
 
             SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
             // expiry date in DD-MM-YYYY format
-            CustonPhoneTextField(
-              controller: expiryDateController,
-              hintText: AppStrings.driverLicenceExpiryHint,
-              borderColor: AppColors.gray,
-              // format as DD-MM-YYYY while typing and limit to 10 chars
-              inputFormatters: [
-                DateInputFormatter(),
-                LengthLimitingTextInputFormatter(10),
-              ],
-              validator: (v) {
-                final val = v?.trim() ?? '';
-                if (val.isEmpty) return 'Please enter expiry date';
-                // Expect exactly 10 characters: DD-MM-YYYY
-                if (val.length != 10) return 'Enter date as DD-MM-YYYY';
-                final parts = val.split('-');
-                if (parts.length != 3) return 'Enter date as DD-MM-YYYY';
-                final day = int.tryParse(parts[0]);
-                final month = int.tryParse(parts[1]);
-                final year = int.tryParse(parts[2]);
-                if (day == null || month == null || year == null) {
-                  return 'Enter date as DD-MM-YYYY';
-                }
-                if (parts[0].length != 2 ||
-                    parts[1].length != 2 ||
-                    parts[2].length != 4) {
-                  return 'Enter date as DD-MM-YYYY';
-                }
-                if (month < 1 || month > 12) return 'Enter valid month';
-                if (day < 1 || day > 31) return 'Enter valid day';
-                return null;
-              },
+            SizedBox(
+              width: double.infinity,
+              child: CustonPhoneTextField(
+                controller: expiryDateController,
+                hintText: AppStrings.driverLicenceExpiryHint,
+                borderColor: AppColors.gray,
+                // format as DD-MM-YYYY while typing and limit to 10 chars
+                inputFormatters: [
+                  DateInputFormatter(),
+                  LengthLimitingTextInputFormatter(10),
+                ],
+                validator: (v) {
+                  final val = v?.trim() ?? '';
+                  if (val.isEmpty) return 'Please enter expiry date';
+                  // Expect exactly 10 characters: DD-MM-YYYY
+                  if (val.length != 10) return 'Enter date as DD-MM-YYYY';
+                  final parts = val.split('-');
+                  if (parts.length != 3) return 'Enter date as DD-MM-YYYY';
+                  final day = int.tryParse(parts[0]);
+                  final month = int.tryParse(parts[1]);
+                  final year = int.tryParse(parts[2]);
+                  if (day == null || month == null || year == null) {
+                    return 'Enter date as DD-MM-YYYY';
+                  }
+                  if (parts[0].length != 2 ||
+                      parts[1].length != 2 ||
+                      parts[2].length != 4) {
+                    return 'Enter date as DD-MM-YYYY';
+                  }
+                  if (month < 1 || month > 12) return 'Enter valid month';
+                  if (day < 1 || day > 31) return 'Enter valid day';
+                  return null;
+                },
+              ),
             ),
 
             SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
