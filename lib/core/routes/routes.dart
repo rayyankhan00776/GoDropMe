@@ -11,6 +11,7 @@ import 'package:godropme/features/DriverSide/driverDataCollection/pages/personal
 import 'package:godropme/features/DriverSide/driverDataCollection/binding/personal_info_binding.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/pages/vehicle_Selection_screen.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/binding/vehicle_selection_binding.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/pages/vehicle_registration_Screen.dart';
 import 'package:godropme/features/onboard/binding/onboard_binding.dart';
 import 'package:godropme/features/onboard/pages/onboard_screen.dart';
 import 'package:godropme/features/Reg-option/pages/option_screen.dart';
@@ -33,6 +34,7 @@ class AppRoutes {
   static const String personalInfo = '/personal_info';
   static const String driverLicence = '/driver_licence';
   static const String driverIdentification = '/driver_identification';
+  static const String vehicleRegistration = '/vehicle_registration';
   // static const String register = '/register'; // Example for future screens
 
   static final routes = [
@@ -86,5 +88,6 @@ class AppRoutes {
       page: () => const DriverIdentificationScreen(),
       binding: DriverIdentificationBinding(),
     ),
+    GetPage(name: vehicleRegistration, page: () => VehicleRegistrationScreen()),
   ];
 }

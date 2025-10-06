@@ -52,7 +52,7 @@ class AppStrings {
   static const help = 'Help';
   static const personalInfoHelpLine1 = 'Take a clear picture in a good light';
   static const personalInfoHelpLine2 = 'No filter, sunglasses or masks';
-  static const personalInfoTakeNewPicture = 'Take a picture';
+  static const personalInfoTakeNewPicture = 'Take a New picture';
 
   // Personal info helper texts
   static const personalInfoImageLabel = 'Personal information';
@@ -80,7 +80,7 @@ class AppStrings {
       'Hold the licence next to your face so both are clearly visible';
   static const driverLicenceSelfieHelpLine2 =
       'Remove hats, sunglasses and ensure good lighting';
-  static const driverLicenceTakeNewPicture = 'Take a picture';
+  static const driverLicenceTakeNewPicture = 'Take a New picture';
   static const driverLicenceNumberHint = 'Licence Number';
   static const driverLicenceExpiryHint = 'Expiry Date (DD/MM/YYYY)';
 

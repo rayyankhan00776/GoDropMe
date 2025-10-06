@@ -19,6 +19,13 @@ class LicenceImageHelpScreen extends StatefulWidget {
 
 class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
   final ImagePicker _picker = ImagePicker();
+  late String _currentImagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentImagePath = widget.imagePath;
+  }
 
   Future<void> _takeNewPicture() async {
     try {
@@ -30,8 +37,10 @@ class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
         maxHeight: 1200,
       );
 
-      if (file != null) {
-        if (mounted) Navigator.of(context).pop(file.path);
+      if (file != null && mounted) {
+        setState(() {
+          _currentImagePath = file.path;
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -52,12 +61,23 @@ class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: Icon(Icons.arrow_back, color: AppColors.black),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    onPressed: () => Get.back(),
+                    icon: Icon(Icons.arrow_back, color: AppColors.black),
+                  ),
                 ),
-                SizedBox(width: Responsive.scaleClamped(context, 8, 6, 12)),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () =>
+                        Navigator.of(context).pop(_currentImagePath),
+                    child: Text('Done', style: AppTypography.helpButton),
+                  ),
+                ),
               ],
             ),
 
@@ -109,9 +129,12 @@ class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
                 child: SizedBox(
                   width: 300,
                   height: 200,
-                  child: widget.imagePath.startsWith('assets/')
-                      ? Image.asset(widget.imagePath, fit: BoxFit.contain)
-                      : Image.file(File(widget.imagePath), fit: BoxFit.contain),
+                  child: _currentImagePath.startsWith('assets/')
+                      ? Image.asset(_currentImagePath, fit: BoxFit.contain)
+                      : Image.file(
+                          File(_currentImagePath),
+                          fit: BoxFit.contain,
+                        ),
                 ),
               ),
             ),

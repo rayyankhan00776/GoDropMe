@@ -20,6 +20,13 @@ class PersonalinfoHelpScreen extends StatefulWidget {
 
 class _PersonalinfoHelpScreenState extends State<PersonalinfoHelpScreen> {
   final ImagePicker _picker = ImagePicker();
+  late String _currentImagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentImagePath = widget.imagePath;
+  }
 
   Future<void> _takeNewPicture() async {
     try {
@@ -31,9 +38,10 @@ class _PersonalinfoHelpScreenState extends State<PersonalinfoHelpScreen> {
         maxHeight: 1600,
       );
 
-      if (file != null) {
-        // Return the file path to the caller
-        if (mounted) Navigator.of(context).pop(file.path);
+      if (file != null && mounted) {
+        setState(() {
+          _currentImagePath = file.path;
+        });
       }
     } catch (e) {
       // If permission denied or camera error, show a simple snackbar and stay
@@ -56,12 +64,23 @@ class _PersonalinfoHelpScreenState extends State<PersonalinfoHelpScreen> {
           children: [
             // Back icon and title (match PersonalInfo screen heading)
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: Icon(Icons.arrow_back, color: AppColors.black),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    onPressed: () => Get.back(),
+                    icon: Icon(Icons.arrow_back, color: AppColors.black),
+                  ),
                 ),
-                SizedBox(width: Responsive.scaleClamped(context, 8, 6, 12)),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () =>
+                        Navigator.of(context).pop(_currentImagePath),
+                    child: Text('Done', style: AppTypography.helpButton),
+                  ),
+                ),
               ],
             ),
 
@@ -111,7 +130,7 @@ class _PersonalinfoHelpScreenState extends State<PersonalinfoHelpScreen> {
             // Image preview container (re-using CustomImageContainer in read-only mode)
             Center(
               child: CustomImageContainer(
-                imagePath: widget.imagePath,
+                imagePath: _currentImagePath,
                 width: 280,
                 height: 280,
                 onTap: null,
