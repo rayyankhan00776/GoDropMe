@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:io';
 import 'package:godropme/core/widgets/custom_Appbar.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
 import 'package:godropme/core/theme/colors.dart';
@@ -8,6 +7,7 @@ import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/utils/app_strings.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:godropme/core/widgets/custom_image_container.dart';
 
 class IdentificationImageHelpScreen extends StatefulWidget {
   final String imagePath;
@@ -131,15 +131,15 @@ class _IdentificationImageHelpScreenState
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
+                child: CustomImageContainer(
+                  imagePath: _currentImagePath,
                   width: 300,
-                  height: 200,
-                  child: _currentImagePath.startsWith('assets/')
-                      ? Image.asset(_currentImagePath, fit: BoxFit.cover)
-                      : Image.file(
-                          File(_currentImagePath),
-                          fit: BoxFit.cover,
-                        ),
+                  height: 340,
+                  fit: BoxFit.fill,
+                  alignment: Alignment.center,
+                  backgroundColor: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: null,
                 ),
               ),
             ),

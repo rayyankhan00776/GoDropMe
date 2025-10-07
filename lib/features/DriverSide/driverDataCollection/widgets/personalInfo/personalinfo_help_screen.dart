@@ -131,8 +131,11 @@ class _PersonalinfoHelpScreenState extends State<PersonalinfoHelpScreen> {
             Center(
               child: CustomImageContainer(
                 imagePath: _currentImagePath,
-                width: 280,
-                height: 280,
+                width: 300,
+                height: 340,
+                fit: BoxFit.fill,
+                alignment: Alignment.center,
+                backgroundColor: Colors.grey[50],
                 onTap: null,
                 borderRadius: BorderRadius.circular(12),
               ),

@@ -14,6 +14,9 @@ class CustomImageContainer extends StatelessWidget {
   final double width;
   final double height;
   final BorderRadius? borderRadius;
+  final BoxFit fit;
+  final AlignmentGeometry alignment;
+  final Color? backgroundColor;
 
   const CustomImageContainer({
     super.key,
@@ -22,6 +25,9 @@ class CustomImageContainer extends StatelessWidget {
     this.width = 120,
     this.height = 120,
     this.borderRadius,
+    this.fit = BoxFit.cover,
+    this.alignment = Alignment.center,
+    this.backgroundColor,
   });
 
   @override
@@ -33,7 +39,7 @@ class CustomImageContainer extends StatelessWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.grey[200],
+          color: backgroundColor ?? Colors.grey[200],
           borderRadius: borderRadius ?? BorderRadius.circular(7),
           image: imagePath != null
               ? DecorationImage(
@@ -43,7 +49,8 @@ class CustomImageContainer extends StatelessWidget {
                   image: imagePath!.startsWith('assets/')
                       ? AssetImage(imagePath!) as ImageProvider
                       : FileImage(File(imagePath!)),
-                      fit: BoxFit.cover,
+                  fit: fit,
+                  alignment: alignment,
                 )
               : null,
         ),
