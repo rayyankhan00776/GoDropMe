@@ -11,6 +11,7 @@ class PersonalinfoForm extends StatelessWidget {
   final TextEditingController surNameController;
   final TextEditingController lastNameController;
   final bool showSubmittedErrors;
+  final bool showGlobalError;
 
   const PersonalinfoForm({
     super.key,
@@ -19,6 +20,7 @@ class PersonalinfoForm extends StatelessWidget {
     required this.surNameController,
     required this.lastNameController,
     required this.showSubmittedErrors,
+    this.showGlobalError = false,
   });
 
   @override
@@ -64,17 +66,11 @@ class PersonalinfoForm extends StatelessWidget {
             child: Align(
               alignment: Alignment.center,
               child: Text(
-                // show first name required error when submitted
-                showSubmittedErrors &&
-                        (firstNameController.text.isEmpty ||
-                            firstNameController.text.trim().isEmpty)
-                    ? AppStrings.firstNameRequired
+                showGlobalError
+                    ? 'Please complete all fields and add image'
                     : '',
                 style: TextStyle(
-                  color:
-                      showSubmittedErrors &&
-                          (firstNameController.text.isEmpty ||
-                              firstNameController.text.trim().isEmpty)
+                  color: showGlobalError
                       ? const Color(0xFFFF6B6B)
                       : Colors.transparent,
                   fontSize: 12,

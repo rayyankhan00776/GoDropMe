@@ -44,6 +44,8 @@ flutter:
     - assets/images/logo/
     - assets/images/flag/
     - assets/images/sample/
+    # Car catalog JSON used for dropdowns
+    - lib/core/theme/car_details.json
   #---------------------- ./ LOCAL ASSETS END ----------------------#
 
   #---------------------- LOCAL FONTS ----------------------#

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/app_typography.dart';
+import 'package:flutter/services.dart';
 
 typedef TextValidator = String? Function(String? value);
 
@@ -21,6 +22,8 @@ class CustomTextField extends StatelessWidget {
   final bool showContainer;
   final Color borderColor;
   final Color? hintColor;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   const CustomTextField({
     this.controller,
@@ -30,6 +33,8 @@ class CustomTextField extends StatelessWidget {
     this.showContainer = true,
     this.borderColor = AppColors.primary,
     this.hintColor,
+    this.keyboardType,
+    this.inputFormatters,
     super.key,
   });
 
@@ -37,7 +42,8 @@ class CustomTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final input = TextFormField(
       controller: controller,
-      keyboardType: TextInputType.text,
+      keyboardType: keyboardType ?? TextInputType.text,
+      inputFormatters: inputFormatters,
       style: AppTypography.optionLineSecondary.copyWith(color: AppColors.black),
       // Keep the text vertically centered inside the fixed-height container
       // so validation state changes won't adjust the container size.

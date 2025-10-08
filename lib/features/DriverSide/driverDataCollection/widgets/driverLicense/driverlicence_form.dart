@@ -42,6 +42,7 @@ class DriverLicenceForm extends StatelessWidget {
   final TextEditingController licenceNumberController;
   final TextEditingController expiryDateController;
   final bool showSubmittedErrors;
+  final bool showGlobalError;
 
   const DriverLicenceForm({
     super.key,
@@ -49,6 +50,7 @@ class DriverLicenceForm extends StatelessWidget {
     required this.licenceNumberController,
     required this.expiryDateController,
     required this.showSubmittedErrors,
+    this.showGlobalError = false,
   });
 
   @override
@@ -129,11 +131,11 @@ class DriverLicenceForm extends StatelessWidget {
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  showSubmittedErrors
+                  showGlobalError
                       ? 'Please complete all fields and add images'
                       : '',
                   style: TextStyle(
-                    color: showSubmittedErrors
+                    color: showGlobalError
                         ? const Color(0xFFFF6B6B)
                         : Colors.transparent,
                     fontSize: 12,

@@ -20,4 +20,10 @@ class AppAssets {
       'assets/images/sample/manwithdrivinglicence.jpg';
   static const cnicFront = "assets/images/sample/cnicFront.png";
   static const cnicBack = "assets/images/sample/cnicBack.png";
+  // Vehicle registration samples
+  static const vehiclePhoto = 'assets/images/sample/car.jpg';
+  static const vehicleCertFront =
+      'assets/images/sample/vehicleCertificationFront.png';
+  static const vehicleCertBack =
+      'assets/images/sample/vehicleCertificationBack.png';
 }

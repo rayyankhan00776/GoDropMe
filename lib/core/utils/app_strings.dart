@@ -92,4 +92,32 @@ class AppStrings {
   static const idBackTitle = 'ID Back Side';
   static const driverIdentificationNote =
       'Please fill the Details according to the CNIC';
+
+  // Vehicle registration strings
+  static const vehicleRegistrationTitle = 'Vehicle Information';
+  static const vehiclePhotoLabel = 'Vehicle Photo';
+  static const vehicleCertFrontLabel = 'Registration Certificate (Front)';
+  static const vehicleCertBackLabel = 'Registration Certificate (Back)';
+  static const vehicleDetailsNote =
+      'Fill the following details of your vehicle';
+  static const vehicleBrandHint = 'Vehicle Brand';
+  static const vehicleModelHint = 'Vehicle Model';
+  static const vehicleColorHint = 'Vehicle Color';
+  static const vehicleProductionYearHint = 'Production Year';
+  static const vehicleNumberPlateHint = 'Number Plate';
+
+  // Vehicle registration help strings
+  static const vehiclePhotoHelpLine1 =
+      'Take the photo in daylight and ensure the whole vehicle is visible';
+  static const vehiclePhotoHelpLine2 =
+      'Avoid glare and ensure the photo is sharp and clear';
+  static const vehicleCertHelpLine1 =
+      'Place the certificate on a flat surface and ensure all details are visible';
+  static const vehicleCertHelpLine2 =
+      'Avoid glare; use natural light if possible';
+  static const vehicleTakeNewPicture = 'Take a New picture';
+
+  // Generic
+  static const done = 'Done';
+  static const vehicleDetailsSaved = 'Vehicle details saved';
 }

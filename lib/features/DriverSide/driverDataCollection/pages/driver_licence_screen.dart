@@ -31,11 +31,15 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
   String? _licenceImagePath;
   String? _selfieImagePath;
   bool _submitted = false;
+  bool _showGlobalError = false;
 
   @override
   void initState() {
     super.initState();
     _dlController = Get.find<DriverLicenceController>();
+    // Reset local flags when entering this screen
+    _submitted = false;
+    _showGlobalError = false;
     _licenceNumberController.text = _dlController.licenceNumber.value;
     _expiryDateController.text = _dlController.expiryDate.value;
     _licenceImagePath = _dlController.licenceImagePath.value;
@@ -169,6 +173,7 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                       licenceNumberController: _licenceNumberController,
                       expiryDateController: _expiryDateController,
                       showSubmittedErrors: _submitted,
+                      showGlobalError: _showGlobalError,
                     ),
                   ],
                 ),
@@ -187,13 +192,19 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                 currentStep: 2,
                 totalSteps: 4,
                 onNext: () async {
-                  setState(() => _submitted = true);
+                  setState(() {
+                    _submitted = true;
+                    _showGlobalError = false;
+                  });
 
                   final bool formValid =
                       _formKey.currentState?.validate() ?? false;
                   final bool hasImages =
                       _licenceImagePath != null && _selfieImagePath != null;
-                  if (!formValid || !hasImages) return;
+                  if (!formValid || !hasImages) {
+                    setState(() => _showGlobalError = true);
+                    return;
+                  }
 
                   // persist into controller
                   _dlController.setLicenceNumber(

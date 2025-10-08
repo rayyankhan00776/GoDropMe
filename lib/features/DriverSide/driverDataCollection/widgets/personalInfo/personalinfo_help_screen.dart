@@ -133,7 +133,7 @@ class _PersonalinfoHelpScreenState extends State<PersonalinfoHelpScreen> {
                 imagePath: _currentImagePath,
                 width: 300,
                 height: 340,
-                fit: BoxFit.fill,
+                fit: BoxFit.contain,
                 alignment: Alignment.center,
                 backgroundColor: Colors.grey[50],
                 onTap: null,

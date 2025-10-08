@@ -1,31 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:godropme/core/widgets/custom_Appbar.dart';
 import 'package:godropme/core/widgets/custom_button.dart';
-import 'package:godropme/core/theme/colors.dart';
-import 'package:godropme/core/utils/app_typography.dart';
-import 'package:godropme/core/utils/responsive.dart';
-import 'package:godropme/core/utils/app_strings.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:godropme/core/widgets/custom_image_container.dart';
+import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/app_strings.dart';
+import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/core/theme/colors.dart';
 
-class IdentificationImageHelpScreen extends StatefulWidget {
+class VehicleCertBackHelpScreen extends StatefulWidget {
   final String imagePath;
-  final String title;
-
-  const IdentificationImageHelpScreen({
-    super.key,
-    required this.imagePath,
-    required this.title,
-  });
+  const VehicleCertBackHelpScreen({super.key, required this.imagePath});
 
   @override
-  State<IdentificationImageHelpScreen> createState() =>
-      _IdentificationImageHelpScreenState();
+  State<VehicleCertBackHelpScreen> createState() =>
+      _VehicleCertBackHelpScreenState();
 }
 
-class _IdentificationImageHelpScreenState
-    extends State<IdentificationImageHelpScreen> {
+class _VehicleCertBackHelpScreenState extends State<VehicleCertBackHelpScreen> {
   final ImagePicker _picker = ImagePicker();
   late String _currentImagePath;
 
@@ -44,11 +37,8 @@ class _IdentificationImageHelpScreenState
         maxWidth: 1600,
         maxHeight: 1200,
       );
-
       if (file != null && mounted) {
-        setState(() {
-          _currentImagePath = file.path;
-        });
+        setState(() => _currentImagePath = file.path);
       }
     } catch (e) {
       if (mounted) {
@@ -75,7 +65,7 @@ class _IdentificationImageHelpScreenState
                   alignment: Alignment.centerLeft,
                   child: IconButton(
                     onPressed: () => Get.back(),
-                    icon: Icon(Icons.arrow_back, color: AppColors.black),
+                    icon: const Icon(Icons.arrow_back, color: AppColors.black),
                   ),
                 ),
                 Align(
@@ -83,7 +73,10 @@ class _IdentificationImageHelpScreenState
                   child: TextButton(
                     onPressed: () =>
                         Navigator.of(context).pop(_currentImagePath),
-                    child: Text('Done', style: AppTypography.helpButton),
+                    child: Text(
+                      AppStrings.done,
+                      style: AppTypography.helpButton,
+                    ),
                   ),
                 ),
               ],
@@ -92,7 +85,10 @@ class _IdentificationImageHelpScreenState
             SizedBox(height: Responsive.scaleClamped(context, 16, 12, 24)),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
-              child: Text(widget.title, style: AppTypography.optionHeading),
+              child: Text(
+                AppStrings.vehicleCertBackLabel,
+                style: AppTypography.optionHeading,
+              ),
             ),
             SizedBox(height: Responsive.scaleClamped(context, 16, 12, 24)),
 
@@ -103,15 +99,13 @@ class _IdentificationImageHelpScreenState
                 SizedBox(width: Responsive.scaleClamped(context, 8, 6, 12)),
                 Expanded(
                   child: Text(
-                    AppStrings.driverLicenceHelpLine1,
+                    AppStrings.vehicleCertHelpLine1,
                     style: AppTypography.personalInfoHelper,
                   ),
                 ),
               ],
             ),
-
             SizedBox(height: Responsive.scaleClamped(context, 8, 6, 12)),
-
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -119,7 +113,7 @@ class _IdentificationImageHelpScreenState
                 SizedBox(width: Responsive.scaleClamped(context, 8, 6, 12)),
                 Expanded(
                   child: Text(
-                    AppStrings.driverLicenceHelpLine2,
+                    AppStrings.vehicleCertHelpLine2,
                     style: AppTypography.personalInfoHelper,
                   ),
                 ),
@@ -147,7 +141,7 @@ class _IdentificationImageHelpScreenState
             const Spacer(),
 
             CustomButton(
-              text: AppStrings.driverLicenceTakeNewPicture,
+              text: AppStrings.vehicleTakeNewPicture,
               onTap: _takeNewPicture,
               height: 59,
               borderRadius: BorderRadius.circular(12),

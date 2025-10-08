@@ -28,6 +28,15 @@ class _DriverIdentificationScreenState
   String? _frontImagePath;
   String? _backImagePath;
   bool _submitted = false;
+  bool _showGlobalError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Ensure previous screen's validation flags don't bleed into this screen
+    _submitted = false;
+    _showGlobalError = false;
+  }
 
   @override
   void dispose() {
@@ -128,6 +137,7 @@ class _DriverIdentificationScreenState
                       cnicController: _cnicController,
                       expiryController: _expiryController,
                       showSubmittedErrors: _submitted,
+                      showGlobalError: _showGlobalError,
                     ),
                   ],
                 ),
@@ -146,16 +156,22 @@ class _DriverIdentificationScreenState
                 currentStep: 3,
                 totalSteps: 4,
                 onNext: () async {
-                  setState(() => _submitted = true);
+                  setState(() {
+                    _submitted = true;
+                    _showGlobalError = false;
+                  });
 
                   final bool formValid =
                       _formKey.currentState?.validate() ?? false;
                   final bool hasImages =
                       _frontImagePath != null && _backImagePath != null;
-                  if (!formValid || !hasImages) return;
+                  if (!formValid || !hasImages) {
+                    setState(() => _showGlobalError = true);
+                    return;
+                  }
 
-                  // Temporarily navigate back to driver licence (will be updated later)
-                  Get.toNamed(AppRoutes.driverLicence);
+                  // Navigate to vehicle registration after successful identification
+                  Get.toNamed(AppRoutes.vehicleRegistration);
                 },
                 onPrevious: () {
                   Get.offNamed(AppRoutes.driverLicence);

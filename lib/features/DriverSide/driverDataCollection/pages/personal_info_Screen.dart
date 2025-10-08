@@ -29,6 +29,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   final TextEditingController _surNameController = TextEditingController();
   String? _selectedImagePath;
   bool _submitted = false;
+  bool _showGlobalError = false;
   late final PersonalInfoController _piController;
 
   @override
@@ -44,6 +45,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     super.initState();
     // obtain the controller from the binding
     _piController = Get.find<PersonalInfoController>();
+    _submitted = false;
+    _showGlobalError = false;
     // initialize local fields from controller if any existing values
     _firstNameController.text = _piController.firstName.value;
     _surNameController.text = _piController.surName.value;
@@ -161,6 +164,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                       surNameController: _surNameController,
                       lastNameController: _lastNameController,
                       showSubmittedErrors: _submitted,
+                      showGlobalError: _showGlobalError,
                     ),
                   ],
                 ),
@@ -180,13 +184,18 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                 currentStep: 1,
                 totalSteps: 4,
                 onNext: () async {
-                  setState(() => _submitted = true);
+                  setState(() {
+                    _submitted = true;
+                    _showGlobalError = false;
+                  });
 
                   final bool formValid =
                       _formKey.currentState?.validate() ?? false;
                   final bool hasImage = _selectedImagePath != null;
-
-                  if (!formValid || !hasImage) return;
+                  if (!formValid || !hasImage) {
+                    setState(() => _showGlobalError = true);
+                    return;
+                  }
 
                   // Sync values into the controller and save (stub)
                   _piController.setFirstName(_firstNameController.text.trim());

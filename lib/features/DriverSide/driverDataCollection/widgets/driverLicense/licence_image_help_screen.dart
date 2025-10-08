@@ -130,7 +130,7 @@ class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
                   imagePath: _currentImagePath,
                   width: 300,
                   height: 340,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.contain,
                   alignment: Alignment.center,
                   backgroundColor: Colors.grey[50],
                   borderRadius: BorderRadius.circular(8),
