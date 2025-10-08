@@ -26,6 +26,9 @@ dependencies:
   # Add image picker for camera access
   image_picker: ^1.2.0
 
+  # Local storage for simple key-value persistence
+  shared_preferences: ^2.3.2
+
   # Product Specific Packages
   # add to be when needed
 #---------------------- ./ PACKAGES END ----------------------#

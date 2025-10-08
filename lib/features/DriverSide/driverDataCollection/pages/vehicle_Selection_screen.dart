@@ -59,6 +59,7 @@ class VehicleSelectionScreen extends StatelessWidget {
                   label: AppStrings.vehicleCar,
                   onTap: () {
                     controller.select(AppStrings.vehicleCar);
+                    controller.saveSelection();
                     // Navigate to personal info screen
                     Get.offNamed(AppRoutes.personalInfo);
                   },
@@ -69,6 +70,7 @@ class VehicleSelectionScreen extends StatelessWidget {
                   label: AppStrings.vehicleRickshaw,
                   onTap: () {
                     controller.select(AppStrings.vehicleRickshaw);
+                    controller.saveSelection();
                     // Navigate to personal info screen
                     Get.offNamed(AppRoutes.personalInfo);
                   },

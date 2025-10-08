@@ -10,6 +10,7 @@ import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driver
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/driverIdentification/identification_image_help_screen.dart';
 import 'package:godropme/core/utils/app_assets.dart';
 import 'package:godropme/core/routes/routes.dart';
+import 'package:godropme/features/DriverSide/driverDataCollection/controllers/driver_identification_controller.dart';
 
 class DriverIdentificationScreen extends StatefulWidget {
   const DriverIdentificationScreen({super.key});
@@ -36,6 +37,9 @@ class _DriverIdentificationScreenState
     // Ensure previous screen's validation flags don't bleed into this screen
     _submitted = false;
     _showGlobalError = false;
+    // Optionally, we can pre-load persisted data here if desired
+    // (Controller load would require controller instance; skipping for now
+    // as this screen manages local state for image paths and form fields.)
   }
 
   @override
@@ -169,6 +173,17 @@ class _DriverIdentificationScreenState
                     setState(() => _showGlobalError = true);
                     return;
                   }
+
+                  // Optionally persist to SharedPrefs via controller (lightweight cache)
+                  try {
+                    final c = Get.find<DriverIdentificationController>();
+                    c
+                      ..setCnicNumber(_cnicController.text.trim())
+                      ..setExpiryDate(_expiryController.text.trim())
+                      ..setFrontImagePath(_frontImagePath)
+                      ..setBackImagePath(_backImagePath);
+                    await c.saveDriverIdentification();
+                  } catch (_) {}
 
                   // Navigate to vehicle registration after successful identification
                   Get.toNamed(AppRoutes.vehicleRegistration);

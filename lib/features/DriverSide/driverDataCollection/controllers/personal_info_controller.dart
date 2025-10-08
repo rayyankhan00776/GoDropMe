@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:godropme/core/utils/local_storage.dart';
 
 class PersonalInfoController extends GetxController {
   final firstName = ''.obs;
@@ -17,5 +18,20 @@ class PersonalInfoController extends GetxController {
     debugPrint(
       'PersonalInfoController: first=${firstName.value}, last=${lastName.value}, image=${imagePath.value}',
     );
+    await LocalStorage.setJson(StorageKeys.personalInfo, {
+      'firstName': firstName.value,
+      'surName': surName.value,
+      'lastName': lastName.value,
+      'imagePath': imagePath.value,
+    });
+  }
+
+  Future<void> loadPersonalInfo() async {
+    final data = await LocalStorage.getJson(StorageKeys.personalInfo);
+    if (data == null) return;
+    firstName.value = (data['firstName'] ?? '') as String;
+    surName.value = (data['surName'] ?? '') as String;
+    lastName.value = (data['lastName'] ?? '') as String;
+    imagePath.value = data['imagePath'] as String?;
   }
 }

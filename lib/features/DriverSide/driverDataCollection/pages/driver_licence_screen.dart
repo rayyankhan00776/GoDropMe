@@ -40,10 +40,11 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
     // Reset local flags when entering this screen
     _submitted = false;
     _showGlobalError = false;
-    _licenceNumberController.text = _dlController.licenceNumber.value;
-    _expiryDateController.text = _dlController.expiryDate.value;
-    _licenceImagePath = _dlController.licenceImagePath.value;
-    _selfieImagePath = _dlController.selfieWithLicencePath.value;
+    // Per latest UX requirement: do NOT prefill fields from SharedPreferences.
+    _licenceNumberController.text = '';
+    _expiryDateController.text = '';
+    _licenceImagePath = null;
+    _selfieImagePath = null;
   }
 
   @override

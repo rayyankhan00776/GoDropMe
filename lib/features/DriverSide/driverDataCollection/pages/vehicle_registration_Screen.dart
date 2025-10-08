@@ -8,6 +8,7 @@ import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/core/utils/local_storage.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/vehicleRegistration/vehicle_images_row.dart';
 import 'package:godropme/features/DriverSide/driverDataCollection/widgets/vehicleRegistration/vehicle_registration_form.dart';
 import 'package:godropme/core/utils/app_assets.dart';
@@ -202,14 +203,70 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                     return;
                   }
 
-                  // TODO: Persist data or send to backend
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(AppStrings.vehicleDetailsSaved),
-                      ),
+                  // Persist the section locally (SharedPreferences)
+                  final messenger = ScaffoldMessenger.of(context);
+                  await saveVehicleRegistrationSection(
+                    brand: _brandController.text.trim(),
+                    model: _modelController.text.trim(),
+                    color: _colorController.text.trim(),
+                    year: _yearController.text.trim(),
+                    plate: _plateController.text.trim(),
+                    vehiclePhotoPath: _vehiclePhotoPath,
+                    certFrontPath: _certFrontPath,
+                    certBackPath: _certBackPath,
+                  );
+
+                  // Fetch and print aggregated onboarding data for debugging.
+                  try {
+                    final driverName = await LocalStorage.getString(
+                      StorageKeys.driverName,
                     );
+                    final vehicleSelection = await LocalStorage.getString(
+                      StorageKeys.vehicleSelection,
+                    );
+                    final personal = await LocalStorage.getJson(
+                      StorageKeys.personalInfo,
+                    );
+                    final licence = await LocalStorage.getJson(
+                      StorageKeys.driverLicence,
+                    );
+                    final identification = await LocalStorage.getJson(
+                      StorageKeys.driverIdentification,
+                    );
+                    final vehicle = await LocalStorage.getJson(
+                      StorageKeys.vehicleRegistration,
+                    );
+
+                    // Print in a compact, readable form to the debug console.
+                    // This data will later be sent to the backend.
+                    // ignore: avoid_print
+                    print('--- Onboarding cached data ---');
+                    // ignore: avoid_print
+                    print('driverName: $driverName');
+                    // ignore: avoid_print
+                    print('vehicleSelection: $vehicleSelection');
+                    // ignore: avoid_print
+                    print('personalInfo: ${personal ?? {}}');
+                    // ignore: avoid_print
+                    print('driverLicence: ${licence ?? {}}');
+                    // ignore: avoid_print
+                    print('driverIdentification: ${identification ?? {}}');
+                    // ignore: avoid_print
+                    print('vehicleRegistration: ${vehicle ?? {}}');
+                    // ignore: avoid_print
+                    print('--- end onboarding data ---');
+                  } catch (e) {
+                    // ignore: avoid_print
+                    print('Failed to print onboarding data: $e');
                   }
+
+                  // TODO: Send to backend in future
+                  if (!mounted) return;
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text(AppStrings.vehicleDetailsSaved),
+                    ),
+                  );
                 },
                 onPrevious: () {
                   Get.back();

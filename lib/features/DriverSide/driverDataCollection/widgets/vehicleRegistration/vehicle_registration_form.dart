@@ -8,6 +8,7 @@ import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/widgets/custom_text_field.dart';
 import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/core/utils/local_storage.dart';
 
 /// Forces any alphabetic input to uppercase for fields like number plates.
 /// Keeps cursor at the end of the transformed text for a natural typing feel.
@@ -23,6 +24,29 @@ class _UpperCaseTextFormatter extends TextInputFormatter {
       selection: TextSelection.collapsed(offset: upper.length),
     );
   }
+}
+
+/// Helper to persist vehicle registration data when the parent screen proceeds.
+Future<void> saveVehicleRegistrationSection({
+  required String brand,
+  required String model,
+  required String color,
+  required String year,
+  required String plate,
+  required String? vehiclePhotoPath,
+  required String? certFrontPath,
+  required String? certBackPath,
+}) async {
+  await LocalStorage.setJson(StorageKeys.vehicleRegistration, {
+    'brand': brand,
+    'model': model,
+    'color': color,
+    'year': year,
+    'plate': plate,
+    'vehiclePhotoPath': vehiclePhotoPath,
+    'certFrontPath': certFrontPath,
+    'certBackPath': certBackPath,
+  });
 }
 
 class VehicleRegistrationForm extends StatefulWidget {

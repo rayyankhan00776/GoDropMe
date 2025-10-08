@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:godropme/core/utils/local_storage.dart';
 
 class DriverLicenceController extends GetxController {
   final licenceImagePath = RxnString();
@@ -18,5 +19,20 @@ class DriverLicenceController extends GetxController {
     debugPrint(
       'DriverLicenceController: licence=${licenceNumber.value}, expiry=${expiryDate.value}, licenceImage=${licenceImagePath.value}, selfie=${selfieWithLicencePath.value}',
     );
+    await LocalStorage.setJson(StorageKeys.driverLicence, {
+      'licenceImagePath': licenceImagePath.value,
+      'selfieWithLicencePath': selfieWithLicencePath.value,
+      'licenceNumber': licenceNumber.value,
+      'expiryDate': expiryDate.value,
+    });
+  }
+
+  Future<void> loadDriverLicence() async {
+    final data = await LocalStorage.getJson(StorageKeys.driverLicence);
+    if (data == null) return;
+    licenceImagePath.value = data['licenceImagePath'] as String?;
+    selfieWithLicencePath.value = data['selfieWithLicencePath'] as String?;
+    licenceNumber.value = (data['licenceNumber'] ?? '') as String;
+    expiryDate.value = (data['expiryDate'] ?? '') as String;
   }
 }

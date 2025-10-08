@@ -47,11 +47,13 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     _piController = Get.find<PersonalInfoController>();
     _submitted = false;
     _showGlobalError = false;
-    // initialize local fields from controller if any existing values
-    _firstNameController.text = _piController.firstName.value;
-    _surNameController.text = _piController.surName.value;
-    _lastNameController.text = _piController.lastName.value;
-    _selectedImagePath = _piController.imagePath.value;
+
+    // Per latest UX requirement: do NOT prefill fields from SharedPreferences.
+    // Keep local controllers empty so the user always types fresh data.
+    _firstNameController.text = '';
+    _surNameController.text = '';
+    _lastNameController.text = '';
+    _selectedImagePath = null;
   }
 
   @override

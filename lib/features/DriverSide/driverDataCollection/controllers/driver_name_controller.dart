@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:godropme/core/utils/local_storage.dart';
 
 class DriverNameController extends GetxController {
   final name = ''.obs;
@@ -9,5 +10,11 @@ class DriverNameController extends GetxController {
   Future<void> saveName() async {
     // Placeholder: persist locally or call backend later.
     debugPrint('DriverNameController: saving name: ${name.value}');
+    await LocalStorage.setString(StorageKeys.driverName, name.value);
+  }
+
+  Future<void> loadName() async {
+    final v = await LocalStorage.getString(StorageKeys.driverName);
+    if (v != null) name.value = v;
   }
 }

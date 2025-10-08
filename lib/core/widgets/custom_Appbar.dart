@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/core/routes/routes.dart';
+import 'package:godropme/core/utils/local_storage.dart';
 import 'package:godropme/core/theme/colors.dart';
 
 class CustomBlurAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -20,7 +21,15 @@ class CustomBlurAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Align(
         alignment: Alignment.centerRight,
         child: InkWell(
-          onTap: () => Get.offNamed(AppRoutes.dopOption),
+          onTap: () async {
+            // Clear any cached onboarding progress so the next time the user
+            // enters onboarding they start fresh.
+            await Future.microtask(() {}); // keep async slot
+            try {
+              await LocalStorage.clearOnboardingData();
+            } catch (_) {}
+            Get.offNamed(AppRoutes.dopOption);
+          },
           child: Text(
             "Close",
             style: TextStyle(
