@@ -26,4 +26,5 @@ class AppAssets {
       'assets/images/sample/vehicleCertificationFront.png';
   static const vehicleCertBack =
       'assets/images/sample/vehicleCertificationBack.png';
+  static const jsonData = 'assets/json/car_details.json';
 }

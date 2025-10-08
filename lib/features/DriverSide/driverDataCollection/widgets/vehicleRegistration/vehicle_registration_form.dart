@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:godropme/core/utils/app_assets.dart';
 import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/responsive.dart';
@@ -55,9 +56,7 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
 
   Future<void> _loadCatalog() async {
     try {
-      final jsonStr = await rootBundle.loadString(
-        'lib/core/theme/car_details.json',
-      );
+      final jsonStr = await rootBundle.loadString(AppAssets.jsonData);
       final data = json.decode(jsonStr) as Map<String, dynamic>;
       final brands = (data['vehicleBrands'] as List<dynamic>).cast<String>();
       final models = (data['vehicleModels'] as Map<String, dynamic>).map(
