@@ -1,13 +1,29 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart';
 import 'package:godropme/core/utils/app_assets.dart';
 import 'package:godropme/core/utils/app_strings.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/utils/responsive.dart';
 import 'package:godropme/core/widgets/custom_text_field.dart';
 import 'package:godropme/core/utils/app_typography.dart';
+
+/// Forces any alphabetic input to uppercase for fields like number plates.
+/// Keeps cursor at the end of the transformed text for a natural typing feel.
+class _UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final upper = newValue.text.toUpperCase();
+    return TextEditingValue(
+      text: upper,
+      selection: TextSelection.collapsed(offset: upper.length),
+    );
+  }
+}
 
 class VehicleRegistrationForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -348,9 +364,14 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
             hintText: AppStrings.vehicleProductionYearHint,
             borderColor: AppColors.gray,
             keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(4),
+            ],
             validator: (v) {
               final val = v?.trim() ?? '';
               if (val.isEmpty) return 'Please enter production year';
+              if (val.length != 4) return 'Year must be 4 digits';
               final year = int.tryParse(val);
               if (year == null || year < 1960 || year > DateTime.now().year) {
                 return 'Enter a valid year';
@@ -365,6 +386,7 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
             controller: widget.plateController,
             hintText: AppStrings.vehicleNumberPlateHint,
             borderColor: AppColors.gray,
+            inputFormatters: [_UpperCaseTextFormatter()],
             validator: (v) => (v == null || v.trim().isEmpty)
                 ? 'Please enter number plate'
                 : null,
