@@ -121,25 +121,27 @@ class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
               ],
             ),
 
-            SizedBox(height: Responsive.scaleClamped(context, 60, 36, 100)),
+            SizedBox(height: Responsive.scaleClamped(context, 12, 8, 20)),
 
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: CustomImageContainer(
-                  imagePath: _currentImagePath,
-                  width: 300,
-                  height: 340,
-                  fit: BoxFit.contain,
-                  alignment: Alignment.center,
-                  backgroundColor: Colors.grey[50],
+            Expanded(
+              child: Center(
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  onTap: null,
+                  child: CustomImageContainer(
+                    imagePath: _currentImagePath,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    backgroundColor: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: null,
+                  ),
                 ),
               ),
             ),
 
-            const Spacer(),
+            SizedBox(height: Responsive.scaleClamped(context, 12, 8, 20)),
 
             CustomButton(
               text: AppStrings.driverLicenceTakeNewPicture,

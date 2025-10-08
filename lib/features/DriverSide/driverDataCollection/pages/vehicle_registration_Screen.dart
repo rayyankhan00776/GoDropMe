@@ -149,7 +149,11 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                     ),
 
                     Padding(
-                      padding: const EdgeInsets.only(left: 8.0, bottom: 6.0),
+                      padding: const EdgeInsets.only(
+                        left: 8.0,
+                        bottom: 6.0,
+                        top: 10.0,
+                      ),
                       child: Text(
                         AppStrings.vehicleDetailsNote,
                         style: AppTypography.optionTerms,

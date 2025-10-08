@@ -39,7 +39,7 @@ class CustomImageContainer extends StatelessWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: backgroundColor ?? Colors.grey[200],
+          color: backgroundColor ?? Colors.grey[50],
           borderRadius: borderRadius ?? BorderRadius.circular(7),
           image: imagePath != null
               ? DecorationImage(
@@ -49,7 +49,7 @@ class CustomImageContainer extends StatelessWidget {
                   image: imagePath!.startsWith('assets/')
                       ? AssetImage(imagePath!) as ImageProvider
                       : FileImage(File(imagePath!)),
-                  fit: fit,
+                  fit: BoxFit.contain,
                   alignment: alignment,
                 )
               : null,

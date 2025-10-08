@@ -125,23 +125,25 @@ class _PersonalinfoHelpScreenState extends State<PersonalinfoHelpScreen> {
               ],
             ),
 
-            SizedBox(height: Responsive.scaleClamped(context, 60, 36, 100)),
+            SizedBox(height: Responsive.scaleClamped(context, 12, 8, 20)),
 
             // Image preview container (re-using CustomImageContainer in read-only mode)
-            Center(
-              child: CustomImageContainer(
-                imagePath: _currentImagePath,
-                width: 300,
-                height: 340,
-                fit: BoxFit.contain,
-                alignment: Alignment.center,
-                backgroundColor: Colors.grey[50],
-                onTap: null,
-                borderRadius: BorderRadius.circular(12),
+            Expanded(
+              child: Center(
+                child: CustomImageContainer(
+                  imagePath: _currentImagePath,
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                  backgroundColor: Colors.grey[50],
+                  onTap: null,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
 
-            const Spacer(),
+            SizedBox(height: Responsive.scaleClamped(context, 12, 8, 20)),
 
             // Take a new picture button
             CustomButton(

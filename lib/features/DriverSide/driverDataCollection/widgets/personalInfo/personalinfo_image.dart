@@ -25,7 +25,7 @@ class PersonalinfoImage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CustomImageContainer(
-          width: 190,
+          width: 150,
           height: 140,
           imagePath: imagePath,
           onTap: onTap,
