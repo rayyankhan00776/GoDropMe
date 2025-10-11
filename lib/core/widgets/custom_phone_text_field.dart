@@ -64,6 +64,17 @@ class CustonPhoneTextField extends StatelessWidget {
       style: AppTypography.optionLineSecondary.copyWith(
         color: textColor ?? AppColors.black,
       ),
+      cursorHeight: (AppTypography.optionLineSecondary.fontSize ?? 16) * 1.2,
+      cursorWidth: 2,
+      // Keep the text and caret vertically centered and stable
+      textAlignVertical: TextAlignVertical.center,
+      minLines: 1,
+      expands: false,
+      maxLines: 1,
+      strutStyle: StrutStyle.fromTextStyle(
+        AppTypography.optionLineSecondary,
+        forceStrutHeight: true,
+      ),
       decoration: InputDecoration(
         hintText: hintText,
         // allow overriding hint color; default to a lighter black and slightly larger size
@@ -73,12 +84,8 @@ class CustonPhoneTextField extends StatelessWidget {
         ),
         border: InputBorder.none,
         isDense: true,
-        // Collapse the decoration so the TextFormField won't reserve extra
-        // vertical space for inline errors. We still suppress the inline
-        // error style (transparent + zero height/size) because errors are
-        // rendered externally in a fixed area beneath the input.
-        isCollapsed: true,
-        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        // Symmetric padding maintains vertical centering without jumps.
+        contentPadding: const EdgeInsets.symmetric(vertical: 16),
         errorStyle: const TextStyle(
           height: 0,
           color: Colors.transparent,
@@ -86,6 +93,7 @@ class CustonPhoneTextField extends StatelessWidget {
         ),
       ),
       validator: validator ?? pakistanPhoneValidator,
+      autovalidateMode: AutovalidateMode.disabled,
     );
 
     if (!showContainer) return input;

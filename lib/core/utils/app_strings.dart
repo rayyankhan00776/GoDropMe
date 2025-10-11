@@ -86,8 +86,8 @@ class AppStrings {
 
   // Driver Identification (CNIC / ID) strings
   static const driverIdentificationTitle = 'Driver Identification';
-  static const cnicFrontHint = 'CNIC Number (front)';
-  static const cnicBackHint = 'CNIC Number (back)';
+  static const cnicFrontHint = 'CNIC Number';
+  // static const cnicBackHint = 'CNIC Number (back)';
   static const idFrontTitle = 'ID Front Side';
   static const idBackTitle = 'ID Back Side';
   static const driverIdentificationNote =

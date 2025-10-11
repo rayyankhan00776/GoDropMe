@@ -272,6 +272,7 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
     final isHint = value == null || value.isEmpty;
     return SizedBox(
       width: double.infinity,
+      height: 56,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: enabled

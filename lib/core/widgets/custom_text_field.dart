@@ -45,11 +45,20 @@ class CustomTextField extends StatelessWidget {
       keyboardType: keyboardType ?? TextInputType.text,
       inputFormatters: inputFormatters,
       style: AppTypography.optionLineSecondary.copyWith(color: AppColors.black),
+      // Keep caret size stable to avoid visual jumps
+      cursorHeight: (AppTypography.optionLineSecondary.fontSize ?? 16) * 1.2,
+      cursorWidth: 2,
       // Keep the text vertically centered inside the fixed-height container
       // so validation state changes won't adjust the container size.
       textAlignVertical: TextAlignVertical.center,
+      // Keep single-line height and caret stable
+      minLines: 1,
       expands: false,
       maxLines: 1,
+      strutStyle: StrutStyle.fromTextStyle(
+        AppTypography.optionLineSecondary,
+        forceStrutHeight: true,
+      ),
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: AppTypography.optionTerms.copyWith(
@@ -57,12 +66,9 @@ class CustomTextField extends StatelessWidget {
         ),
         border: InputBorder.none,
         isDense: true,
-        // Remove inner content padding so the surrounding Container fully
-        // controls sizing. Also hide any inline error text by making it
-        // transparent and collapsed so it doesn't reserve vertical space
-        // (validation messages are shown externally in a fixed area).
-        isCollapsed: true,
-        contentPadding: EdgeInsets.zero,
+        // Provide symmetric vertical padding so the caret and text remain
+        // vertically centered and do not jump on validation.
+        contentPadding: const EdgeInsets.symmetric(vertical: 16),
         errorStyle: const TextStyle(
           height: 0,
           color: Colors.transparent,
@@ -86,6 +92,7 @@ class CustomTextField extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       alignment: Alignment.center,
+      // Keep the field expanded horizontally and vertically centered
       child: Row(children: [Expanded(child: input)]),
     );
   }
