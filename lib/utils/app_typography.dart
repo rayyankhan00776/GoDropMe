@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/theme/colors.dart';
 
 class AppTypography {
   static const TextStyle onboardTitle = TextStyle(

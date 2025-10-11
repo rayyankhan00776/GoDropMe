@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/utils/app_strings.dart';
+import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
 

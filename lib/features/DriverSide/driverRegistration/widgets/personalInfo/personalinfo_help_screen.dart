@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 import 'package:godropme/common%20widgets/custom_Appbar.dart';
 import 'package:godropme/common%20widgets/custom_button.dart';
 import 'package:godropme/common%20widgets/custom_image_container.dart';
-import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/utils/app_strings.dart';
+import 'package:godropme/constants/app_strings.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PersonalinfoHelpScreen extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:godropme/routes/routes.dart';
+import 'package:godropme/routes.dart';
 
 /// Simple controller for the Driver or Parent option screen.
 ///

@@ -3,9 +3,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/routes/routes.dart';
-import 'package:godropme/utils/local_storage.dart';
-import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/routes.dart';
+import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/theme/colors.dart';
 
 class CustomBlurAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomBlurAppBar({super.key});

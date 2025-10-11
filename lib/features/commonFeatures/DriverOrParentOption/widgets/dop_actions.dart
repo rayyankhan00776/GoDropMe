@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/common%20widgets/custom_button.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 
 /// Actions for the Driver/Parent option screen.

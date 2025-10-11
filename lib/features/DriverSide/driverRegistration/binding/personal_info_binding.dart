@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/controllers/personal_info_controller.dart';
+import 'package:godropme/features/driverSide/driverRegistration/controllers/personal_info_controller.dart';
 
 class PersonalInfoBinding extends Bindings {
   @override

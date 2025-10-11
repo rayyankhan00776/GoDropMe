@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/features/commonFeatures/onboard/controllers/onboard_controller.dart';
-import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/responsive.dart';
 
 /// Animated, tappable progress bar for onboarding.

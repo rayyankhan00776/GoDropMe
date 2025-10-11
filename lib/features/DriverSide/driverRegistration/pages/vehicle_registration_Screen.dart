@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/common%20widgets/custom_Appbar.dart';
 import 'package:godropme/common%20widgets/progress_next_bar.dart';
-import 'package:godropme/utils/app_strings.dart';
+import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/core/theme/colors.dart';
-import 'package:godropme/utils/local_storage.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/widgets/vehicleRegistration/vehicle_images_row.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/widgets/vehicleRegistration/vehicle_registration_form.dart';
+import 'package:godropme/theme/colors.dart';
+import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_images_row.dart';
+import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_registration_form.dart';
 import 'package:godropme/utils/app_assets.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/widgets/vehicleRegistration/vehicle_photo_help_screen.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/widgets/vehicleRegistration/vehicle_cert_front_help_screen.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/widgets/vehicleRegistration/vehicle_cert_back_help_screen.dart';
+import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_photo_help_screen.dart';
+import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_cert_front_help_screen.dart';
+import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_cert_back_help_screen.dart';
 
 class VehicleRegistrationScreen extends StatefulWidget {
   const VehicleRegistrationScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/core/theme/theme.dart';
-import 'package:godropme/routes/routes.dart';
+import 'package:godropme/theme/theme.dart';
+import 'package:godropme/routes.dart';
 
 void main() {
   runApp(const GoDropMe());

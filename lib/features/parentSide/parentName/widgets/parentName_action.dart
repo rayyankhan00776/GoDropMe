@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/common%20widgets/custom_button.dart';
-import 'package:godropme/utils/app_strings.dart';
-import 'package:godropme/core/theme/button_dimensions.dart';
+import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/constants/button_dimensions.dart';
 
 class ParentnameAction extends StatelessWidget {
   final VoidCallback onNext;

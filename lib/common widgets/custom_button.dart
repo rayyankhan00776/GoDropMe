@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/core/theme/colors.dart';
-import 'package:godropme/core/theme/button_dimensions.dart';
+import 'package:godropme/theme/colors.dart';
+import 'package:godropme/constants/button_dimensions.dart';
 
 /// A reusable button widget for the app.
 ///

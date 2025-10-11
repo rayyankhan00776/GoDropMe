@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/commonFeatures/DriverOrParentOption/widgets/dop_header.dart';
-import 'package:godropme/features/commonFeatures/DriverOrParentOption/widgets/dop_illustration.dart';
-import 'package:godropme/features/commonFeatures/DriverOrParentOption/widgets/dop_actions.dart';
-import 'package:godropme/features/commonFeatures/DriverOrParentOption/controllers/dop_controller.dart';
+import 'package:godropme/features/commonFeatures/driverOrParentOption/widgets/dop_header.dart';
+import 'package:godropme/features/commonFeatures/driverOrParentOption/widgets/dop_illustration.dart';
+import 'package:godropme/features/commonFeatures/driverOrParentOption/widgets/dop_actions.dart';
+import 'package:godropme/features/commonFeatures/driverOrParentOption/controllers/dop_controller.dart';
 import 'package:godropme/utils/responsive.dart';
 
 class DopOptionScreen extends StatelessWidget {

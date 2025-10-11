@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/routes/routes.dart';
+import 'package:godropme/routes.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/parentSide/parentName/controller/parent_name_controller.dart';
 import 'package:godropme/features/parentSide/parentName/widgets/parentName_action.dart';

@@ -1,14 +1,14 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/routes/routes.dart';
+import 'package:godropme/routes.dart';
 import 'package:godropme/common%20widgets/custom_Appbar.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/controllers/vehicle_selection_controller.dart';
+import 'package:godropme/features/driverSide/driverRegistration/controllers/vehicle_selection_controller.dart';
 import 'package:godropme/utils/app_assets.dart';
-import 'package:godropme/utils/app_strings.dart';
+import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_typography.dart';
-import 'package:godropme/core/theme/colors.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/widgets/vehicleSelection/vehicle_selection_item.dart';
+import 'package:godropme/theme/colors.dart';
+import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleSelection/vehicle_selection_item.dart';
 import 'package:godropme/utils/responsive.dart';
 
 class VehicleSelectionScreen extends StatelessWidget {

@@ -2,18 +2,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/routes/routes.dart';
-import 'package:godropme/core/theme/colors.dart';
-import 'package:godropme/utils/app_strings.dart';
+import 'package:godropme/routes.dart';
+import 'package:godropme/theme/colors.dart';
+import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/app_assets.dart';
 import 'package:godropme/common%20widgets/custom_Appbar.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/common%20widgets/progress_next_bar.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/widgets/personalInfo/personalinfo_help_screen.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/widgets/personalInfo/personalinfo_image.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/widgets/personalInfo/personalinfo_form.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/controllers/personal_info_controller.dart';
+import 'package:godropme/features/driverSide/driverRegistration/widgets/personalInfo/personalinfo_help_screen.dart';
+import 'package:godropme/features/driverSide/driverRegistration/widgets/personalInfo/personalinfo_image.dart';
+import 'package:godropme/features/driverSide/driverRegistration/widgets/personalInfo/personalinfo_form.dart';
+import 'package:godropme/features/driverSide/driverRegistration/controllers/personal_info_controller.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   const PersonalInfoScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:godropme/utils/local_storage.dart';
+import 'package:godropme/sharedPrefs/local_storage.dart';
 
 class PersonalInfoController extends GetxController {
   final firstName = ''.obs;

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:godropme/features/DriverSide/driverRegistration/controllers/driver_licence_controller.dart';
+import 'package:godropme/features/driverSide/driverRegistration/controllers/driver_licence_controller.dart';
 
 class DriverLicenceBinding extends Bindings {
   @override

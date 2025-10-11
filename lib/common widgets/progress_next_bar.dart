@@ -1,10 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:godropme/core/theme/colors.dart';
+import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/common%20widgets/custom_button.dart';
-import 'package:godropme/core/theme/button_dimensions.dart';
+import 'package:godropme/constants/button_dimensions.dart';
 
 /// A reusable bottom bar that shows a step indicator (e.g. "1 of 4"),
 /// a small previous/rounded icon button and a primary Next button.
