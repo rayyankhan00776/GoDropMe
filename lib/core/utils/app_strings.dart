@@ -121,4 +121,9 @@ class AppStrings {
   // Generic
   static const done = 'Done';
   static const vehicleDetailsSaved = 'Vehicle details saved';
+
+    // parent name collection strings
+  static const parentNameTitle = 'Welcome to GoDropMe!';
+  static const parentNameSubtitle = 'Please introduce yourself';
+  static const parentNameButton = 'Next';
 }

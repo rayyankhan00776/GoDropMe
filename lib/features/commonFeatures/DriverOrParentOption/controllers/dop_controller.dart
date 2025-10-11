@@ -44,9 +44,10 @@ class DopOptionController extends GetxController {
       return;
     }
 
-    // Parent selection — no dedicated parent route yet; just log for now.
-    debugPrint(
-      'DopOptionController: continuing as ${selected.value} (no parent route configured)',
-    );
+    // Parent selection — navigate to parent name screen
+    if (isParentSelected) {
+      Get.toNamed(AppRoutes.parentName);
+      return;
+    }
   }
 }

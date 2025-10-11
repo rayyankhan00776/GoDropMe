@@ -20,6 +20,8 @@ import 'package:godropme/features/commonFeatures/phoneVerfication/pages/otp_scre
 import 'package:godropme/features/commonFeatures/phoneVerfication/pages/phone_Screen.dart';
 import 'package:godropme/features/commonFeatures/phoneVerfication/binding/phone_binding.dart';
 import 'package:godropme/features/commonFeatures/phoneVerfication/binding/otp_binding.dart';
+import 'package:godropme/features/parentSide/parentName/pages/parent_name_screen.dart';
+import 'package:godropme/features/parentSide/parentName/binding/driver_name_binding.dart';
 
 // Add more imports for other screens as you create them
 
@@ -30,6 +32,7 @@ class AppRoutes {
   static const String otpScreen = '/otp_screen';
   static const String dopOption = '/dop_option';
   static const String driverName = '/driver_name';
+  static const String parentName = '/parent_name';
   static const String vehicleSelection = '/vehicle_selection';
   static const String personalInfo = '/personal_info';
   static const String driverLicence = '/driver_licence';
@@ -67,6 +70,11 @@ class AppRoutes {
       name: driverName,
       page: () => DriverNameScreen(),
       binding: DriverNameBinding(),
+    ),
+    GetPage(
+      name: parentName,
+      page: () => const ParentNameScreen(),
+      binding: ParentNameBinding(),
     ),
     GetPage(
       name: vehicleSelection,
