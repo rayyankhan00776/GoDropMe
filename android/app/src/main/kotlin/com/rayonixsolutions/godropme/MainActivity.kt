@@ -1,4 +1,4 @@
-package com.example.godropmee
+package com.rayonixsolutions.godropme
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -26,5 +26,7 @@ class AppAssets {
       'assets/images/sample/vehicleCertificationFront.png';
   static const vehicleCertBack =
       'assets/images/sample/vehicleCertificationBack.png';
-  static const jsonData = 'assets/json/car_details.json';
+  // JSON data for vehicle brands and models
+  static const carcarJsonData = 'assets/json/car_details.json';
+  static const rikshawcarJsonData = 'assets/json/rikshaw_details.json';
 }

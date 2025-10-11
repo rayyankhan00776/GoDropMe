@@ -31,6 +31,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   final _colorController = TextEditingController();
   final _yearController = TextEditingController();
   final _plateController = TextEditingController();
+  final _seatCapacityController = TextEditingController();
 
   String? _vehiclePhotoPath;
   String? _certFrontPath;
@@ -45,6 +46,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
     _colorController.dispose();
     _yearController.dispose();
     _plateController.dispose();
+    _seatCapacityController.dispose();
     super.dispose();
   }
 
@@ -168,6 +170,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                       colorController: _colorController,
                       yearController: _yearController,
                       plateController: _plateController,
+                      seatCapacityController: _seatCapacityController,
                       showSubmittedErrors: _submitted,
                       showGlobalError: _showGlobalError,
                     ),
@@ -193,24 +196,32 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                     _showGlobalError = false;
                   });
 
+                  // Validate text fields with validators (year, plate, seat capacity)
                   final valid = _formKey.currentState?.validate() ?? false;
+                  // Validate dropdown selections
+                  final dropdownsValid =
+                      _brandController.text.trim().isNotEmpty &&
+                      _modelController.text.trim().isNotEmpty &&
+                      _colorController.text.trim().isNotEmpty;
                   final hasImages =
                       _vehiclePhotoPath != null &&
                       _certFrontPath != null &&
                       _certBackPath != null;
-                  if (!valid || !hasImages) {
+                  if (!valid || !dropdownsValid || !hasImages) {
                     setState(() => _showGlobalError = true);
+                    // SnackBars removed as requested; rely on the form-level error banner.
                     return;
                   }
 
                   // Persist the section locally (SharedPreferences)
-                  final messenger = ScaffoldMessenger.of(context);
                   await saveVehicleRegistrationSection(
                     brand: _brandController.text.trim(),
                     model: _modelController.text.trim(),
                     color: _colorController.text.trim(),
                     year: _yearController.text.trim(),
                     plate: _plateController.text.trim(),
+                    seatCapacity:
+                        int.tryParse(_seatCapacityController.text.trim()) ?? 0,
                     vehiclePhotoPath: _vehiclePhotoPath,
                     certFrontPath: _certFrontPath,
                     certBackPath: _certBackPath,
@@ -261,12 +272,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                   }
 
                   // TODO: Send to backend in future
-                  if (!mounted) return;
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text(AppStrings.vehicleDetailsSaved),
-                    ),
-                  );
+                  // Success SnackBar removed as requested.
                 },
                 onPrevious: () {
                   Get.back();

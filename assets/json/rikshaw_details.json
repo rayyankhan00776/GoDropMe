@@ -1,0 +1,168 @@
+{
+  "vehicleBrands": [
+    "Qingqi",
+    "Sazgar",
+    "United",
+    "New Asia",
+    "Super Power",
+    "Road Prince",
+    "Tez Raftar",
+    "Super Star",
+    "Ghani",
+    "Ravi",
+    "Metro",
+    "Crown",
+    "Hero",
+    "Pak Hero",
+    "Hassan",
+    "Habib",
+    "Power",
+    "Master",
+    "Hi-Speed",
+    "Sohrab",
+    "Others"
+  ],
+  "vehicleModels": {
+    "Qingqi": [
+      "QM200",
+      "QM150",
+      "QM100",
+      "QM Loader",
+      "QM Passenger",
+      "QM Deluxe"
+    ],
+    "Sazgar": [
+      "Deluxe",
+      "Standard",
+      "Executive",
+      "Eco",
+      "Loader 150",
+      "Loader 200",
+      "Electric Rickshaw"
+    ],
+    "United": [
+      "US100",
+      "US150",
+      "US200",
+      "Loader",
+      "Passenger",
+      "Electric Rickshaw"
+    ],
+    "New Asia": [
+      "150CC Standard",
+      "200CC Deluxe",
+      "Loader 150CC",
+      "Loader 200CC",
+      "Electric Model"
+    ],
+    "Super Power": [
+      "SP150",
+      "SP200",
+      "Loader SP150",
+      "Loader SP200",
+      "Deluxe Model"
+    ],
+    "Road Prince": [
+      "150CC",
+      "200CC",
+      "Loader 150",
+      "Loader 200",
+      "Eco Model",
+      "Electric"
+    ],
+    "Tez Raftar": [
+      "150CC",
+      "200CC",
+      "Deluxe",
+      "Loader",
+      "Passenger",
+      "Electric"
+    ],
+    "Super Star": ["SS150", "SS200", "Loader", "Passenger", "Eco", "Electric"],
+    "Ghani": [
+      "Ghani 150CC",
+      "Ghani Deluxe",
+      "Ghani Loader",
+      "Ghani Passenger",
+      "Ghani Electric"
+    ],
+    "Ravi": [
+      "Ravi Hamsafar",
+      "Ravi Deluxe",
+      "Ravi Loader",
+      "Ravi Passenger",
+      "Ravi Electric"
+    ],
+    "Metro": [
+      "Metro 150CC",
+      "Metro Loader",
+      "Metro Passenger",
+      "Metro Deluxe",
+      "Electric"
+    ],
+    "Crown": [
+      "Crown 150CC",
+      "Crown 200CC",
+      "Crown Deluxe",
+      "Crown Loader",
+      "Crown Electric"
+    ],
+    "Hero": [
+      "Hero 150CC",
+      "Hero Loader",
+      "Hero Passenger",
+      "Hero Deluxe",
+      "Hero Electric"
+    ],
+    "Pak Hero": [
+      "150CC Standard",
+      "200CC Deluxe",
+      "Loader",
+      "Passenger",
+      "Electric"
+    ],
+    "Hassan": ["Standard", "Deluxe", "Loader", "Passenger", "Electric"],
+    "Habib": ["150CC", "200CC", "Loader", "Passenger", "Electric"],
+    "Power": ["Power 150", "Power 200", "Loader", "Passenger", "Electric"],
+    "Master": ["Standard", "Deluxe", "Loader", "Passenger", "Electric"],
+    "Hi-Speed": [
+      "Hi-Speed 150CC",
+      "Hi-Speed 200CC",
+      "Loader",
+      "Passenger",
+      "Electric"
+    ],
+    "Sohrab": [
+      "Sohrab Standard",
+      "Sohrab Deluxe",
+      "Sohrab Loader",
+      "Sohrab Passenger",
+      "Electric"
+    ],
+    "Others": ["Other Model"]
+  },
+  "vehicleColors": [
+    "Yellow",
+    "Green",
+    "Blue",
+    "Red",
+    "White",
+    "Black",
+    "Silver",
+    "Orange",
+    "Brown",
+    "Beige",
+    "Golden",
+    "Cream",
+    "Maroon",
+    "Sky Blue",
+    "Navy Blue",
+    "Grey",
+    "Light Green",
+    "Dark Green",
+    "Matte Black",
+    "Two-Tone",
+    "Multi-Color",
+    "Other"
+  ]
+}

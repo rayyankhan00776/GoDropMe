@@ -33,6 +33,7 @@ Future<void> saveVehicleRegistrationSection({
   required String color,
   required String year,
   required String plate,
+  required int seatCapacity,
   required String? vehiclePhotoPath,
   required String? certFrontPath,
   required String? certBackPath,
@@ -43,6 +44,7 @@ Future<void> saveVehicleRegistrationSection({
     'color': color,
     'year': year,
     'plate': plate,
+    'seatCapacity': seatCapacity,
     'vehiclePhotoPath': vehiclePhotoPath,
     'certFrontPath': certFrontPath,
     'certBackPath': certBackPath,
@@ -56,6 +58,7 @@ class VehicleRegistrationForm extends StatefulWidget {
   final TextEditingController colorController;
   final TextEditingController yearController;
   final TextEditingController plateController;
+  final TextEditingController seatCapacityController;
   final bool showSubmittedErrors;
   final bool showGlobalError;
 
@@ -67,6 +70,7 @@ class VehicleRegistrationForm extends StatefulWidget {
     required this.colorController,
     required this.yearController,
     required this.plateController,
+    required this.seatCapacityController,
     required this.showSubmittedErrors,
     this.showGlobalError = false,
   });
@@ -87,6 +91,7 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
 
   bool _loading = true;
   String? _loadError;
+  int? _seatMax;
 
   @override
   void initState() {
@@ -96,7 +101,14 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
 
   Future<void> _loadCatalog() async {
     try {
-      final jsonStr = await rootBundle.loadString(AppAssets.jsonData);
+      // Decide data source based on previously selected vehicle type
+      final selection = (await LocalStorage.getString(
+        StorageKeys.vehicleSelection,
+      ))?.trim().toLowerCase();
+      final assetPath = (selection == 'rikshaw' || selection == 'rickshaw')
+          ? AppAssets.rikshawcarJsonData
+          : AppAssets.carcarJsonData;
+      final jsonStr = await rootBundle.loadString(assetPath);
       final data = json.decode(jsonStr) as Map<String, dynamic>;
       final brands = (data['vehicleBrands'] as List<dynamic>).cast<String>();
       final models = (data['vehicleModels'] as Map<String, dynamic>).map(
@@ -124,6 +136,19 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
         _selectedColor = initialColor;
         _loading = false;
       });
+      // Determine seat capacity cap from saved vehicle selection (Car/Rikshaw)
+      // Defaults: Car<=9, Rikshaw<=4, else <=12
+      final sel = await LocalStorage.getString(StorageKeys.vehicleSelection);
+      final v = sel?.trim().toLowerCase();
+      int cap;
+      if (v == 'car') {
+        cap = 9;
+      } else if (v == 'rikshaw' || v == 'rickshaw') {
+        cap = 4;
+      } else {
+        cap = 12;
+      }
+      if (mounted) setState(() => _seatMax = cap);
     } catch (e) {
       setState(() {
         _loadError = 'Failed to load car catalog';
@@ -344,7 +369,6 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
               });
             },
           ),
-
           _gap(context),
 
           // Model dropdown filtered by brand
@@ -378,6 +402,40 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
                 widget.colorController.text = val ?? '';
               });
             },
+          ),
+
+          _gap(context),
+
+          // Seat capacity text field (placed beneath Color)
+          CustomTextField(
+            controller: widget.seatCapacityController,
+            hintText: AppStrings.vehicleSeatCapacityHint,
+            borderColor: AppColors.gray,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(2),
+            ],
+            validator: (v) {
+              final val = v?.trim() ?? '';
+              if (val.isEmpty) return 'Please enter seat capacity';
+              final n = int.tryParse(val);
+              if (n == null || n <= 0) return 'Enter a valid capacity';
+              final mx = _seatMax ?? 12;
+              if (n > mx) return 'Max allowed seats: $mx';
+              return null;
+            },
+          ),
+
+          SizedBox(height: Responsive.scaleClamped(context, 6, 4, 10)),
+          Padding(
+            padding: const EdgeInsets.only(left: 4.0),
+            child: Text(
+              'Max allowed seats: ${_seatMax ?? 12}',
+              style: AppTypography.optionTerms.copyWith(
+                color: AppColors.darkGray,
+              ),
+            ),
           ),
 
           _gap(context),

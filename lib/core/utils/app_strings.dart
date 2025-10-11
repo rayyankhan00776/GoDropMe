@@ -105,6 +105,7 @@ class AppStrings {
   static const vehicleColorHint = 'Vehicle Color';
   static const vehicleProductionYearHint = 'Production Year';
   static const vehicleNumberPlateHint = 'Number Plate';
+  static const vehicleSeatCapacityHint = 'Seat Capacity';
 
   // Vehicle registration help strings
   static const vehiclePhotoHelpLine1 =

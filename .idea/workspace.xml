@@ -6,19 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="344f2811-d295-41ea-8c46-120907b8900d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/controllers/driver_identification_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/controllers/driver_identification_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/controllers/driver_licence_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/controllers/driver_licence_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/controllers/driver_name_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/controllers/driver_name_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/controllers/personal_info_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/controllers/personal_info_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/controllers/vehicle_selection_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/controllers/vehicle_selection_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/driver_identification_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/driver_identification_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/driver_licence_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/driver_licence_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/personal_info_Screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/personal_info_Screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/vehicle_Selection_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/vehicle_Selection_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/vehicle_registration_Screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/pages/vehicle_registration_Screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/widgets/vehicleRegistration/vehicle_registration_form.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/DriverSide/driverDataCollection/widgets/vehicleRegistration/vehicle_registration_form.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

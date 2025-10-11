@@ -58,6 +58,8 @@ flutter:
     - assets/images/sample/
     # Car catalog JSON used for dropdowns
     - assets/json/car_details.json
+    # Rikshaw catalog JSON used when Rikshaw is selected
+    - assets/json/rikshaw_details.json
   #---------------------- ./ LOCAL ASSETS END ----------------------#
 
   #---------------------- LOCAL FONTS ----------------------#
