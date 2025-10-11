@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:godropme/core/utils/local_storage.dart';
+import 'package:godropme/utils/local_storage.dart';
 
 class VehicleSelectionController extends GetxController {
   // 'car' or 'rikshaw' or null

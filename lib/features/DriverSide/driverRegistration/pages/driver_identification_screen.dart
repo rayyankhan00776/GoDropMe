@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/core/widgets/custom_Appbar.dart';
-import 'package:godropme/core/widgets/progress_next_bar.dart';
-import 'package:godropme/core/utils/app_strings.dart';
-import 'package:godropme/core/utils/app_typography.dart';
-import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/common%20widgets/custom_Appbar.dart';
+import 'package:godropme/common%20widgets/progress_next_bar.dart';
+import 'package:godropme/utils/app_strings.dart';
+import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverIdentification/driver_identification_image_row.dart';
 import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverIdentification/driver_identification_form.dart';
 import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverIdentification/identification_image_help_screen.dart';
-import 'package:godropme/core/utils/app_assets.dart';
-import 'package:godropme/core/routes/routes.dart';
+import 'package:godropme/utils/app_assets.dart';
+import 'package:godropme/routes/routes.dart';
 import 'package:godropme/features/DriverSide/driverRegistration/controllers/driver_identification_controller.dart';
 
 class DriverIdentificationScreen extends StatefulWidget {

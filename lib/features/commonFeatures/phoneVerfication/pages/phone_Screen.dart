@@ -2,13 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/core/routes/routes.dart';
+import 'package:godropme/routes/routes.dart';
 // ...existing imports
 import 'package:godropme/features/commonFeatures/phoneVerfication/widgets/PhoneWidgets/phone_header.dart';
 import 'package:godropme/features/commonFeatures/phoneVerfication/widgets/PhoneWidgets/phone_input_row.dart';
-import 'package:godropme/core/widgets/custom_phone_text_field.dart';
+import 'package:godropme/common%20widgets/custom_phone_text_field.dart';
 import 'package:godropme/features/commonFeatures/phoneVerfication/widgets/PhoneWidgets/phone_actions.dart';
-import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/utils/responsive.dart';
 
 class PhoneScreen extends StatefulWidget {
   const PhoneScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/core/widgets/custom_image_container.dart';
-import 'package:godropme/core/utils/responsive.dart';
-import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/common%20widgets/custom_image_container.dart';
+import 'package:godropme/utils/responsive.dart';
+import 'package:godropme/utils/app_typography.dart';
 
 /// A small reusable widget that shows two image containers side-by-side:
 /// - left: licence image

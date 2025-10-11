@@ -1,10 +1,10 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/utils/responsive.dart';
 // import 'package:godropme/core/theme/colors.dart';
 // import 'package:godropme/core/utils/app_typography.dart';
-import 'package:godropme/core/widgets/custom_text_field.dart';
+import 'package:godropme/common%20widgets/custom_text_field.dart';
 
 class ParentnameInput extends StatelessWidget {
   final TextEditingController controller;

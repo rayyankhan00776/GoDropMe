@@ -6,7 +6,7 @@ import 'package:godropme/features/commonFeatures/DriverOrParentOption/widgets/do
 import 'package:godropme/features/commonFeatures/DriverOrParentOption/widgets/dop_illustration.dart';
 import 'package:godropme/features/commonFeatures/DriverOrParentOption/widgets/dop_actions.dart';
 import 'package:godropme/features/commonFeatures/DriverOrParentOption/controllers/dop_controller.dart';
-import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/utils/responsive.dart';
 
 class DopOptionScreen extends StatelessWidget {
   const DopOptionScreen({super.key});

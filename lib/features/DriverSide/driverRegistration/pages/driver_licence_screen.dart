@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/core/routes/routes.dart';
+import 'package:godropme/routes/routes.dart';
 import 'package:godropme/core/theme/colors.dart';
-import 'package:godropme/core/utils/app_assets.dart';
-import 'package:godropme/core/utils/app_strings.dart';
-import 'package:godropme/core/utils/app_typography.dart';
-import 'package:godropme/core/utils/responsive.dart';
-import 'package:godropme/core/widgets/custom_Appbar.dart';
-import 'package:godropme/core/widgets/progress_next_bar.dart';
+import 'package:godropme/utils/app_assets.dart';
+import 'package:godropme/utils/app_strings.dart';
+import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/utils/responsive.dart';
+import 'package:godropme/common%20widgets/custom_Appbar.dart';
+import 'package:godropme/common%20widgets/progress_next_bar.dart';
 // ...existing widget imports moved to modular widgets
 import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverLicense/licence_image_row.dart';
 import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverLicense/driverlicence_form.dart';

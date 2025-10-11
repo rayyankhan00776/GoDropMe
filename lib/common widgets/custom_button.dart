@@ -1,8 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:godropme/core/utils/app_typography.dart';
-import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/core/theme/colors.dart';
 import 'package:godropme/core/theme/button_dimensions.dart';
 

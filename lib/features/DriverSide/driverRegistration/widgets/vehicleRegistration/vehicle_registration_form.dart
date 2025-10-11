@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:godropme/core/utils/app_assets.dart';
-import 'package:godropme/core/utils/app_strings.dart';
+import 'package:godropme/utils/app_assets.dart';
+import 'package:godropme/utils/app_strings.dart';
 import 'package:godropme/core/theme/colors.dart';
-import 'package:godropme/core/utils/responsive.dart';
-import 'package:godropme/core/widgets/custom_text_field.dart';
-import 'package:godropme/core/utils/app_typography.dart';
-import 'package:godropme/core/utils/local_storage.dart';
+import 'package:godropme/utils/responsive.dart';
+import 'package:godropme/common%20widgets/custom_text_field.dart';
+import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/utils/local_storage.dart';
 
 /// Forces any alphabetic input to uppercase for fields like number plates.
 /// Keeps cursor at the end of the transformed text for a natural typing feel.

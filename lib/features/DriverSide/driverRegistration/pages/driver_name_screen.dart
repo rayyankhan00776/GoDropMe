@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/core/routes/routes.dart';
-import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/routes/routes.dart';
+import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverName/driverName_action.dart';
 import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverName/driverName_header.dart';
 import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverName/driverName_input.dart';

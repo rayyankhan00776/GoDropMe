@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:godropme/core/utils/app_assets.dart';
-import 'package:godropme/core/utils/app_strings.dart';
-import 'package:godropme/core/utils/app_typography.dart';
-import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/utils/app_assets.dart';
+import 'package:godropme/utils/app_strings.dart';
+import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/utils/responsive.dart';
 import 'dart:math' as math;
 
 class OptionIllustration extends StatelessWidget {

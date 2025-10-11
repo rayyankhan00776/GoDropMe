@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:godropme/core/theme/colors.dart';
-import 'package:godropme/core/utils/app_typography.dart';
+import 'package:godropme/utils/app_typography.dart';
 import 'package:flutter/services.dart';
 
 typedef TextValidator = String? Function(String? value);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/core/widgets/progress_next_bar.dart';
+import 'package:godropme/common%20widgets/progress_next_bar.dart';
 
 /// Simple wrapper to keep the PersonalInfoScreen smaller.
 class PersonalinfoActions extends StatelessWidget {

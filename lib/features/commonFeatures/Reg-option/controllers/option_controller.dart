@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:godropme/core/routes/routes.dart';
+import 'package:godropme/routes/routes.dart';
 // ...existing imports
 
 /// Controller for the Reg-option (Option) screen.

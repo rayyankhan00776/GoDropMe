@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:godropme/core/widgets/custom_phone_text_field.dart';
-import 'package:godropme/core/utils/responsive.dart';
-import 'package:godropme/core/utils/app_strings.dart';
+import 'package:godropme/common%20widgets/custom_phone_text_field.dart';
+import 'package:godropme/utils/responsive.dart';
+import 'package:godropme/utils/app_strings.dart';
 import 'package:godropme/core/theme/colors.dart';
 
 class DateInputFormatter extends TextInputFormatter {

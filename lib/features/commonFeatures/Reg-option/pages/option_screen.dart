@@ -7,7 +7,7 @@ import 'package:godropme/features/commonFeatures/Reg-option/widgets/option_illus
 import 'package:godropme/features/commonFeatures/Reg-option/widgets/option_actions.dart';
 import 'package:godropme/features/commonFeatures/Reg-option/widgets/option_terms.dart';
 import 'package:godropme/features/commonFeatures/Reg-option/controllers/option_controller.dart';
-import 'package:godropme/core/utils/responsive.dart';
+import 'package:godropme/utils/responsive.dart';
 
 class OptionScreen extends StatelessWidget {
   const OptionScreen({super.key});
