@@ -1,25 +1,25 @@
 import 'package:get/get.dart';
-import 'package:godropme/features/DriverOrParentOption/binding/dop_binding.dart';
-import 'package:godropme/features/DriverOrParentOption/pages/DOP_option_screen.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/pages/driver_identification_screen.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/pages/driver_licence_screen.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/pages/driver_name_screen.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/binding/driver_name_binding.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/binding/driver_licence_binding.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/binding/driver_identification_binding.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/pages/personal_info_Screen.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/binding/personal_info_binding.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/pages/vehicle_Selection_screen.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/binding/vehicle_selection_binding.dart';
-import 'package:godropme/features/DriverSide/driverDataCollection/pages/vehicle_registration_Screen.dart';
-import 'package:godropme/features/onboard/binding/onboard_binding.dart';
-import 'package:godropme/features/onboard/pages/onboard_screen.dart';
-import 'package:godropme/features/Reg-option/pages/option_screen.dart';
-import 'package:godropme/features/Reg-option/binding/option_binding.dart';
-import 'package:godropme/features/phoneVerfication/pages/otp_screen.dart';
-import 'package:godropme/features/phoneVerfication/pages/phone_Screen.dart';
-import 'package:godropme/features/phoneVerfication/binding/phone_binding.dart';
-import 'package:godropme/features/phoneVerfication/binding/otp_binding.dart';
+import 'package:godropme/features/commonFeatures/DriverOrParentOption/binding/dop_binding.dart';
+import 'package:godropme/features/commonFeatures/DriverOrParentOption/pages/DOP_option_screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/driver_identification_screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/driver_licence_screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/driver_name_screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/driver_name_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/driver_licence_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/driver_identification_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/personal_info_Screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/personal_info_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/vehicle_Selection_screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/vehicle_selection_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/vehicle_registration_Screen.dart';
+import 'package:godropme/features/commonFeatures/onboard/binding/onboard_binding.dart';
+import 'package:godropme/features/commonFeatures/onboard/pages/onboard_screen.dart';
+import 'package:godropme/features/commonFeatures/Reg-option/pages/option_screen.dart';
+import 'package:godropme/features/commonFeatures/Reg-option/binding/option_binding.dart';
+import 'package:godropme/features/commonFeatures/phoneVerfication/pages/otp_screen.dart';
+import 'package:godropme/features/commonFeatures/phoneVerfication/pages/phone_Screen.dart';
+import 'package:godropme/features/commonFeatures/phoneVerfication/binding/phone_binding.dart';
+import 'package:godropme/features/commonFeatures/phoneVerfication/binding/otp_binding.dart';
 
 // Add more imports for other screens as you create them
 
