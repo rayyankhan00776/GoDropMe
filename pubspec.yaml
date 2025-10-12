@@ -1,5 +1,5 @@
 name: godropme
-description: "A new Flutter project."
+description: "Smart School transportation solution"
 publish_to: "none"
 version: 1.0.0+1
 
@@ -60,7 +60,7 @@ flutter:
     - assets/images/flag/
     # Sample images for help screens
     - assets/images/sample/
-    # Car catalog JSON used for dropdowns
+    # Car catalog JSON used when Car is selected
     - assets/json/car_details.json
     # Rikshaw catalog JSON used when Rikshaw is selected
     - assets/json/rikshaw_details.json

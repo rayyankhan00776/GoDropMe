@@ -12,6 +12,7 @@ import 'package:godropme/features/driverSide/driverRegistration/binding/personal
 import 'package:godropme/features/driverSide/driverRegistration/pages/vehicle_Selection_screen.dart';
 import 'package:godropme/features/driverSide/driverRegistration/binding/vehicle_selection_binding.dart';
 import 'package:godropme/features/driverSide/driverRegistration/pages/vehicle_registration_Screen.dart';
+import 'package:godropme/features/driverSide/driverRegistration/binding/vehicle_registration_binding.dart';
 import 'package:godropme/features/commonFeatures/onboard/binding/onboard_binding.dart';
 import 'package:godropme/features/commonFeatures/onboard/pages/onboard_screen.dart';
 import 'package:godropme/features/commonFeatures/registrationOption/pages/option_screen.dart';
@@ -96,6 +97,10 @@ class AppRoutes {
       page: () => const DriverIdentificationScreen(),
       binding: DriverIdentificationBinding(),
     ),
-    GetPage(name: vehicleRegistration, page: () => VehicleRegistrationScreen()),
+    GetPage(
+      name: vehicleRegistration,
+      page: () => const VehicleRegistrationScreen(),
+      binding: VehicleRegistrationBinding(),
+    ),
   ];
 }

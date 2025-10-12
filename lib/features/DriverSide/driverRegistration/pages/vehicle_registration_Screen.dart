@@ -15,6 +15,7 @@ import 'package:godropme/utils/app_assets.dart';
 import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_photo_help_screen.dart';
 import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_cert_front_help_screen.dart';
 import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_cert_back_help_screen.dart';
+import 'package:godropme/features/driverSide/driverRegistration/controllers/vehicle_registration_controller.dart';
 
 class VehicleRegistrationScreen extends StatefulWidget {
   const VehicleRegistrationScreen({super.key});
@@ -52,6 +53,8 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Controller is provided via route binding; do not register here.
+    final VehicleRegistrationController controller = Get.find();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: const CustomBlurAppBar(),
@@ -213,8 +216,8 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                     return;
                   }
 
-                  // Persist the section locally (SharedPreferences)
-                  await saveVehicleRegistrationSection(
+                  // Persist the section locally via controller (logic preserved)
+                  await controller.saveVehicleRegistrationSection(
                     brand: _brandController.text.trim(),
                     model: _modelController.text.trim(),
                     color: _colorController.text.trim(),

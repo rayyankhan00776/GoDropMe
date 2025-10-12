@@ -6,7 +6,7 @@
     <!-- Permission for camera access used by image_picker -->
     <uses-permission android:name="android.permission.CAMERA" />
     <application
-        android:label="godropmee"
+        android:label="Go Drop Me"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
