@@ -35,6 +35,7 @@ dependencies:
 
   # Product Specific Packages
   # add to be when needed
+  google_nav_bar: ^5.0.6
 #---------------------- ./ PACKAGES END ----------------------#
 
 dev_dependencies:
@@ -64,6 +65,8 @@ flutter:
     - assets/json/car_details.json
     # Rikshaw catalog JSON used when Rikshaw is selected
     - assets/json/rikshaw_details.json
+    # nav bar icons
+    - assets/icons/navBarIcons/
   #---------------------- ./ LOCAL ASSETS END ----------------------#
 
   #---------------------- LOCAL FONTS ----------------------#
