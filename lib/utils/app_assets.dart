@@ -29,4 +29,5 @@ class AppAssets {
   // JSON data for vehicle brands and models
   static const carcarJsonData = 'assets/json/car_details.json';
   static const rikshawcarJsonData = 'assets/json/rikshaw_details.json';
+  static const defaultPersonSvg = "assets/images/svg/person.svg"; 
 }

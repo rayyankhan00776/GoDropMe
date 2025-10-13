@@ -1,8 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:godropme/features/parentSide/parentHome/widgets/map_screen_drawer.dart';
+import 'package:godropme/features/parentSide/parentHome/widgets/drawer_button.dart';
 
 class ParentMapScreen extends StatefulWidget {
   const ParentMapScreen({super.key});
@@ -12,7 +14,7 @@ class ParentMapScreen extends StatefulWidget {
 }
 
 class _ParentMapScreenState extends State<ParentMapScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final ZoomDrawerController _zoomController = ZoomDrawerController();
 
   static const LatLng _target = LatLng(32.462074, 74.529802);
   static const CameraPosition _initialCameraPosition = CameraPosition(
@@ -30,42 +32,38 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: const Drawer(),
-      body: GoogleMap(
-        initialCameraPosition: _initialCameraPosition,
-        onMapCreated: (c) => _controller = c,
-      ),
-
-      // Glassy Drawer Button ✨
-      floatingActionButton: ClipRRect(
-        // borderRadius: BorderRadius.circular(10),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 0, sigmaY: 1),
-          child: Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              border: Border.all(
-                color: Colors.black.withOpacity(0.4),
-                width: 0.6,
+    return ZoomDrawer(
+      controller: _zoomController,
+      menuScreen: const MapScreenDrawer(),
+      mainScreen: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: _initialCameraPosition,
+            onMapCreated: (c) => _controller = c,
+          ),
+          // Overlay the glassy button at top-left
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12, top: 12),
+                child: GlassDrawerButton(
+                  onPressed: () => _zoomController.toggle?.call(),
+                ),
               ),
-
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 8),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black, size: 28),
-              onPressed: () => _scaffoldKey.currentState?.openDrawer(),
             ),
           ),
-        ),
+        ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+      // Visual tuning for smooth animation
+      borderRadius: 24,
+      showShadow: true,
+      angle: 0.0,
+      slideWidth: MediaQuery.of(context).size.width * 0.80,
+      openCurve: Curves.fastOutSlowIn,
+      closeCurve: Curves.easeInOut,
+      drawerShadowsBackgroundColor: Colors.black.withOpacity(0.2),
+      menuBackgroundColor: Colors.transparent,
     );
   }
 }

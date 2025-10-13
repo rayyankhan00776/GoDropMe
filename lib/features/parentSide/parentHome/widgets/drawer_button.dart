@@ -1,0 +1,56 @@
+// Glassy Drawer Button widget
+// Matches the styling currently used on the map screen, but reusable.
+
+// ignore_for_file: deprecated_member_use
+
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:godropme/theme/colors.dart';
+
+class GlassDrawerButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final double size;
+  final double borderRadius;
+  final Color iconColor;
+  final IconData icon;
+
+  const GlassDrawerButton({
+    super.key,
+    this.onPressed,
+    this.size = 50,
+    this.borderRadius = 8,
+    this.iconColor = Colors.black,
+    this.icon = Icons.menu,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 0, sigmaY: 1),
+        child: Container(
+          height: size,
+          width: size,
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            border: Border.all(
+              color: AppColors.primaryDark.withOpacity(0.4),
+              width: 0.6,
+            ),
+            borderRadius: BorderRadius.circular(borderRadius),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryDark.withOpacity(0.08),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: Icon(icon, color: iconColor, size: 28),
+            onPressed: onPressed,
+          ),
+        ),
+      ),
+    );
+  }
+}
