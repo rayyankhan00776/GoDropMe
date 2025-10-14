@@ -14,8 +14,6 @@ import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawe
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_card.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_tile.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/profile_tile.dart';
-import 'package:godropme/features/parentSide/common widgets/drawer widgets/gradient_action_button.dart';
-import 'package:godropme/features/parentSide/common widgets/drawer widgets/outline_action_button.dart';
 
 class ParentDrawer extends StatelessWidget {
   const ParentDrawer({super.key});
@@ -46,12 +44,18 @@ class ParentDrawer extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 7),
 
                   // Quick actions
                   DrawerCard(
                     child: Column(
                       children: [
+                        DrawerTile(
+                          icon: Icons.drive_eta_rounded,
+                          title: AppStrings.drawerMapScreen,
+                          onTap: () => Get.offNamed(AppRoutes.parentmapScreen),
+                        ),
+                        const Divider(height: 1),
                         DrawerTile(
                           icon: Icons.child_care_rounded,
                           title: AppStrings.drawerAddChildren,
@@ -63,16 +67,8 @@ class ParentDrawer extends StatelessWidget {
                           title: AppStrings.drawerFindDrivers,
                           onTap: () => Get.offNamed(AppRoutes.findDrivers),
                         ),
-                      ],
-                    ),
-                  ),
+                        const Divider(height: 1),
 
-                  const SizedBox(height: 14),
-
-                  // App options
-                  DrawerCard(
-                    child: Column(
-                      children: [
                         DrawerTile(
                           icon: Icons.settings_rounded,
                           title: AppStrings.drawerSettings,
@@ -96,56 +92,22 @@ class ParentDrawer extends StatelessWidget {
                           title: AppStrings.drawerTerms,
                           onTap: () {},
                         ),
+                        const Divider(height: 1),
+                        DrawerTile(
+                          icon: Icons.logout_rounded,
+                          title: AppStrings.drawerLogout,
+                          onTap: () {},
+                        ),
+                        const Divider(height: 1),
+                        DrawerTile(
+                          icon: Icons.star_rate_outlined,
+                          title: AppStrings.drawerRateUs,
+                          onTap: () {},
+                        ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            // Sticky bottom: Rate Us, Logout and version
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Map Screen button (full width) -> Navigate to Map Screen
-                  DrawerGradientActionButton(
-                    icon: Icons.drive_eta_rounded,
-                    label: AppStrings.drawerMapScreen,
-                    colors: const [AppColors.primary, AppColors.primaryDark],
-                    onTap: () => Get.offNamed(AppRoutes.parentmapScreen),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: DrawerGradientActionButton(
-                          icon: Icons.star_rate_rounded,
-                          label: AppStrings.drawerRateUs,
-                          colors: const [
-                            AppColors.primary,
-                            AppColors.primaryDark,
-                          ],
-                          onTap: () {
-                            // TODO: Implement rate prompt or app store redirect
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: DrawerOutlineActionButton(
-                          icon: Icons.logout_rounded,
-                          label: AppStrings.drawerLogout,
-                          color: Colors.redAccent,
-                          onTap: () {
-                            // TODO: Implement logout
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 5),
                   Center(
                     child: Text(
                       AppStrings.drawerVersionLabel,
@@ -156,6 +118,7 @@ class ParentDrawer extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 7),
                 ],
               ),
             ),
@@ -164,7 +127,5 @@ class ParentDrawer extends StatelessWidget {
       ),
     );
   }
-
   // (No local helpers; composition uses DrawerCard, DrawerTile, ProfileTile,
-  // DrawerGradientActionButton, and DrawerOutlineActionButton widgets.)
 }

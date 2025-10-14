@@ -134,7 +134,7 @@ class AppStrings {
   static const drawerSupport = 'Support';
   static const drawerHelp = 'Help';
   static const drawerTerms = 'Terms & Conditions';
-  static const drawerMapScreen = 'Map Screen';
+  static const drawerMapScreen = 'Home Screen';
   static const drawerRateUs = 'Rate Us';
   static const drawerLogout = 'Logout';
   static const drawerVersionLabel = 'GoDropMe v1.0.0';
