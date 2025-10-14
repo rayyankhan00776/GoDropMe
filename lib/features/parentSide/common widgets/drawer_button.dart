@@ -1,5 +1,4 @@
-// Glassy Drawer Button widget
-// Matches the styling currently used on the map screen, but reusable.
+// Glassy Drawer Button widget - reusable across parent side screens
 
 // ignore_for_file: deprecated_member_use
 

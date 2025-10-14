@@ -20,6 +20,8 @@
 
 //   static const List<Widget> _pages = <Widget>[MapTab(), SearchTab(), ChatTab()];
 
+// ignore_for_file: file_names
+
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(

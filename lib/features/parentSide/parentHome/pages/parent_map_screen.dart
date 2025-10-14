@@ -2,9 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-import 'package:godropme/features/parentSide/parentHome/widgets/map_screen_drawer.dart';
-import 'package:godropme/features/parentSide/parentHome/widgets/drawer_button.dart';
+import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
 
 class ParentMapScreen extends StatefulWidget {
   const ParentMapScreen({super.key});
@@ -14,13 +12,11 @@ class ParentMapScreen extends StatefulWidget {
 }
 
 class _ParentMapScreenState extends State<ParentMapScreen> {
-  final ZoomDrawerController _zoomController = ZoomDrawerController();
-
   static const LatLng _target = LatLng(32.462074, 74.529802);
-  static const CameraPosition _initialCameraPosition = CameraPosition(
-    target: _target,
-    zoom: 14.5,
-  );
+  // static const CameraPosition _initialCameraPosition = CameraPosition(
+  // target: _target,
+  // zoom: 14.5,
+  // );
 
   GoogleMapController? _controller;
 
@@ -32,38 +28,31 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ZoomDrawer(
-      controller: _zoomController,
-      menuScreen: const MapScreenDrawer(),
-      mainScreen: Stack(
-        children: [
-          GoogleMap(
-            initialCameraPosition: _initialCameraPosition,
-            onMapCreated: (c) => _controller = c,
-          ),
-          // Overlay the glassy button at top-left
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 12, top: 12),
-                child: GlassDrawerButton(
-                  onPressed: () => _zoomController.toggle?.call(),
-                ),
+    return ParentDrawerShell(
+      body: Scaffold(
+        body: Stack(
+          children: [
+            GoogleMap(
+              initialCameraPosition: const CameraPosition(
+                target: LatLng(34.0000, 71.57849),
+                zoom: 15,
               ),
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: true,
+              myLocationEnabled: true,
+              onMapCreated: (c) => _controller = c,
+              mapType: MapType.normal,
+              markers: <Marker>{
+                Marker(
+                  markerId: const MarkerId('target'),
+                  position: _target,
+                  infoWindow: const InfoWindow(title: 'Target Location'),
+                ),
+              },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-      // Visual tuning for smooth animation
-      borderRadius: 24,
-      showShadow: true,
-      angle: 0.0,
-      slideWidth: MediaQuery.of(context).size.width * 0.80,
-      openCurve: Curves.fastOutSlowIn,
-      closeCurve: Curves.easeInOut,
-      drawerShadowsBackgroundColor: Colors.black.withOpacity(0.2),
-      menuBackgroundColor: Colors.transparent,
     );
   }
 }

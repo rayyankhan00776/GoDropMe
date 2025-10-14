@@ -122,8 +122,22 @@ class AppStrings {
   static const done = 'Done';
   static const vehicleDetailsSaved = 'Vehicle details saved';
 
-    // parent name collection strings
+  // parent name collection strings
   static const parentNameTitle = 'Welcome to GoDropMe!';
   static const parentNameSubtitle = 'Please introduce yourself';
   static const parentNameButton = 'Next';
+
+  // Drawer strings
+  static const drawerAddChildren = 'Add Children';
+  static const drawerFindDrivers = 'Find Drivers';
+  static const drawerSettings = 'Settings';
+  static const drawerSupport = 'Support';
+  static const drawerHelp = 'Help';
+  static const drawerTerms = 'Terms & Conditions';
+  static const drawerMapScreen = 'Map Screen';
+  static const drawerRateUs = 'Rate Us';
+  static const drawerLogout = 'Logout';
+  static const drawerVersionLabel = 'GoDropMe v1.0.0';
+  static const drawerProfileNamePlaceholder = 'John Doe';
+  static const drawerProfileRoleParent = 'Parent';
 }
