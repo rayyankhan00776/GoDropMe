@@ -28,6 +28,7 @@ import 'package:godropme/features/parentSide/parentName/binding/driver_name_bind
 import 'package:godropme/features/parentSide/addChildren/pages/add_children_screen.dart';
 import 'package:godropme/features/parentSide/findDrivers/pages/find_drivers_screen.dart';
 import 'package:godropme/features/parentSide/profile/pages/profile_screen.dart';
+import 'package:godropme/features/parentSide/parentChat/pages/parent_chat_screen.dart';
 
 // Add more imports for other screens as you create them
 
@@ -45,6 +46,7 @@ class AppRoutes {
   static const String driverIdentification = '/driver_identification';
   static const String vehicleRegistration = '/vehicle_registration';
   static const String parentmapScreen = '/map_screen';
+  static const String parentChat = '/parent_chat';
   static const String addChildren = '/add_children';
   static const String findDrivers = '/find_drivers';
   static const String profile = '/profile';
@@ -113,6 +115,7 @@ class AppRoutes {
     ),
     // parents Screens can be added here in the same manner
     GetPage(name: parentmapScreen, page: () => const ParentMapScreen()),
+    GetPage(name: parentChat, page: () => const ParentChatScreen()),
     GetPage(name: addChildren, page: () => const AddChildrenScreen()),
     GetPage(name: findDrivers, page: () => const FindDriversScreen()),
     GetPage(name: profile, page: () => const ProfileScreen()),

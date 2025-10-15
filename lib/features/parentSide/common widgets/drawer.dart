@@ -127,5 +127,6 @@ class ParentDrawer extends StatelessWidget {
       ),
     );
   }
+
   // (No local helpers; composition uses DrawerCard, DrawerTile, ProfileTile,
 }

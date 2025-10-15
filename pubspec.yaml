@@ -32,8 +32,7 @@ dependencies:
   # Maps and permissions
   google_maps_flutter: ^2.13.1
   permission_handler: ^12.0.1
-  # drawer package
-  flutter_zoom_drawer: ^3.2.0
+  appwrite: ^20.2.1
 
   # Product Specific Packages
   # add to be when needed

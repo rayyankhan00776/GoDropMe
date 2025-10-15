@@ -16,9 +16,9 @@ class GlassDrawerButton extends StatelessWidget {
   const GlassDrawerButton({
     super.key,
     this.onPressed,
-    this.size = 50,
+    this.size = 45,
     this.borderRadius = 8,
-    this.iconColor = Colors.black,
+    this.iconColor = AppColors.white,
     this.icon = Icons.menu,
   });
 
@@ -31,18 +31,13 @@ class GlassDrawerButton extends StatelessWidget {
           height: size,
           width: size,
           decoration: BoxDecoration(
-            color: Colors.transparent,
+            color: AppColors.primary.withOpacity(0.9),
             border: Border.all(
-              color: AppColors.primaryDark.withOpacity(0.4),
+              color: AppColors.primaryDark.withOpacity(0.8),
               width: 0.6,
             ),
             borderRadius: BorderRadius.circular(borderRadius),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primaryDark.withOpacity(0.08),
-                blurRadius: 8,
-              ),
-            ],
+            // boxShadow: [BoxShadow(color: AppColors.primary, blurRadius: 8)],
           ),
           child: IconButton(
             icon: Icon(icon, color: iconColor, size: 28),

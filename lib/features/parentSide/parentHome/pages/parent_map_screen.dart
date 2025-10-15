@@ -1,6 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:godropme/routes.dart';
+import 'package:godropme/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
 
@@ -49,6 +52,38 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
                   infoWindow: const InfoWindow(title: 'Target Location'),
                 ),
               },
+            ),
+
+            // Rounded chat button at bottom-left
+            Positioned(
+              right: 16,
+              bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Get.offNamed(AppRoutes.parentChat);
+                  },
+                  borderRadius: BorderRadius.circular(28),
+                  child: Container(
+                    height: 56,
+                    width: 56,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.9),
+                      border: Border.all(
+                        color: AppColors.primaryDark.withOpacity(0.8),
+                        width: 0.6,
+                      ),
+                      shape: BoxShape.circle,
+                      // boxShadow: [BoxShadow(color: AppColors.primary, blurRadius: 8)],
+                    ),
+                    child: const Icon(
+                      Icons.chat_bubble_outline_sharp,
+                      color: AppColors.white,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
