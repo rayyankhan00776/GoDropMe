@@ -140,4 +140,5 @@ class AppStrings {
   static const drawerVersionLabel = 'GoDropMe v1.0.0';
   static const drawerProfileNamePlaceholder = 'John Doe';
   static const drawerProfileRoleParent = 'Parent';
+  static const parentChatHeading = 'Chat';
 }

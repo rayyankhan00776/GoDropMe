@@ -11,7 +11,7 @@ class ParentChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ParentDrawerShell(
       body: Scaffold(
-        appBar: AppBar(title: const Text('Chat'), elevation: 0),
+        // appBar: AppBar(title: const Text('Chat'), elevation: 0),
         body: const Center(
           child: Text('Chat', style: AppTypography.optionLinePrimary),
         ),

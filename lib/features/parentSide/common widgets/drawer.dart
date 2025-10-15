@@ -68,7 +68,12 @@ class ParentDrawer extends StatelessWidget {
                           onTap: () => Get.offNamed(AppRoutes.findDrivers),
                         ),
                         const Divider(height: 1),
-
+                        DrawerTile(
+                          icon: Icons.directions_bus_filled_rounded,
+                          title: AppStrings.parentChatHeading,
+                          onTap: () => Get.offNamed(AppRoutes.parentChat),
+                        ),
+                        const Divider(height: 1),
                         DrawerTile(
                           icon: Icons.settings_rounded,
                           title: AppStrings.drawerSettings,
