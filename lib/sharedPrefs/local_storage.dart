@@ -13,6 +13,9 @@ class StorageKeys {
   static const driverLicence = 'driver_licence'; // JSON blob
   static const driverIdentification = 'driver_identification'; // JSON blob
   static const vehicleRegistration = 'vehicle_registration'; // JSON blob
+
+  // Parent: children list stored as JSON array of child maps
+  static const childrenList = 'children_list';
 }
 
 /// A very small wrapper around SharedPreferences tailored for this app's
@@ -51,6 +54,30 @@ class LocalStorage {
       if (decoded is Map<String, dynamic>) return decoded;
     } catch (_) {}
     return null;
+  }
+
+  // JSON list helpers
+  static Future<void> setJsonList(
+    String key,
+    List<Map<String, dynamic>> list,
+  ) async {
+    await setString(key, jsonEncode(list));
+  }
+
+  static Future<List<Map<String, dynamic>>> getJsonList(String key) async {
+    final s = await getString(key);
+    if (s == null) return <Map<String, dynamic>>[];
+    try {
+      final decoded = jsonDecode(s);
+      if (decoded is List) {
+        return decoded
+            .whereType<Map>()
+            .map((e) => e.map((k, v) => MapEntry(k.toString(), v)))
+            .cast<Map<String, dynamic>>()
+            .toList();
+      }
+    } catch (_) {}
+    return <Map<String, dynamic>>[];
   }
 
   /// Clear all onboarding-related keys. Used when the user explicitly cancels

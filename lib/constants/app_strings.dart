@@ -140,5 +140,24 @@ class AppStrings {
   static const drawerVersionLabel = 'GoDropMe v1.0.0';
   static const drawerProfileNamePlaceholder = 'John Doe';
   static const drawerProfileRoleParent = 'Parent';
+  // Add Children form strings
+  static const addChildTitle = 'Add your Child Details';
+  static const childNameHint = 'Child Name';
+  static const childAgeHint = 'Age ';
+  static const childGenderHint = 'Gender';
+  static const childSchoolHint = 'School Name';
+  static const childPickPointHint = 'Pick Point';
+  static const childDropPointHint = 'Drop Point';
+  static const childRelationshipHint = 'Relationship to Child';
+  static const childPickupTimePref = 'Pickup Time';
+  static const addChildSave = 'Save Child';
   static const parentChatHeading = 'Chat';
+
+  // Add Children helpers
+  static const childFormGlobalError = 'Please fill all the details';
+  static const timeNotSet = 'Not set';
+  static const unableToSubmitForm = 'Unable to submit form';
+  static const addChildrenTitle = 'Add Children';
+  static const noChildrenAdded = 'No child added';
+  static const yourChildren = 'Your Children';
 }
