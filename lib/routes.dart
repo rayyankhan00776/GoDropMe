@@ -29,7 +29,7 @@ import 'package:godropme/features/parentSide/addChildren/pages/add_children_scre
 import 'package:godropme/features/parentSide/addChildren/binding/add_children_binding.dart';
 import 'package:godropme/features/parentSide/findDrivers/pages/find_drivers_screen.dart';
 import 'package:godropme/features/parentSide/profile/pages/profile_screen.dart';
-import 'package:godropme/features/parentSide/addChildren/widgets/add_child_help_screen.dart';
+import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/add_child_help_screen.dart';
 import 'package:godropme/features/parentSide/parentChat/pages/parent_chat_screen.dart';
 
 // Add more imports for other screens as you create them

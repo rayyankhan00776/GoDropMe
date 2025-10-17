@@ -6,9 +6,9 @@ import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/parentSide/addChildren/models/children_form_options.dart';
 import 'package:godropme/features/parentSide/addChildren/utils/children_form_options_loader.dart';
-import 'package:godropme/features/parentSide/addChildren/widgets/dropdown_field.dart';
-import 'package:godropme/features/parentSide/addChildren/widgets/selection_bottom_sheet.dart';
-import 'package:godropme/features/parentSide/addChildren/widgets/time_picker_field.dart';
+import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/dropdown_field.dart';
+import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/selection_bottom_sheet.dart';
+import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/time_picker_field.dart';
 import 'package:godropme/theme/colors.dart';
 
 typedef OnSaveChild = void Function(Map<String, dynamic> childData);
