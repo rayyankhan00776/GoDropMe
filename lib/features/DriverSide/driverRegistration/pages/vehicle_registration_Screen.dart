@@ -16,6 +16,7 @@ import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleR
 import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_cert_front_help_screen.dart';
 import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_cert_back_help_screen.dart';
 import 'package:godropme/features/driverSide/driverRegistration/controllers/vehicle_registration_controller.dart';
+import 'package:godropme/routes.dart';
 
 class VehicleRegistrationScreen extends StatefulWidget {
   const VehicleRegistrationScreen({super.key});
@@ -273,6 +274,9 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                     // ignore: avoid_print
                     print('Failed to print onboarding data: $e');
                   }
+
+                  // Navigate to Driver Map screen after successful completion
+                  Get.offAllNamed(AppRoutes.driverMap);
 
                   // TODO: Send to backend in future
                   // Success SnackBar removed as requested.

@@ -160,4 +160,10 @@ class AppStrings {
   static const addChildrenTitle = 'Add Children';
   static const noChildrenAdded = 'No child added';
   static const yourChildren = 'Your Children';
+
+  // Driver home / map
+  static const driverOnlineLabel = 'Online';
+  static const driverOfflineLabel = 'Offline';
+  static const driverOfflineMessage =
+      'You are offline. Go online to start receiving rides.';
 }

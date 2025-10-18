@@ -28,9 +28,11 @@ import 'package:godropme/features/parentSide/parentName/binding/driver_name_bind
 import 'package:godropme/features/parentSide/addChildren/pages/add_children_screen.dart';
 import 'package:godropme/features/parentSide/addChildren/binding/add_children_binding.dart';
 import 'package:godropme/features/parentSide/findDrivers/pages/find_drivers_screen.dart';
-import 'package:godropme/features/parentSide/profile/pages/profile_screen.dart';
+import 'package:godropme/features/parentSide/parentProfile/pages/profile_screen.dart';
 import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/add_child_help_screen.dart';
 import 'package:godropme/features/parentSide/parentChat/pages/parent_chat_screen.dart';
+import 'package:godropme/features/driverSide/driverHome/pages/driver_home_screen.dart';
+import 'package:godropme/features/driverSide/driverHome/binding/driver_home_binding.dart';
 
 // Add more imports for other screens as you create them
 
@@ -53,6 +55,7 @@ class AppRoutes {
   static const String addChildHelp = '/add_child_help';
   static const String findDrivers = '/find_drivers';
   static const String profile = '/profile';
+  static const String driverMap = '/driver_map';
   // static const String register = '/register'; // Example for future screens
 
   static final routes = [
@@ -131,5 +134,10 @@ class AppRoutes {
     ),
     GetPage(name: findDrivers, page: () => const FindDriversScreen()),
     GetPage(name: profile, page: () => const ProfileScreen()),
+    GetPage(
+      name: driverMap,
+      page: () => const DriverHomeScreen(),
+      binding: DriverMapBinding(),
+    ),
   ];
 }

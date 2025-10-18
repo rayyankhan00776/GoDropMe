@@ -5,6 +5,7 @@ import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
+import 'package:godropme/common%20widgets/custom_button.dart';
 
 class ChildTile extends StatefulWidget {
   final Map<String, dynamic> childData;
@@ -35,7 +36,7 @@ class _ChildTileState extends State<ChildTile> {
           border: Border.all(color: AppColors.grayLight, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -76,7 +77,7 @@ class _ChildTileState extends State<ChildTile> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.accent.withOpacity(0.15),
+                          color: AppColors.accent.withValues(alpha: 0.15),
                           blurRadius: 14,
                           offset: const Offset(0, 6),
                         ),
@@ -159,7 +160,21 @@ class _ChildTileState extends State<ChildTile> {
                     ? widget.childData['pickup_time']
                     : AppStrings.timeNotSet),
               ),
-              SizedBox(height: Responsive.scaleClamped(context, 8, 6, 12)),
+              SizedBox(height: Responsive.scaleClamped(context, 12, 8, 16)),
+              // Centered 'Find Driver' button (no navigation yet)
+              // TODO: Wire up navigation to find drivers for this child when flow is ready.
+              Center(
+                child: SizedBox(
+                  width: Responsive.wp(context, 70),
+                  child: CustomButton(
+                    text: 'Find Driver',
+                    onTap: () {
+                      // TODO: Implement navigation to find drivers for this child
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(height: Responsive.scaleClamped(context, 12, 8, 16)),
             ],
           ),
         ),
@@ -189,7 +204,7 @@ class _Pill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.12),
+        color: AppColors.primary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
@@ -243,7 +258,7 @@ class _IconRow extends StatelessWidget {
             height: 28,
             width: 28,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6),
             ),
             alignment: Alignment.center,
