@@ -81,9 +81,9 @@ class ParentDrawer extends StatelessWidget {
                         ),
                         const Divider(height: 1),
                         DrawerTile(
-                          icon: Icons.support_agent_rounded,
-                          title: AppStrings.drawerSupport,
-                          onTap: () {},
+                          icon: Icons.report_gmailerrorred_rounded,
+                          title: 'Report',
+                          onTap: () => Get.offNamed(AppRoutes.parentReport),
                         ),
                         const Divider(height: 1),
                         DrawerTile(

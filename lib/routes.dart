@@ -33,6 +33,7 @@ import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenForm
 import 'package:godropme/features/parentSide/parentChat/pages/parent_chat_screen.dart';
 import 'package:godropme/features/driverSide/driverHome/pages/driver_home_screen.dart';
 import 'package:godropme/features/driverSide/driverHome/binding/driver_home_binding.dart';
+import 'package:godropme/features/parentSide/report/pages/parent_report_screen.dart';
 
 // Add more imports for other screens as you create them
 
@@ -56,7 +57,7 @@ class AppRoutes {
   static const String findDrivers = '/find_drivers';
   static const String profile = '/profile';
   static const String driverMap = '/driver_map';
-  // static const String register = '/register'; // Example for future screens
+  static const String parentReport = '/parent_report';
 
   static final routes = [
     GetPage(
@@ -139,5 +140,7 @@ class AppRoutes {
       page: () => const DriverHomeScreen(),
       binding: DriverMapBinding(),
     ),
+    // Parent Report Screen
+    GetPage(name: parentReport, page: () => const ParentReportScreen()),
   ];
 }
