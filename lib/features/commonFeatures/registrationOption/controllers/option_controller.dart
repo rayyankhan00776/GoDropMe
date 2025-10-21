@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:godropme/services/Terms_uri_opener.dart';
 // ...existing imports
 
 /// Controller for the Reg-option (Option) screen.
@@ -19,19 +19,11 @@ class OptionController extends GetxController {
 
   /// Open the Terms and Conditions page.
   void openTerms() async {
-    final Uri url = Uri.parse('https://rayonixsolutions.com/privacy-policy');
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      // Handle error
-      print('Could not launch $url');
-    }
+    termsUriOpener();
   }
 
   /// Open the Privacy Policy page.
   void openPrivacy() async {
-    final Uri url = Uri.parse('https://rayonixsolutions.com/privacy-policy');
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      // Handle error
-      print('Could not launch $url');
-    }
+    termsUriOpener();
   }
 }
