@@ -14,6 +14,7 @@ import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawe
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_card.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_tile.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/profile_tile.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ParentDrawer extends StatelessWidget {
   const ParentDrawer({super.key});
@@ -95,7 +96,18 @@ class ParentDrawer extends StatelessWidget {
                         DrawerTile(
                           icon: Icons.description_outlined,
                           title: AppStrings.drawerTerms,
-                          onTap: () {},
+                          onTap: () async {
+                            final Uri url = Uri.parse(
+                              'https://rayonixsolutions.com/privacy-policy',
+                            );
+                            if (!await launchUrl(
+                              url,
+                              mode: LaunchMode.externalApplication,
+                            )) {
+                              // Handle error
+                              print('Could not launch $url');
+                            }
+                          },
                         ),
                         const Divider(height: 1),
                         DrawerTile(
