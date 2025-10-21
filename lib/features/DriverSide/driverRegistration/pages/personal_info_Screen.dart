@@ -97,16 +97,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                             splashRadius: 20,
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              AppStrings.help,
-                              style: AppTypography.helpButton,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
 

@@ -94,16 +94,6 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                             splashRadius: 20,
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              AppStrings.help,
-                              style: AppTypography.helpButton,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
 

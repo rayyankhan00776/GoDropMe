@@ -16,12 +16,6 @@ class OptionController extends GetxController {
     );
   }
 
-  /// Continue using Google sign-in.
-  void continueWithGoogle() {
-    // TODO: integrate Google Sign-In
-    debugPrint('OptionController: continueWithGoogle called');
-  }
-
   /// Open the Terms and Conditions page.
   void openTerms() {
     // TODO: navigate to terms page when implemented

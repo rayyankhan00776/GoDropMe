@@ -51,10 +51,7 @@ class OptionScreen extends StatelessWidget {
                           ),
                         ),
 
-                        OptionActions(
-                          onContinuePhone: ctrl.continueWithPhone,
-                          onContinueGoogle: ctrl.continueWithGoogle,
-                        ),
+                        OptionActions(onContinuePhone: ctrl.continueWithPhone),
 
                         SizedBox(
                           height: Responsive.scaleClamped(context, 5, 4, 12),
