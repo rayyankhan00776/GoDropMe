@@ -33,6 +33,7 @@ dependencies:
   google_maps_flutter: ^2.13.1
   permission_handler: ^12.0.1
   appwrite: ^20.2.1
+  geolocator: ^10.1.0
 
   # Product Specific Packages
   # add to be when needed

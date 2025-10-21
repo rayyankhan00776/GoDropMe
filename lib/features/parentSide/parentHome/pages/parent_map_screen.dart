@@ -1,6 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/theme/colors.dart';
@@ -45,6 +47,16 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
               myLocationEnabled: true,
               onMapCreated: (c) => _controller = c,
               mapType: MapType.normal,
+              // Improve interaction responsiveness inside drawer shell
+              gestureRecognizers: {
+                Factory<OneSequenceGestureRecognizer>(
+                  () => EagerGestureRecognizer(),
+                ),
+              },
+              scrollGesturesEnabled: true,
+              zoomGesturesEnabled: true,
+              rotateGesturesEnabled: true,
+              tiltGesturesEnabled: true,
               markers: <Marker>{
                 Marker(
                   markerId: const MarkerId('target'),

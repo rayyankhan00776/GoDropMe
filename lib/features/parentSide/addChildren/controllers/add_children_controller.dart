@@ -22,7 +22,15 @@ class AddChildrenController extends GetxController {
     // Dummy persistence: local storage only; no backend calls here.
     final list = await LocalStorage.getJsonList(StorageKeys.childrenList);
     list.add(data);
-    await LocalStorage.setJsonList(StorageKeys.childrenList, list);
+    await LocalStorage.replaceJsonList(StorageKeys.childrenList, list);
+    children.assignAll(list);
+  }
+
+  Future<void> updateChild(int index, Map<String, dynamic> data) async {
+    final list = await LocalStorage.getJsonList(StorageKeys.childrenList);
+    if (index < 0 || index >= list.length) return;
+    list[index] = data;
+    await LocalStorage.replaceJsonList(StorageKeys.childrenList, list);
     children.assignAll(list);
   }
 }

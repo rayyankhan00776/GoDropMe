@@ -16,6 +16,8 @@ class StorageKeys {
 
   // Parent: children list stored as JSON array of child maps
   static const childrenList = 'children_list';
+  // Parent: store parent name similar to driver name for parity
+  static const parentName = 'parent_name';
 }
 
 /// A very small wrapper around SharedPreferences tailored for this app's
@@ -61,7 +63,17 @@ class LocalStorage {
     String key,
     List<Map<String, dynamic>> list,
   ) async {
-    await setString(key, jsonEncode(list));
+    // Write atomically by encoding first
+    final payload = jsonEncode(list);
+    await setString(key, payload);
+  }
+
+  /// Replace the entire JSON list atomically.
+  static Future<void> replaceJsonList(
+    String key,
+    List<Map<String, dynamic>> list,
+  ) async {
+    await setJsonList(key, list);
   }
 
   static Future<List<Map<String, dynamic>>> getJsonList(String key) async {
@@ -71,9 +83,16 @@ class LocalStorage {
       final decoded = jsonDecode(s);
       if (decoded is List) {
         return decoded
-            .whereType<Map>()
-            .map((e) => e.map((k, v) => MapEntry(k.toString(), v)))
-            .cast<Map<String, dynamic>>()
+            .map((e) {
+              if (e is Map) {
+                // Ensure we get a proper Map<String, dynamic>
+                return Map<String, dynamic>.from(
+                  e.map((k, v) => MapEntry(k.toString(), v)),
+                );
+              }
+              return <String, dynamic>{};
+            })
+            .where((m) => m.isNotEmpty)
             .toList();
       }
     } catch (_) {}

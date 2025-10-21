@@ -23,8 +23,9 @@ import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/binding/
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/binding/otp_binding.dart';
 // import 'package:godropme/features/parentSide/parentHome/extra/parent_Home_Screen.dart';
 import 'package:godropme/features/parentSide/parentHome/pages/parent_map_screen.dart';
+import 'package:godropme/features/parentSide/parentHome/binding/parent_map_binding.dart';
 import 'package:godropme/features/parentSide/parentName/pages/parent_name_screen.dart';
-import 'package:godropme/features/parentSide/parentName/binding/driver_name_binding.dart';
+import 'package:godropme/features/parentSide/parentName/binding/parent_name_binding.dart';
 import 'package:godropme/features/parentSide/addChildren/pages/add_children_screen.dart';
 import 'package:godropme/features/parentSide/addChildren/binding/add_children_binding.dart';
 import 'package:godropme/features/parentSide/findDrivers/pages/find_drivers_screen.dart';
@@ -121,7 +122,11 @@ class AppRoutes {
       binding: VehicleRegistrationBinding(),
     ),
     // parents Screens can be added here in the same manner
-    GetPage(name: parentmapScreen, page: () => const ParentMapScreen()),
+    GetPage(
+      name: parentmapScreen,
+      page: () => const ParentMapScreen(),
+      binding: ParentMapBinding(),
+    ),
     GetPage(name: parentChat, page: () => const ParentChatScreen()),
     GetPage(
       name: addChildren,

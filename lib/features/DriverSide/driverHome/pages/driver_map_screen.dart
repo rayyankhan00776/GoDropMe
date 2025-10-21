@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
 
@@ -30,6 +32,16 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
           myLocationEnabled: true,
           myLocationButtonEnabled: true,
           zoomControlsEnabled: false,
+          // Improve gesture responsiveness inside scrollable/drawer shells
+          gestureRecognizers: {
+            Factory<OneSequenceGestureRecognizer>(
+              () => EagerGestureRecognizer(),
+            ),
+          },
+          scrollGesturesEnabled: true,
+          zoomGesturesEnabled: true,
+          rotateGesturesEnabled: true,
+          tiltGesturesEnabled: true,
           onMapCreated: (c) => _mapController = c,
         ),
       ),

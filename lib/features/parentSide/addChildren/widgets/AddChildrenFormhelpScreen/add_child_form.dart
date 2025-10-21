@@ -10,6 +10,8 @@ import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenForm
 import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/selection_bottom_sheet.dart';
 import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/time_picker_field.dart';
 import 'package:godropme/theme/colors.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/location_picker_bottom_sheet.dart';
 
 typedef OnSaveChild = void Function(Map<String, dynamic> childData);
 
@@ -28,6 +30,9 @@ class AddChildFormState extends State<AddChildForm> {
   // Text controllers kept only for text fields
   final _pickPointController = TextEditingController();
   final _dropPointController = TextEditingController();
+  LatLng? _pickLatLng;
+  LatLng? _dropLatLng;
+  bool _sameAsPick = false;
   TimeOfDay? _pickupTime;
   // Single global error message shown when any required field is missing
   String? _globalError;
@@ -104,6 +109,10 @@ class AddChildFormState extends State<AddChildForm> {
       'school': school,
       'pick_point': pick,
       'drop_point': drop,
+      'pick_lat': _pickLatLng?.latitude,
+      'pick_lng': _pickLatLng?.longitude,
+      'drop_lat': _dropLatLng?.latitude,
+      'drop_lng': _dropLatLng?.longitude,
       'relationship': rel,
       'pickup_time': _pickupTime?.format(context) ?? '',
     };
@@ -114,6 +123,39 @@ class AddChildFormState extends State<AddChildForm> {
 
   /// Public helper so parents can trigger the save from outside via a GlobalKey.
   void submitForm() => _save();
+
+  Future<void> _selectPickLocation() async {
+    final result = await showLocationPickerBottomSheet(
+      context,
+      initial: _pickLatLng,
+    );
+    if (result != null) {
+      setState(() {
+        _pickLatLng = result;
+        _pickPointController.text =
+            '${result.latitude.toStringAsFixed(6)}, ${result.longitude.toStringAsFixed(6)}';
+        if (_sameAsPick) {
+          _dropLatLng = result;
+          _dropPointController.text = _pickPointController.text;
+        }
+      });
+    }
+  }
+
+  Future<void> _selectDropLocation() async {
+    if (_sameAsPick) return; // disabled when same-as-pick is on
+    final result = await showLocationPickerBottomSheet(
+      context,
+      initial: _dropLatLng ?? _pickLatLng,
+    );
+    if (result != null) {
+      setState(() {
+        _dropLatLng = result;
+        _dropPointController.text =
+            '${result.latitude.toStringAsFixed(6)}, ${result.longitude.toStringAsFixed(6)}';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,19 +220,64 @@ class AddChildFormState extends State<AddChildForm> {
           ),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
-          // Pick point
-          CustomTextField(
-            borderColor: AppColors.gray,
-            controller: _pickPointController,
-            hintText: AppStrings.childPickPointHint,
+          // Pick point (map picker)
+          GestureDetector(
+            onTap: _selectPickLocation,
+            child: AbsorbPointer(
+              child: CustomTextField(
+                borderColor: AppColors.gray,
+                controller: _pickPointController,
+                hintText: AppStrings.childPickPointHint,
+              ),
+            ),
           ),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
-          // Drop point
-          CustomTextField(
-            borderColor: AppColors.gray,
-            controller: _dropPointController,
-            hintText: AppStrings.childDropPointHint,
+          // Drop point header with Same as pick toggle
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  AppStrings.childDropPointHint,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Same as pick',
+                style: TextStyle(color: AppColors.darkGray, fontSize: 12),
+              ),
+              const SizedBox(width: 8),
+              Switch(
+                value: _sameAsPick,
+                activeColor: AppColors.primary,
+                onChanged: (val) {
+                  setState(() {
+                    _sameAsPick = val;
+                    if (_sameAsPick) {
+                      _dropLatLng = _pickLatLng;
+                      _dropPointController.text = _pickPointController.text;
+                    } else {
+                      _dropLatLng = null;
+                      _dropPointController.clear();
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
+          GestureDetector(
+            onTap: _selectDropLocation,
+            child: AbsorbPointer(
+              child: CustomTextField(
+                borderColor: _sameAsPick ? AppColors.grayLight : AppColors.gray,
+                controller: _dropPointController,
+                hintText: 'Tap to select on map',
+              ),
+            ),
           ),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
