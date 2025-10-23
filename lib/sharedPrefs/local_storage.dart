@@ -13,6 +13,7 @@ class StorageKeys {
   static const driverLicence = 'driver_licence'; // JSON blob
   static const driverIdentification = 'driver_identification'; // JSON blob
   static const vehicleRegistration = 'vehicle_registration'; // JSON blob
+  static const driverServiceDetails = 'driver_service_details'; // JSON blob
 
   // Parent: children list stored as JSON array of child maps
   static const childrenList = 'children_list';
@@ -110,6 +111,7 @@ class LocalStorage {
       StorageKeys.driverLicence,
       StorageKeys.driverIdentification,
       StorageKeys.vehicleRegistration,
+      StorageKeys.driverServiceDetails,
     ];
     final p = await _prefs();
     for (final k in keys) {

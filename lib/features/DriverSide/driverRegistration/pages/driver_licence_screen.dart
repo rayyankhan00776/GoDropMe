@@ -181,7 +181,7 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
               padding: const EdgeInsets.only(bottom: 20.0),
               child: ProgressNextBar(
                 currentStep: 2,
-                totalSteps: 4,
+                totalSteps: 5,
                 onNext: () async {
                   setState(() {
                     _submitted = true;

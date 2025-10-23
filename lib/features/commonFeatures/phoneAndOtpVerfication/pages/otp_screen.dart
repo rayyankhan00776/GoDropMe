@@ -6,6 +6,7 @@ import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/otpWidgets/otp_header.dart';
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/otpWidgets/otp_text_field.dart';
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/otpWidgets/otp_error_dialog.dart';
+import 'package:godropme/constants/app_strings.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -47,12 +48,11 @@ class _OtpScreenState extends State<OtpScreen> {
 
     showDialog(
       context: context,
-      builder:
-          (_) => const OtpErrorDialog(
-            title: 'Invalid code',
-            message: 'Please enter the 6-digit verification code.',
-            buttonText: 'OK',
-          ),
+      builder: (_) => const OtpErrorDialog(
+        title: AppStrings.error,
+        message: 'Please enter the 6-digit verification code.',
+        buttonText: AppStrings.ok,
+      ),
     );
   }
 

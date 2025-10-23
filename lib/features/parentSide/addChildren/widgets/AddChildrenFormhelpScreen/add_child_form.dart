@@ -7,11 +7,12 @@ import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/parentSide/addChildren/models/children_form_options.dart';
 import 'package:godropme/features/parentSide/addChildren/utils/children_form_options_loader.dart';
 import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/dropdown_field.dart';
-import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/selection_bottom_sheet.dart';
+import 'package:godropme/shared/bottom_sheets/selection_bottom_sheet.dart';
 import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/time_picker_field.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/location_picker_bottom_sheet.dart';
+import 'package:godropme/shared/bottom_sheets/location_picker_bottom_sheet.dart';
+import 'package:godropme/shared/widgets/section_header.dart';
 
 typedef OnSaveChild = void Function(Map<String, dynamic> childData);
 
@@ -233,41 +234,35 @@ class AddChildFormState extends State<AddChildForm> {
           ),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
-          // Drop point header with Same as pick toggle
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  AppStrings.childDropPointHint,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+          // Drop point header with Same as pick toggle (centralized SectionHeader)
+          SectionHeader(
+            title: AppStrings.childDropPointHint,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Same as pick',
+                  style: TextStyle(color: AppColors.darkGray, fontSize: 12),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Same as pick',
-                style: TextStyle(color: AppColors.darkGray, fontSize: 12),
-              ),
-              const SizedBox(width: 8),
-              Switch(
-                value: _sameAsPick,
-                activeColor: AppColors.primary,
-                onChanged: (val) {
-                  setState(() {
-                    _sameAsPick = val;
-                    if (_sameAsPick) {
-                      _dropLatLng = _pickLatLng;
-                      _dropPointController.text = _pickPointController.text;
-                    } else {
-                      _dropLatLng = null;
-                      _dropPointController.clear();
-                    }
-                  });
-                },
-              ),
-            ],
+                const SizedBox(width: 8),
+                Switch(
+                  value: _sameAsPick,
+                  activeColor: AppColors.primary,
+                  onChanged: (val) {
+                    setState(() {
+                      _sameAsPick = val;
+                      if (_sameAsPick) {
+                        _dropLatLng = _pickLatLng;
+                        _dropPointController.text = _pickPointController.text;
+                      } else {
+                        _dropLatLng = null;
+                        _dropPointController.clear();
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
           GestureDetector(
             onTap: _selectDropLocation,

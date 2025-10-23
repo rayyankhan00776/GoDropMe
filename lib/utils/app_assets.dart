@@ -31,4 +31,5 @@ class AppAssets {
   static const rikshawcarJsonData = 'assets/json/rikshaw_details.json';
   static const defaultPersonSvg = "assets/images/svg/person.svg";
   static const childrenDetailsJson = 'assets/json/children_details.json';
+  static const driverDetailsJson = 'assets/json/driver_details.json';
 }

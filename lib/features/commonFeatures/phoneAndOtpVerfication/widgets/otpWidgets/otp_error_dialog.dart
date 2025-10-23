@@ -5,6 +5,7 @@ import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/common%20widgets/custom_button.dart';
+import 'package:godropme/constants/app_strings.dart';
 
 /// A small reusable alert dialog used by the OTP flow.
 class OtpErrorDialog extends StatelessWidget {
@@ -15,9 +16,9 @@ class OtpErrorDialog extends StatelessWidget {
 
   const OtpErrorDialog({
     super.key,
-    this.title = 'Error',
+    this.title = AppStrings.error,
     required this.message,
-    this.buttonText = 'OK',
+    this.buttonText = AppStrings.ok,
     this.onPressed,
   });
 

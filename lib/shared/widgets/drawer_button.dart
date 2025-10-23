@@ -1,14 +1,14 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 
-class DrawerTile extends StatelessWidget {
+/// A reusable drawer tile used across app drawers.
+class AppDrawerTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback? onTap;
-  const DrawerTile({
+
+  const AppDrawerTile({
     super.key,
     required this.icon,
     required this.title,

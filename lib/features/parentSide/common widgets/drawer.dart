@@ -13,7 +13,7 @@ import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_header.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_card.dart';
-import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_tile.dart';
+import 'package:godropme/shared/widgets/drawer_button.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/profile_tile.dart';
 
 class ParentDrawer extends StatelessWidget {
@@ -51,49 +51,49 @@ class ParentDrawer extends StatelessWidget {
                   DrawerCard(
                     child: Column(
                       children: [
-                        DrawerTile(
+                        AppDrawerTile(
                           icon: Icons.drive_eta_rounded,
                           title: AppStrings.drawerMapScreen,
                           onTap: () => Get.offNamed(AppRoutes.parentmapScreen),
                         ),
                         const Divider(height: 1),
-                        DrawerTile(
+                        AppDrawerTile(
                           icon: Icons.child_care_rounded,
                           title: AppStrings.drawerAddChildren,
                           onTap: () => Get.offNamed(AppRoutes.addChildren),
                         ),
                         const Divider(height: 1),
-                        DrawerTile(
+                        AppDrawerTile(
                           icon: Icons.directions_bus_filled_rounded,
                           title: AppStrings.drawerFindDrivers,
                           onTap: () => Get.offNamed(AppRoutes.findDrivers),
                         ),
                         const Divider(height: 1),
-                        DrawerTile(
+                        AppDrawerTile(
                           icon: Icons.directions_bus_filled_rounded,
                           title: AppStrings.parentChatHeading,
                           onTap: () => Get.offNamed(AppRoutes.parentChat),
                         ),
                         const Divider(height: 1),
-                        DrawerTile(
+                        AppDrawerTile(
                           icon: Icons.settings_rounded,
                           title: AppStrings.drawerSettings,
                           onTap: () {},
                         ),
                         const Divider(height: 1),
-                        DrawerTile(
+                        AppDrawerTile(
                           icon: Icons.report_gmailerrorred_rounded,
-                          title: 'Report',
+                          title: AppStrings.report,
                           onTap: () => Get.offNamed(AppRoutes.parentReport),
                         ),
                         const Divider(height: 1),
-                        DrawerTile(
+                        AppDrawerTile(
                           icon: Icons.help_outline_rounded,
                           title: AppStrings.drawerHelp,
                           onTap: () {},
                         ),
                         const Divider(height: 1),
-                        DrawerTile(
+                        AppDrawerTile(
                           icon: Icons.description_outlined,
                           title: AppStrings.drawerTerms,
                           onTap: () async {
@@ -101,13 +101,13 @@ class ParentDrawer extends StatelessWidget {
                           },
                         ),
                         const Divider(height: 1),
-                        DrawerTile(
+                        AppDrawerTile(
                           icon: Icons.logout_rounded,
                           title: AppStrings.drawerLogout,
                           onTap: () {},
                         ),
                         const Divider(height: 1),
-                        DrawerTile(
+                        AppDrawerTile(
                           icon: Icons.star_rate_outlined,
                           title: AppStrings.drawerRateUs,
                           onTap: () {},

@@ -6,8 +6,8 @@ import 'dart:math' as math;
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/common%20widgets/custom_button.dart';
-import 'package:godropme/theme/colors.dart';
 import 'package:godropme/routes.dart';
+import 'package:godropme/utils/app_typography.dart';
 
 /// A single onboarding page widget.
 ///
@@ -63,26 +63,14 @@ class OnboardPage extends StatelessWidget {
                 SizedBox(height: Responsive.scaleClamped(context, 16, 12, 24)),
                 Text(
                   title,
-                  style:
-                      titleStyle ??
-                      const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.black,
-                      ),
+                  style: titleStyle ?? AppTypography.onboardTitle,
                   textAlign: TextAlign.center,
                 ),
                 if (subtitle.isNotEmpty) ...[
                   SizedBox(height: Responsive.scaleClamped(context, 8, 6, 12)),
                   Text(
                     subtitle,
-                    style:
-                        subtitleStyle ??
-                        const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.darkGray,
-                        ),
+                    style: subtitleStyle ?? AppTypography.onboardSubtitle,
                     textAlign: TextAlign.center,
                   ),
                 ],

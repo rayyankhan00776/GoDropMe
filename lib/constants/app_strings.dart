@@ -166,4 +166,22 @@ class AppStrings {
   static const driverOfflineLabel = 'Offline';
   static const driverOfflineMessage =
       'You are offline. Go online to start receiving rides.';
+
+  // Common actions / labels (added for centralization)
+  static const next = 'Next';
+  static const close = 'Close';
+  static const ok = 'OK';
+  static const cancel = 'Cancel';
+  static const settings = 'Settings';
+  static const enable = 'Enable';
+  static const report = 'Report';
+
+  // Driver nav labels
+  static const driverTabRequests = 'Requests';
+  static const driverTabOrders = 'My Orders';
+  static const driverTabMaps = 'Maps';
+  static const driverTabChat = 'Chat';
+
+  // Generic error title
+  static const error = 'Error';
 }

@@ -6,6 +6,7 @@ import 'package:godropme/features/driverSide/driverHome/pages/driver_requests_sc
 import 'package:godropme/features/driverSide/driverHome/pages/driver_orders_screen.dart';
 import 'package:godropme/features/driverSide/driverHome/pages/driver_map_screen.dart';
 import 'package:godropme/features/driverSide/driverHome/pages/driver_chat_screen.dart';
+import 'package:godropme/constants/app_strings.dart';
 
 class DriverHomeScreen extends StatefulWidget {
   const DriverHomeScreen({super.key});
@@ -65,16 +66,19 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
           destinations: const [
             NavigationDestination(
               icon: Icon(Icons.list_alt),
-              label: 'Requests',
+              label: AppStrings.driverTabRequests,
             ),
             NavigationDestination(
               icon: Icon(Icons.assignment),
-              label: 'My Orders',
+              label: AppStrings.driverTabOrders,
             ),
-            NavigationDestination(icon: Icon(Icons.map), label: 'Maps'),
+            NavigationDestination(
+              icon: Icon(Icons.map),
+              label: AppStrings.driverTabMaps,
+            ),
             NavigationDestination(
               icon: Icon(Icons.chat_bubble_outline),
-              label: 'Chat',
+              label: AppStrings.driverTabChat,
             ),
           ],
         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
+import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/utils/app_typography.dart';
 
 class FindDriversScreen extends StatelessWidget {
   const FindDriversScreen({super.key});
@@ -10,8 +12,8 @@ class FindDriversScreen extends StatelessWidget {
       body: const Scaffold(
         body: Center(
           child: Text(
-            'Find Drivers',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+            AppStrings.drawerFindDrivers,
+            style: AppTypography.optionHeading,
           ),
         ),
       ),

@@ -35,6 +35,8 @@ import 'package:godropme/features/parentSide/parentChat/pages/parent_chat_screen
 import 'package:godropme/features/driverSide/driverHome/pages/driver_home_screen.dart';
 import 'package:godropme/features/driverSide/driverHome/binding/driver_home_binding.dart';
 import 'package:godropme/features/parentSide/report/pages/parent_report_screen.dart';
+import 'package:godropme/features/driverSide/driverRegistration/pages/service_details_screen.dart';
+import 'package:godropme/features/driverSide/driverRegistration/binding/service_details_binding.dart';
 
 // Add more imports for other screens as you create them
 
@@ -51,6 +53,7 @@ class AppRoutes {
   static const String driverLicence = '/driver_licence';
   static const String driverIdentification = '/driver_identification';
   static const String vehicleRegistration = '/vehicle_registration';
+  static const String driverServiceDetails = '/driver_service_details';
   static const String parentmapScreen = '/map_screen';
   static const String parentChat = '/parent_chat';
   static const String addChildren = '/add_children';
@@ -120,6 +123,11 @@ class AppRoutes {
       name: vehicleRegistration,
       page: () => const VehicleRegistrationScreen(),
       binding: VehicleRegistrationBinding(),
+    ),
+    GetPage(
+      name: driverServiceDetails,
+      page: () => const ServiceDetailsScreen(),
+      binding: ServiceDetailsBinding(),
     ),
     // parents Screens can be added here in the same manner
     GetPage(

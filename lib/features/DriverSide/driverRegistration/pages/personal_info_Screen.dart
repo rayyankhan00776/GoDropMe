@@ -174,7 +174,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               padding: const EdgeInsets.only(bottom: 20.0),
               child: ProgressNextBar(
                 currentStep: 1,
-                totalSteps: 4,
+                totalSteps: 5,
                 onNext: () async {
                   setState(() {
                     _submitted = true;

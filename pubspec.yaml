@@ -69,6 +69,8 @@ flutter:
     - assets/json/rikshaw_details.json
     # Children form dropdown options JSON
     - assets/json/children_details.json
+    # Driver service details options
+    - assets/json/driver_details.json
     # nav bar icons
     - assets/icons/navBarIcons/
   #---------------------- ./ LOCAL ASSETS END ----------------------#

@@ -8,7 +8,6 @@ import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/theme/colors.dart';
-import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_images_row.dart';
 import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_registration_form.dart';
 import 'package:godropme/utils/app_assets.dart';
@@ -193,7 +192,7 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
               padding: const EdgeInsets.only(bottom: 20.0),
               child: ProgressNextBar(
                 currentStep: 4,
-                totalSteps: 4,
+                totalSteps: 5,
                 onNext: () async {
                   setState(() {
                     _submitted = true;
@@ -231,55 +230,8 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                     certBackPath: _certBackPath,
                   );
 
-                  // Fetch and print aggregated onboarding data for debugging.
-                  try {
-                    final driverName = await LocalStorage.getString(
-                      StorageKeys.driverName,
-                    );
-                    final vehicleSelection = await LocalStorage.getString(
-                      StorageKeys.vehicleSelection,
-                    );
-                    final personal = await LocalStorage.getJson(
-                      StorageKeys.personalInfo,
-                    );
-                    final licence = await LocalStorage.getJson(
-                      StorageKeys.driverLicence,
-                    );
-                    final identification = await LocalStorage.getJson(
-                      StorageKeys.driverIdentification,
-                    );
-                    final vehicle = await LocalStorage.getJson(
-                      StorageKeys.vehicleRegistration,
-                    );
-
-                    // Print in a compact, readable form to the debug console.
-                    // This data will later be sent to the backend.
-                    // ignore: avoid_print
-                    print('--- Onboarding cached data ---');
-                    // ignore: avoid_print
-                    print('driverName: $driverName');
-                    // ignore: avoid_print
-                    print('vehicleSelection: $vehicleSelection');
-                    // ignore: avoid_print
-                    print('personalInfo: ${personal ?? {}}');
-                    // ignore: avoid_print
-                    print('driverLicence: ${licence ?? {}}');
-                    // ignore: avoid_print
-                    print('driverIdentification: ${identification ?? {}}');
-                    // ignore: avoid_print
-                    print('vehicleRegistration: ${vehicle ?? {}}');
-                    // ignore: avoid_print
-                    print('--- end onboarding data ---');
-                  } catch (e) {
-                    // ignore: avoid_print
-                    print('Failed to print onboarding data: $e');
-                  }
-
-                  // Navigate to Driver Map screen after successful completion
-                  Get.offAllNamed(AppRoutes.driverMap);
-
-                  // TODO: Send to backend in future
-                  // Success SnackBar removed as requested.
+                  // Navigate to Service Details step after successful completion
+                  Get.toNamed(AppRoutes.driverServiceDetails);
                 },
                 onPrevious: () {
                   Get.back();

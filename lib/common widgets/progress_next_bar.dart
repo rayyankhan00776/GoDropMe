@@ -5,6 +5,8 @@ import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/common%20widgets/custom_button.dart';
 import 'package:godropme/constants/button_dimensions.dart';
+import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/utils/app_typography.dart';
 
 /// A reusable bottom bar that shows a step indicator (e.g. "1 of 4"),
 /// a small previous/rounded icon button and a primary Next button.
@@ -58,7 +60,7 @@ class ProgressNextBar extends StatelessWidget {
               children: [
                 Text(
                   stepText,
-                  style: TextStyle(
+                  style: AppTypography.optionLineSecondary.copyWith(
                     color: AppColors.black,
                     fontWeight: FontWeight.w600,
                   ),
@@ -118,7 +120,7 @@ class ProgressNextBar extends StatelessWidget {
           SizedBox(
             width: Responsive.scaleClamped(context, 140, 100, 220),
             child: CustomButton(
-              text: 'Next',
+              text: AppStrings.next,
               onTap: onNext,
               height: 53,
               borderRadius: BorderRadius.circular(

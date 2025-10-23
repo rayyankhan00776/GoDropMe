@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/theme/colors.dart';
+import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/utils/app_typography.dart';
 
 class CustomBlurAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomBlurAppBar({super.key});
@@ -31,10 +33,9 @@ class CustomBlurAppBar extends StatelessWidget implements PreferredSizeWidget {
             Get.offNamed(AppRoutes.dopOption);
           },
           child: Text(
-            "Close",
-            style: TextStyle(
+            AppStrings.close,
+            style: AppTypography.optionHeading.copyWith(
               color: AppColors.darkGray,
-              fontSize: 26,
               fontWeight: FontWeight.w600,
             ),
           ),
