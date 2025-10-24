@@ -9,6 +9,7 @@ import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/
 import 'package:godropme/common%20widgets/custom_phone_text_field.dart';
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/PhoneWidgets/phone_actions.dart';
 import 'package:godropme/utils/responsive.dart';
+import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/controllers/phone_controller.dart';
 
 class PhoneScreen extends StatefulWidget {
   const PhoneScreen({super.key});
@@ -21,7 +22,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
   final _controller = TextEditingController();
   final String _selectedCode = '+92';
   final _formKey = GlobalKey<FormState>();
-  bool _submitted = false;
+  late final PhoneController _phoneController;
 
   @override
   void dispose() {
@@ -32,7 +33,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
   // Using centralized validator from CustonPhoneTextField (pakistanPhoneValidator)
 
   void _onNextPressed() {
-    setState(() => _submitted = true);
+    _phoneController.markSubmitted();
     final valid = _formKey.currentState?.validate() ?? false;
     if (valid) {
       Get.toNamed(AppRoutes.otpScreen);
@@ -41,6 +42,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _phoneController = Get.find<PhoneController>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -62,12 +64,14 @@ class _PhoneScreenState extends State<PhoneScreen> {
               const SizedBox(height: 24),
               Form(
                 key: _formKey,
-                child: PhoneInputRow(
-                  controller: _controller,
-                  selectedCode: _selectedCode,
-                  validator: pakistanPhoneValidator,
-                  height: Responsive.scaleClamped(context, 56, 44, 66),
-                  showError: _submitted,
+                child: Obx(
+                  () => PhoneInputRow(
+                    controller: _controller,
+                    selectedCode: _selectedCode,
+                    validator: pakistanPhoneValidator,
+                    height: Responsive.scaleClamped(context, 56, 44, 66),
+                    showError: _phoneController.submitted.value,
+                  ),
                 ),
               ),
               const Spacer(),

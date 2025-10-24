@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
 
 class DriverChatScreen extends StatelessWidget {
@@ -11,8 +12,8 @@ class DriverChatScreen extends StatelessWidget {
       body: DriverDrawerShell(
         body: Center(
           child: Text(
-            'Chat',
-            style: AppTypography.optionHeading,
+            AppStrings.driverTabChat,
+            style: AppTypography.titleLarge,
             textAlign: TextAlign.center,
           ),
         ),

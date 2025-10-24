@@ -6,13 +6,14 @@ import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/parentSide/addChildren/models/children_form_options.dart';
 import 'package:godropme/features/parentSide/addChildren/utils/children_form_options_loader.dart';
-import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/dropdown_field.dart';
-import 'package:godropme/shared/bottom_sheets/selection_bottom_sheet.dart';
+import 'package:godropme/common%20widgets/app_dropdown.dart';
+import 'package:godropme/common%20widgets/form_error_line.dart';
 import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/time_picker_field.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:godropme/shared/bottom_sheets/location_picker_bottom_sheet.dart';
 import 'package:godropme/shared/widgets/section_header.dart';
+import 'package:godropme/utils/app_typography.dart';
 
 typedef OnSaveChild = void Function(Map<String, dynamic> childData);
 
@@ -174,50 +175,29 @@ class AddChildFormState extends State<AddChildForm> {
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
           // Age dropdown
-          DropdownField(
+          AppDropdown(
             hint: AppStrings.childAgeHint,
             value: _selectedAge,
             items: _options.ages,
-            onChanged: (val) => setState(() => _selectedAge = val),
-            onTap: () => showSelectionBottomSheet(
-              context: context,
-              title: AppStrings.childAgeHint,
-              items: _options.ages,
-              selected: _selectedAge,
-              onSelect: (sel) => setState(() => _selectedAge = sel),
-            ),
+            onSelect: (sel) => setState(() => _selectedAge = sel),
           ),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
           // Gender
-          DropdownField(
+          AppDropdown(
             hint: AppStrings.childGenderHint,
             value: _selectedGender,
             items: _options.genders,
-            onChanged: (val) => setState(() => _selectedGender = val),
-            onTap: () => showSelectionBottomSheet(
-              context: context,
-              title: AppStrings.childGenderHint,
-              items: _options.genders,
-              selected: _selectedGender,
-              onSelect: (sel) => setState(() => _selectedGender = sel),
-            ),
+            onSelect: (sel) => setState(() => _selectedGender = sel),
           ),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
           // School
-          DropdownField(
+          AppDropdown(
             hint: AppStrings.childSchoolHint,
             value: _selectedSchool,
             items: _options.schools,
-            onChanged: (val) => setState(() => _selectedSchool = val),
-            onTap: () => showSelectionBottomSheet(
-              context: context,
-              title: AppStrings.childSchoolHint,
-              items: _options.schools,
-              selected: _selectedSchool,
-              onSelect: (sel) => setState(() => _selectedSchool = sel),
-            ),
+            onSelect: (sel) => setState(() => _selectedSchool = sel),
           ),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
@@ -240,10 +220,7 @@ class AddChildFormState extends State<AddChildForm> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Same as pick',
-                  style: TextStyle(color: AppColors.darkGray, fontSize: 12),
-                ),
+                Text(AppStrings.sameAsPick, style: AppTypography.helperSmall),
                 const SizedBox(width: 8),
                 Switch(
                   value: _sameAsPick,
@@ -270,25 +247,18 @@ class AddChildFormState extends State<AddChildForm> {
               child: CustomTextField(
                 borderColor: _sameAsPick ? AppColors.grayLight : AppColors.gray,
                 controller: _dropPointController,
-                hintText: 'Tap to select on map',
+                hintText: AppStrings.tapToSelectOnMap,
               ),
             ),
           ),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
           // Relationship
-          DropdownField(
+          AppDropdown(
             hint: AppStrings.childRelationshipHint,
             value: _selectedRelation,
             items: _options.relations,
-            onChanged: (val) => setState(() => _selectedRelation = val),
-            onTap: () => showSelectionBottomSheet(
-              context: context,
-              title: AppStrings.childRelationshipHint,
-              items: _options.relations,
-              selected: _selectedRelation,
-              onSelect: (sel) => setState(() => _selectedRelation = sel),
-            ),
+            onSelect: (sel) => setState(() => _selectedRelation = sel),
           ),
 
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
@@ -296,20 +266,9 @@ class AddChildFormState extends State<AddChildForm> {
           TimePickerField(time: _pickupTime, onPick: _pickTime),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
           // Global validation message area (fixed height)
-          SizedBox(
-            height: 18,
-            child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                _globalError ?? '',
-                style: TextStyle(
-                  color: _globalError != null
-                      ? const Color(0xFFFF6B6B)
-                      : Colors.transparent,
-                  fontSize: 12,
-                ),
-              ),
-            ),
+          FormErrorLine(
+            message: AppStrings.childFormGlobalError,
+            visible: _globalError != null,
           ),
 
           SizedBox(height: Responsive.scaleClamped(context, 18, 12, 24)),

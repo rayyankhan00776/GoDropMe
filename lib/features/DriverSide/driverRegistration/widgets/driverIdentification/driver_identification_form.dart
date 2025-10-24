@@ -4,6 +4,8 @@ import 'package:godropme/common%20widgets/custom_phone_text_field.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/theme/colors.dart';
+import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/utils/validators.dart';
 
 class DateInputFormatter extends TextInputFormatter {
   @override
@@ -94,17 +96,7 @@ class DriverIdentificationForm extends StatelessWidget {
                   LengthLimitingTextInputFormatter(13),
                   CnicInputFormatter(),
                 ],
-                validator: (v) {
-                  final digitsOnly = (v ?? '').replaceAll(
-                    RegExp(r'[^0-9]'),
-                    '',
-                  );
-                  if (digitsOnly.length != 13) return 'CNIC must be 13 digits';
-                  if (int.tryParse(digitsOnly) == null) {
-                    return 'CNIC must be numeric';
-                  }
-                  return null;
-                },
+                validator: Validators.cnic,
               ),
             ),
             SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
@@ -120,27 +112,7 @@ class DriverIdentificationForm extends StatelessWidget {
                   DateInputFormatter(),
                   LengthLimitingTextInputFormatter(10),
                 ],
-                validator: (v) {
-                  final val = v?.trim() ?? '';
-                  if (val.isEmpty) return 'Please enter expiry date';
-                  if (val.length != 10) return 'Enter date as DD-MM-YYYY';
-                  final parts = val.split('-');
-                  if (parts.length != 3) return 'Enter date as DD-MM-YYYY';
-                  final day = int.tryParse(parts[0]);
-                  final month = int.tryParse(parts[1]);
-                  final year = int.tryParse(parts[2]);
-                  if (day == null || month == null || year == null) {
-                    return 'Enter date as DD-MM-YYYY';
-                  }
-                  if (parts[0].length != 2 ||
-                      parts[1].length != 2 ||
-                      parts[2].length != 4) {
-                    return 'Enter date as DD-MM-YYYY';
-                  }
-                  if (month < 1 || month > 12) return 'Enter valid month';
-                  if (day < 1 || day > 31) return 'Enter valid day';
-                  return null;
-                },
+                validator: Validators.dateDMY,
               ),
             ),
             SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
@@ -150,15 +122,12 @@ class DriverIdentificationForm extends StatelessWidget {
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  showGlobalError
-                      ? 'Please complete all fields and add images'
-                      : '',
-                  style: TextStyle(
-                    color: showGlobalError
-                        ? const Color(0xFFFF6B6B)
-                        : Colors.transparent,
-                    fontSize: 12,
-                  ),
+                  showGlobalError ? AppStrings.formGlobalError : '',
+                  style: showGlobalError
+                      ? AppTypography.errorSmall
+                      : AppTypography.errorSmall.copyWith(
+                          color: Colors.transparent,
+                        ),
                 ),
               ),
             ),

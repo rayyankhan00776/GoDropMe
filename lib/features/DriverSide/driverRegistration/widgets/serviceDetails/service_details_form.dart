@@ -6,9 +6,11 @@ import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/common%20widgets/custom_text_field.dart';
 import 'package:godropme/features/driverSide/driverRegistration/utils/driver_service_options_loader.dart';
 import 'package:godropme/features/driverSide/driverRegistration/models/driver_service_options.dart';
-import 'package:godropme/features/driverSide/driverRegistration/widgets/serviceDetails/multi_select_bottom_sheet.dart';
 import 'package:godropme/shared/bottom_sheets/location_picker_bottom_sheet.dart';
-import 'package:godropme/shared/bottom_sheets/selection_bottom_sheet.dart';
+import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/common%20widgets/app_dropdown.dart';
+import 'package:godropme/common%20widgets/form_error_line.dart';
+import 'package:godropme/common%20widgets/app_multi_select.dart';
 
 class ServiceDetailsForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -76,8 +78,8 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
   Widget build(BuildContext context) {
     final options = _options;
     if (options == null) {
-      return const Padding(
-        padding: EdgeInsets.all(8.0),
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
             SizedBox(
@@ -86,7 +88,8 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
             SizedBox(width: 12),
-            Text('Loading options...'),
+            const SizedBox.shrink(),
+            Text(AppStrings.loadingOptions),
           ],
         ),
       );
@@ -98,8 +101,8 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Schools multi-select (dropdown-style with bottom sheet)
-          _MultiDropdownField(
-            hint: 'School Name(s)',
+          AppMultiSelect(
+            hint: AppStrings.schoolNamesHint,
             items: options.schools,
             selected: _selectedSchools,
             onChanged: (v) => setState(() => _selectedSchools = v),
@@ -108,8 +111,8 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
           _gap(context),
 
           // Duty type dropdown
-          _DropdownField(
-            hint: 'Duty Type',
+          AppDropdown(
+            hint: AppStrings.dutyTypeHint,
             value: _dutyType,
             items: options.dutyTypes,
             onSelect: (v) => setState(() => _dutyType = v),
@@ -118,8 +121,8 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
           _gap(context),
 
           // Pickup range dropdown
-          _DropdownField(
-            hint: 'Pickup Range (km)',
+          AppDropdown(
+            hint: AppStrings.pickupRangeKmHint,
             value: _pickupRange,
             items: options.pickupRangeKmOptions,
             onSelect: (v) => setState(() => _pickupRange = v),
@@ -129,7 +132,7 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
 
           // Route start / end pickers
           _MapPickField(
-            label: 'Route Start Point',
+            label: AppStrings.routeStartPointLabel,
             value: _routeStart,
             onTap: _pickStart,
             required: true,
@@ -140,10 +143,10 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
           // Fare
           CustomTextField(
             controller: _fareCtrl,
-            hintText: 'Per Child Monthly Fare (PKR)',
+            hintText: AppStrings.fareHint,
             borderColor: AppColors.gray,
             validator: (v) {
-              if ((v ?? '').trim().isEmpty) return 'Please enter fare or range';
+              if ((v ?? '').trim().isEmpty) return AppStrings.fareRequired;
               return null;
             },
           ),
@@ -151,8 +154,8 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
           _gap(context),
 
           // Operating days dropdown
-          _DropdownField(
-            hint: 'Operating Days',
+          AppDropdown(
+            hint: AppStrings.operatingDaysHint,
             value: _operatingDays,
             items: options.operatingDays,
             onSelect: (v) => setState(() => _operatingDays = v),
@@ -163,7 +166,7 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
           // Notes
           CustomTextField(
             controller: _notesCtrl,
-            hintText: 'Extra Notes (optional)',
+            hintText: AppStrings.extraNotesHint,
             borderColor: AppColors.gray,
           ),
 
@@ -173,27 +176,16 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
           SwitchListTile(
             value: _active,
             onChanged: (v) => setState(() => _active = v),
-            title: const Text('Active Status'),
-            subtitle: const Text('Mark as available/unavailable'),
+            title: Text(AppStrings.activeStatus),
+            subtitle: Text(AppStrings.activeStatusSubtitle),
             contentPadding: const EdgeInsets.symmetric(horizontal: 0),
           ),
 
           SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
 
-          SizedBox(
-            height: 18,
-            child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                _showGlobalError ? 'Please complete required fields' : '',
-                style: TextStyle(
-                  color: _showGlobalError
-                      ? const Color(0xFFFF6B6B)
-                      : Colors.transparent,
-                  fontSize: 12,
-                ),
-              ),
-            ),
+          FormErrorLine(
+            message: AppStrings.requiredFieldsMissing,
+            visible: _showGlobalError,
           ),
         ],
       ),
@@ -229,161 +221,9 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
   }
 }
 
-class _DropdownField extends StatelessWidget {
-  final String hint;
-  final String? value;
-  final List<String> items;
-  final ValueChanged<String> onSelect;
+// _DropdownField removed in favor of shared AppDropdown widget.
 
-  const _DropdownField({
-    required this.hint,
-    required this.value,
-    required this.items,
-    required this.onSelect,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () async {
-          await showSelectionBottomSheet(
-            context: context,
-            title: hint,
-            items: items,
-            selected: value,
-            onSelect: onSelect,
-          );
-        },
-        child: InputDecorator(
-          decoration: InputDecoration(
-            hintText: hint,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 14,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.gray, width: 2),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
-            ),
-            isDense: true,
-            filled: true,
-            fillColor: AppColors.white,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  value ?? hint,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: (value == null)
-                      ? AppTypography.optionTerms
-                      : AppTypography.optionLineSecondary.copyWith(
-                          color: AppColors.black,
-                        ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: AppColors.darkGray,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MultiDropdownField extends StatelessWidget {
-  final String hint;
-  final List<String> items;
-  final List<String> selected;
-  final ValueChanged<List<String>> onChanged;
-
-  const _MultiDropdownField({
-    required this.hint,
-    required this.items,
-    required this.selected,
-    required this.onChanged,
-  });
-
-  String _summary() {
-    if (selected.isEmpty) return 'Tap to select';
-    if (selected.length <= 2) return selected.join(', ');
-    return selected.take(2).join(', ') + '  +${selected.length - 2} more';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () async {
-          final res = await showMultiSelectBottomSheet(
-            context: context,
-            title: hint,
-            items: items,
-            initiallySelected: selected,
-          );
-          if (res != null) onChanged(res);
-        },
-        child: InputDecorator(
-          decoration: InputDecoration(
-            labelText: hint,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 14,
-            ),
-            enabledBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
-              borderSide: BorderSide(color: AppColors.gray, width: 2),
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
-            ),
-            isDense: true,
-            filled: true,
-            fillColor: AppColors.white,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  _summary(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: selected.isEmpty
-                      ? AppTypography.optionTerms
-                      : AppTypography.optionLineSecondary.copyWith(
-                          color: AppColors.black,
-                        ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: AppColors.darkGray,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+// _MultiDropdownField removed in favor of shared AppMultiSelect widget.
 
 class _MapPickField extends StatelessWidget {
   final String label;

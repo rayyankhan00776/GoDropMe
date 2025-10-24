@@ -9,6 +9,9 @@ import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/common%20widgets/custom_text_field.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/utils/validators.dart';
+import 'package:godropme/common%20widgets/app_dropdown.dart';
+import 'package:godropme/common%20widgets/form_error_line.dart';
 
 /// Forces any alphabetic input to uppercase for fields like number plates.
 /// Keeps cursor at the end of the transformed text for a natural typing feel.
@@ -175,154 +178,9 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
   Widget _gap(BuildContext context) =>
       SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18));
 
-  InputBorder _border(Color color) => OutlineInputBorder(
-    borderRadius: BorderRadius.circular(12),
-    borderSide: BorderSide(color: color, width: 2),
-  );
+  // Border builder no longer used after migrating to AppDropdown
 
-  Future<void> _showSelectionSheet({
-    required String title,
-    required List<String> items,
-    required String? selected,
-    required ValueChanged<String> onSelect,
-  }) async {
-    if (!mounted) return;
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.white,
-      builder: (ctx) {
-        final height = MediaQuery.of(ctx).size.height * 0.75;
-        return SafeArea(
-          top: false,
-          child: SizedBox(
-            height: height,
-            width: double.infinity,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: AppTypography.optionHeading,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        icon: const Icon(
-                          Icons.close,
-                          color: AppColors.darkGray,
-                        ),
-                        tooltip: 'Close',
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(height: 1),
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    itemCount: items.length,
-                    itemBuilder: (_, i) {
-                      final item = items[i];
-                      final isSelected = item == selected;
-                      return ListTile(
-                        title: Text(
-                          item,
-                          style: AppTypography.optionLineSecondary.copyWith(
-                            color: AppColors.black,
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                          ),
-                        ),
-                        trailing: isSelected
-                            ? const Icon(Icons.check, color: AppColors.primary)
-                            : null,
-                        onTap: () {
-                          onSelect(item);
-                          Navigator.of(ctx).pop();
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildDropdown({
-    required BuildContext context,
-    required String hint,
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-    bool enabled = true,
-  }) {
-    final display = value?.isNotEmpty == true ? value! : hint;
-    final isHint = value == null || value.isEmpty;
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: enabled
-            ? () => _showSelectionSheet(
-                title: hint,
-                items: items,
-                selected: value,
-                onSelect: (sel) => onChanged(sel),
-              )
-            : null,
-        child: InputDecorator(
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: AppTypography.optionTerms,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 14,
-            ),
-            enabledBorder: _border(AppColors.gray),
-            focusedBorder: _border(AppColors.primary),
-            disabledBorder: _border(AppColors.grayLight),
-            isDense: true,
-            filled: true,
-            fillColor: AppColors.white,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  display,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: isHint
-                      ? AppTypography.optionTerms
-                      : AppTypography.optionLineSecondary.copyWith(
-                          color: AppColors.black,
-                        ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: enabled ? AppColors.darkGray : AppColors.grayLight,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  // Removed local selection sheet and dropdown builder; use shared widgets instead.
 
   @override
   Widget build(BuildContext context) {
@@ -330,14 +188,14 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
-          children: const [
-            SizedBox(
+          children: [
+            const SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
-            SizedBox(width: 12),
-            Text('Loading catalog...'),
+            const SizedBox(width: 12),
+            Text(AppStrings.loadingCatalog, style: AppTypography.optionTerms),
           ],
         ),
       );
@@ -345,7 +203,7 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
     if (_loadError != null) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Text(_loadError!, style: const TextStyle(color: Colors.red)),
+        child: Text(_loadError!, style: AppTypography.errorSmall),
       );
     }
 
@@ -355,15 +213,14 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Brand dropdown (full width)
-          _buildDropdown(
-            context: context,
+          AppDropdown(
             hint: AppStrings.vehicleBrandHint,
             value: _selectedBrand,
             items: _brands,
-            onChanged: (val) {
+            onSelect: (val) {
               setState(() {
-                _selectedBrand = val?.trim();
-                widget.brandController.text = val ?? '';
+                _selectedBrand = val.trim();
+                widget.brandController.text = val;
                 // Reset model when brand changes
                 _selectedModel = null;
                 widget.modelController.clear();
@@ -373,18 +230,17 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
           _gap(context),
 
           // Model dropdown filtered by brand
-          _buildDropdown(
-            context: context,
+          AppDropdown(
             hint: AppStrings.vehicleModelHint,
             value: _selectedModel,
             items: _modelsForSelectedBrand(),
             enabled:
                 (_selectedBrand?.trim().isNotEmpty == true) &&
                 _modelsForSelectedBrand().isNotEmpty,
-            onChanged: (val) {
+            onSelect: (val) {
               setState(() {
                 _selectedModel = val;
-                widget.modelController.text = val ?? '';
+                widget.modelController.text = val;
               });
             },
           ),
@@ -392,15 +248,14 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
           _gap(context),
 
           // Color dropdown (global list)
-          _buildDropdown(
-            context: context,
+          AppDropdown(
             hint: AppStrings.vehicleColorHint,
             value: _selectedColor,
             items: _colors,
-            onChanged: (val) {
+            onSelect: (val) {
               setState(() {
                 _selectedColor = val;
-                widget.colorController.text = val ?? '';
+                widget.colorController.text = val;
               });
             },
           ),
@@ -417,22 +272,14 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(2),
             ],
-            validator: (v) {
-              final val = v?.trim() ?? '';
-              if (val.isEmpty) return 'Please enter seat capacity';
-              final n = int.tryParse(val);
-              if (n == null || n <= 0) return 'Enter a valid capacity';
-              final mx = _seatMax ?? 12;
-              if (n > mx) return 'Max allowed seats: $mx';
-              return null;
-            },
+            validator: (v) => Validators.seatCapacity(v, max: _seatMax ?? 12),
           ),
 
           SizedBox(height: Responsive.scaleClamped(context, 6, 4, 10)),
           Padding(
             padding: const EdgeInsets.only(left: 4.0),
             child: Text(
-              'Max allowed seats: ${_seatMax ?? 12}',
+              '${AppStrings.seatCapacityMaxLabelPrefix} ${_seatMax ?? 12}',
               style: AppTypography.optionTerms.copyWith(
                 color: AppColors.darkGray,
               ),
@@ -451,16 +298,7 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(4),
             ],
-            validator: (v) {
-              final val = v?.trim() ?? '';
-              if (val.isEmpty) return 'Please enter production year';
-              if (val.length != 4) return 'Year must be 4 digits';
-              final year = int.tryParse(val);
-              if (year == null || year < 1960 || year > DateTime.now().year) {
-                return 'Enter a valid year';
-              }
-              return null;
-            },
+            validator: Validators.productionYear,
           ),
 
           _gap(context),
@@ -470,29 +308,14 @@ class _VehicleRegistrationFormState extends State<VehicleRegistrationForm> {
             hintText: AppStrings.vehicleNumberPlateHint,
             borderColor: AppColors.gray,
             inputFormatters: [_UpperCaseTextFormatter()],
-            validator: (v) => (v == null || v.trim().isEmpty)
-                ? 'Please enter number plate'
-                : null,
+            validator: Validators.plateNotEmpty,
           ),
 
           SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
 
-          SizedBox(
-            height: 18,
-            child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                widget.showGlobalError
-                    ? 'Please complete all fields and add images'
-                    : '',
-                style: TextStyle(
-                  color: widget.showGlobalError
-                      ? const Color(0xFFFF6B6B)
-                      : Colors.transparent,
-                  fontSize: 12,
-                ),
-              ),
-            ),
+          FormErrorLine(
+            message: AppStrings.formGlobalError,
+            visible: widget.showGlobalError,
           ),
         ],
       ),

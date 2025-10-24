@@ -152,6 +152,7 @@ class AppStrings {
   static const childPickupTimePref = 'Pickup Time';
   static const addChildSave = 'Save Child';
   static const parentChatHeading = 'Chat';
+  static const profileTitle = 'Profile';
 
   // Add Children helpers
   static const childFormGlobalError = 'Please fill all the details';
@@ -184,4 +185,59 @@ class AppStrings {
 
   // Generic error title
   static const error = 'Error';
+
+  // Validation and helper messages (centralized)
+  static const errorCnicDigits = 'CNIC must be 13 digits';
+  static const errorCnicNumeric = 'CNIC must be numeric';
+  static const errorExpiryRequired = 'Please enter expiry date';
+  static const errorExpiryFormat = 'Enter date as DD-MM-YYYY';
+  static const errorExpiryMonth = 'Enter valid month';
+  static const errorExpiryDay = 'Enter valid day';
+
+  static const errorSeatCapacityRequired = 'Please enter seat capacity';
+  static const errorSeatCapacityInvalid = 'Enter a valid capacity';
+  // Prefix used for label and error message where a max value is appended, e.g., "Max allowed seats: 9"
+  static const seatCapacityMaxLabelPrefix = 'Max allowed seats:';
+
+  static const errorYearRequired = 'Please enter production year';
+  static const errorYearLength = 'Year must be 4 digits';
+  static const errorYearInvalid = 'Enter a valid year';
+
+  static const errorPlateRequired = 'Please enter number plate';
+
+  // Generic form global error shown when required inputs/images are missing
+  static const formGlobalError = 'Please complete all fields and add images';
+
+  // Loading / progress labels
+  static const loadingCatalog = 'Loading catalog...';
+
+  // Generic loading labels
+  static const loadingOptions = 'Loading options...';
+
+  // Common action labels
+  static const useThisLocation = 'Use this location';
+  static const tapToSelect = 'Tap to select';
+  static const optionalLabel = 'Optional';
+  static const sameAsPick = 'Same as pick';
+  static const tapToSelectOnMap = 'Tap to select on map';
+
+  // Camera error prefix used in help screens
+  static const unableToOpenCameraPrefix = 'Unable to open camera: ';
+
+  // Service details hints/labels
+  static const schoolNamesHint = 'School Name(s)';
+  static const dutyTypeHint = 'Duty Type';
+  static const pickupRangeKmHint = 'Pickup Range (km)';
+  static const routeStartPointLabel = 'Route Start Point';
+  static const fareHint = 'Per Child Monthly Fare (PKR)';
+  static const fareRequired = 'Please enter fare or range';
+  static const operatingDaysHint = 'Operating Days';
+  static const extraNotesHint = 'Extra Notes (optional)';
+  static const activeStatus = 'Active Status';
+  static const activeStatusSubtitle = 'Mark as available/unavailable';
+  static const requiredFieldsMissing = 'Please complete required fields';
+
+  // Names input
+  static const fullNameHint = 'Full Name';
+  static const enterFullName = 'Please enter full name';
 }

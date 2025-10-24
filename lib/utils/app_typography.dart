@@ -62,4 +62,25 @@ class AppTypography {
     fontSize: 21,
     fontWeight: FontWeight.w500,
   );
+
+  // Small helper text (e.g., inline notes, captions)
+  static const TextStyle helperSmall = TextStyle(
+    color: AppColors.darkGray,
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+  );
+
+  // Small error text (e.g., form validation messages)
+  static const TextStyle errorSmall = TextStyle(
+    color: Color(0xFFFF6B6B),
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+  );
+
+  // Common large title used in simple screens
+  static const TextStyle titleLarge = TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.w700,
+    color: AppColors.black,
+  );
 }

@@ -308,7 +308,7 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text('Use this location'),
+                    child: const Text(AppStrings.useThisLocation),
                   ),
                 ),
               ],

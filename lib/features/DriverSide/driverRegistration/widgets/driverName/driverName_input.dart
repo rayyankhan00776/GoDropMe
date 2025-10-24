@@ -5,6 +5,9 @@ import 'package:godropme/utils/responsive.dart';
 // import 'package:godropme/core/theme/colors.dart';
 // import 'package:godropme/core/utils/app_typography.dart';
 import 'package:godropme/common%20widgets/custom_text_field.dart';
+import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/theme/colors.dart';
 
 class DrivernameInput extends StatelessWidget {
   final TextEditingController controller;
@@ -25,7 +28,7 @@ class DrivernameInput extends StatelessWidget {
     // Use provided validator or fallback to non-empty check
     final TextValidator localValidator =
         validator ??
-        (v) => v == null || v.trim().isEmpty ? 'Please enter full name' : null;
+        (v) => v == null || v.trim().isEmpty ? AppStrings.enterFullName : null;
 
     // Compute current validation text from controller value so we can
     // display a fixed-height error area beneath the input like PhoneInputRow.
@@ -37,9 +40,9 @@ class DrivernameInput extends StatelessWidget {
       children: [
         CustomTextField(
           controller: controller,
-          hintText: 'Full Name',
+          hintText: AppStrings.fullNameHint,
           height: height,
-          borderColor: const Color(0xFF756AED), // primary
+          borderColor: AppColors.primary,
           validator: localValidator,
         ),
         SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
@@ -52,12 +55,11 @@ class DrivernameInput extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               displayError ?? '',
-              style: TextStyle(
-                color: displayError != null
-                    ? const Color(0xFFFF6B6B)
-                    : Colors.transparent,
-                fontSize: 12,
-              ),
+              style: displayError != null
+                  ? AppTypography.errorSmall
+                  : AppTypography.errorSmall.copyWith(
+                      color: Colors.transparent,
+                    ),
             ),
           ),
         ),

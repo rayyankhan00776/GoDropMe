@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
 import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/constants/app_strings.dart';
 
 class ParentChatScreen extends StatelessWidget {
   const ParentChatScreen({super.key});
@@ -13,7 +14,10 @@ class ParentChatScreen extends StatelessWidget {
       body: Scaffold(
         // appBar: AppBar(title: const Text('Chat'), elevation: 0),
         body: const Center(
-          child: Text('Chat', style: AppTypography.optionLinePrimary),
+          child: Text(
+            AppStrings.parentChatHeading,
+            style: AppTypography.titleLarge,
+          ),
         ),
       ),
     );

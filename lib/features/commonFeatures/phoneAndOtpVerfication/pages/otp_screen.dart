@@ -7,6 +7,7 @@ import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/otpWidgets/otp_text_field.dart';
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/otpWidgets/otp_error_dialog.dart';
 import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/controllers/otp_controller.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -23,6 +24,7 @@ class _OtpScreenState extends State<OtpScreen> {
   );
 
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  late final OtpController _otpController;
 
   @override
   void dispose() {
@@ -39,9 +41,7 @@ class _OtpScreenState extends State<OtpScreen> {
     // For now skip backend verification. If all fields are filled, navigate
     // to the DOP option screen. The button is already enabled only when
     // each field has one character, so this is a safe local bypass.
-    final allFilled = _codeControllers.every((c) => c.text.trim().isNotEmpty);
-
-    if (allFilled) {
+    if (_otpController.allFilled.value) {
       Get.offNamed(AppRoutes.dopOption);
       return;
     }
@@ -58,6 +58,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _otpController = Get.find<OtpController>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -104,9 +105,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           focusNode: _focusNodes[i],
                           fieldNumber: i,
                           size: boxSize,
-                          onChanged: (_) {
-                            setState(() {});
-                          },
+                          onChanged: (val) => _otpController.setDigit(i, val),
                         ),
                       );
                     }),
@@ -115,11 +114,11 @@ class _OtpScreenState extends State<OtpScreen> {
               ),
 
               const Spacer(),
-              OtpActions(
-                onNext: _submitOtp,
-                height: Responsive.scaleClamped(context, 64, 48, 80),
-                enabled: _codeControllers.every(
-                  (c) => c.text.trim().length == 1,
+              Obx(
+                () => OtpActions(
+                  onNext: _submitOtp,
+                  height: Responsive.scaleClamped(context, 64, 48, 80),
+                  enabled: _otpController.allFilled.value,
                 ),
               ),
             ],

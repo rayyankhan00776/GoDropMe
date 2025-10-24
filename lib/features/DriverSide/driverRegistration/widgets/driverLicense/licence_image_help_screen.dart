@@ -44,9 +44,9 @@ class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Unable to open camera: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${AppStrings.unableToOpenCameraPrefix}$e')),
+        );
       }
     }
   }
