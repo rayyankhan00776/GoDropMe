@@ -25,6 +25,13 @@ class _PhoneScreenState extends State<PhoneScreen> {
   late final PhoneController _phoneController;
 
   @override
+  void initState() {
+    super.initState();
+    // Initialize once to avoid re-initialization during rebuilds.
+    _phoneController = Get.find<PhoneController>();
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -42,7 +49,6 @@ class _PhoneScreenState extends State<PhoneScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _phoneController = Get.find<PhoneController>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,

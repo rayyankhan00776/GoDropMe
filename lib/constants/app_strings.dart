@@ -60,6 +60,7 @@ class AppStrings {
       'Please fill the name according to the CNIC';
 
   // Personal info form hints
+  static const whatsappHint = 'WhatsApp Number';
   static const firstNameHint = 'First Name';
   static const surNameHint = 'Sur Name';
   static const lastNameHint = 'Last Name';

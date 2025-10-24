@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/common%20widgets/custom_text_field.dart';
+import 'package:godropme/common%20widgets/custom_phone_text_field.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/constants/app_strings.dart';
@@ -7,6 +8,7 @@ import 'package:godropme/constants/app_strings.dart';
 /// Form widget for Personal Info screen. First name is optional; last name is required.
 class PersonalinfoForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
+  final TextEditingController whatsappController;
   final TextEditingController firstNameController;
   final TextEditingController surNameController;
   final TextEditingController lastNameController;
@@ -16,6 +18,7 @@ class PersonalinfoForm extends StatelessWidget {
   const PersonalinfoForm({
     super.key,
     required this.formKey,
+    required this.whatsappController,
     required this.firstNameController,
     required this.surNameController,
     required this.lastNameController,
@@ -30,6 +33,16 @@ class PersonalinfoForm extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // WhatsApp number at the top, with same validator as phone
+          CustonPhoneTextField(
+            controller: whatsappController,
+            hintText: AppStrings.whatsappHint,
+            borderColor: AppColors.gray,
+            validator: pakistanPhoneValidator,
+          ),
+
+          SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
+
           CustomTextField(
             controller: firstNameController,
             hintText: AppStrings.firstNameHint,
