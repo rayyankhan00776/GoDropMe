@@ -32,6 +32,7 @@ class AppStrings {
   static const otpTitle = 'Enter Verification Code';
   static const otpSubtitle = "we have sent code to your phone number";
   static const otpverify = 'Verify';
+  static const changeNumber = 'Change the phone number';
 
   // Driver or Parent selection strings
   static const dopheading = 'Are you a Parent or a Driver?';

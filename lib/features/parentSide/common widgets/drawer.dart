@@ -78,7 +78,7 @@ class ParentDrawer extends StatelessWidget {
                         AppDrawerTile(
                           icon: Icons.settings_rounded,
                           title: AppStrings.drawerSettings,
-                          onTap: () {},
+                          onTap: () => Get.offNamed(AppRoutes.parentSettings),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(

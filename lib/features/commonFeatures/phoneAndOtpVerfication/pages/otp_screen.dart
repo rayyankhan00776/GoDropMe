@@ -8,6 +8,9 @@ import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/otpWidgets/otp_error_dialog.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/controllers/otp_controller.dart';
+import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/controllers/phone_controller.dart';
+import 'package:godropme/theme/colors.dart';
+import 'package:godropme/utils/app_typography.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -25,6 +28,15 @@ class _OtpScreenState extends State<OtpScreen> {
 
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   late final OtpController _otpController;
+  late final PhoneController _phoneController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize once to avoid reassigning a late final during rebuilds.
+    _otpController = Get.find<OtpController>();
+    _phoneController = Get.find<PhoneController>();
+  }
 
   @override
   void dispose() {
@@ -58,7 +70,6 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _otpController = Get.find<OtpController>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -82,7 +93,6 @@ class _OtpScreenState extends State<OtpScreen> {
               // OTP input row — responsive sizing to avoid overflow on small screens
               LayoutBuilder(
                 builder: (context, constraints) {
-                  // total horizontal padding already added by parent; compute
                   // available width for 6 boxes and spacing between them.
                   final availableWidth = constraints.maxWidth;
                   // desired spacing between boxes
@@ -114,6 +124,56 @@ class _OtpScreenState extends State<OtpScreen> {
               ),
 
               const Spacer(),
+              // Beneath OTP form: show the number and a change action
+              Center(
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 6,
+                  children: [
+                    Obx(() {
+                      final raw = _phoneController.phone.value;
+                      if (raw.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                      // Normalize to exactly one +92 prefix for display
+                      String national = raw;
+                      if (national.startsWith('+92')) {
+                        national = national.substring(3);
+                      } else if (national.startsWith('92')) {
+                        national = national.substring(2);
+                      }
+                      final display = '+92 $national';
+                      return Text(
+                        display,
+                        style: AppTypography.helperSmall.copyWith(
+                          color: AppColors.darkGray,
+                          fontSize: 14, // +2 from helperSmall (12 -> 14)
+                        ),
+                      );
+                    }),
+                    TextButton(
+                      onPressed: () {
+                        // Reset submission state and go back to phone screen for editing
+                        _phoneController.submitted.value = false;
+                        Get.back();
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(0, 0),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        AppStrings.changeNumber,
+                        style: AppTypography.helperSmall.copyWith(
+                          color: AppColors.primary,
+                          fontSize: 14, // +2 from helperSmall (12 -> 14)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
               Obx(
                 () => OtpActions(
                   onNext: _submitOtp,

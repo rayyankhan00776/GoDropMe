@@ -43,6 +43,9 @@ class _PhoneScreenState extends State<PhoneScreen> {
     _phoneController.markSubmitted();
     final valid = _formKey.currentState?.validate() ?? false;
     if (valid) {
+      // Persist the full phone number for OTP screen display (e.g., +92 3001234567)
+      // Store only the user-entered number; UI will render +92 consistently.
+      _phoneController.setPhone(_controller.text.trim());
       Get.toNamed(AppRoutes.otpScreen);
     }
   }

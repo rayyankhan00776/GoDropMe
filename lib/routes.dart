@@ -30,6 +30,7 @@ import 'package:godropme/features/parentSide/addChildren/pages/add_children_scre
 import 'package:godropme/features/parentSide/addChildren/binding/add_children_binding.dart';
 import 'package:godropme/features/parentSide/findDrivers/pages/find_drivers_screen.dart';
 import 'package:godropme/features/parentSide/parentProfile/pages/profile_screen.dart';
+import 'package:godropme/features/parentSide/settings/pages/settings_screen.dart';
 import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/add_child_help_screen.dart';
 import 'package:godropme/features/parentSide/parentChat/pages/parent_chat_screen.dart';
 import 'package:godropme/features/driverSide/driverHome/pages/driver_home_screen.dart';
@@ -62,6 +63,7 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String driverMap = '/driver_map';
   static const String parentReport = '/parent_report';
+  static const String parentSettings = '/parent_settings';
 
   static final routes = [
     GetPage(
@@ -155,5 +157,7 @@ class AppRoutes {
     ),
     // Parent Report Screen
     GetPage(name: parentReport, page: () => const ParentReportScreen()),
+    // Parent Settings Screen
+    GetPage(name: parentSettings, page: () => const ParentSettingsScreen()),
   ];
 }
