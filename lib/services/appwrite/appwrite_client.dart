@@ -7,6 +7,8 @@ import 'package:godropme/config/environment.dart';
 class AppwriteClient {
   AppwriteClient._();
 
+  static final AppwriteClient instance = AppwriteClient._();
+
   static final Client client = Client()
     ..setEndpoint(Environment.appwritePublicEndpoint)
     ..setProject(Environment.appwriteProjectId);
