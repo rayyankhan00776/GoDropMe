@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
+import 'package:get/get.dart';
+import 'package:godropme/routes.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
@@ -168,9 +170,7 @@ class _ChildTileState extends State<ChildTile> {
                   width: Responsive.wp(context, 70),
                   child: CustomButton(
                     text: 'Find Driver',
-                    onTap: () {
-                      // TODO: Implement navigation to find drivers for this child
-                    },
+                    onTap: () => Get.toNamed(AppRoutes.findDrivers),
                   ),
                 ),
               ),
