@@ -6,6 +6,7 @@ import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_assets.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/sharedPrefs/local_storage.dart';
 
 class ProfileTile extends StatelessWidget {
   final VoidCallback? onTap;
@@ -27,13 +28,22 @@ class ProfileTile extends StatelessWidget {
           ),
         ),
       ),
-      title: Text(
-        AppStrings.drawerProfileNamePlaceholder,
-        style: AppTypography.optionLineSecondary.copyWith(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: AppColors.black,
-        ),
+      title: FutureBuilder<String?>(
+        future: LocalStorage.getString(StorageKeys.parentName),
+        builder: (context, snapshot) {
+          final raw = snapshot.data;
+          final displayName = (raw != null && raw.trim().isNotEmpty)
+              ? raw.trim()
+              : AppStrings.drawerProfileNamePlaceholder;
+          return Text(
+            displayName,
+            style: AppTypography.optionLineSecondary.copyWith(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppColors.black,
+            ),
+          );
+        },
       ),
       subtitle: Text(
         AppStrings.drawerProfileRoleParent,

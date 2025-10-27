@@ -10,6 +10,7 @@ import 'package:godropme/common%20widgets/custom_phone_text_field.dart';
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/PhoneWidgets/phone_actions.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/controllers/phone_controller.dart';
+import 'package:godropme/sharedPrefs/local_storage.dart';
 
 class PhoneScreen extends StatefulWidget {
   const PhoneScreen({super.key});
@@ -46,6 +47,8 @@ class _PhoneScreenState extends State<PhoneScreen> {
       // Persist the full phone number for OTP screen display (e.g., +92 3001234567)
       // Store only the user-entered number; UI will render +92 consistently.
       _phoneController.setPhone(_controller.text.trim());
+      // Non-blocking persistence for Settings screen subtitle
+      LocalStorage.setString(StorageKeys.parentPhone, _controller.text.trim());
       Get.toNamed(AppRoutes.otpScreen);
     }
   }

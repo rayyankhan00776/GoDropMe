@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/services/Terms_uri_opener.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/responsive.dart';
@@ -90,20 +89,6 @@ class ParentDrawer extends StatelessWidget {
                         AppDrawerTile(
                           icon: Icons.help_outline_rounded,
                           title: AppStrings.drawerHelp,
-                          onTap: () {},
-                        ),
-                        const Divider(height: 1),
-                        AppDrawerTile(
-                          icon: Icons.description_outlined,
-                          title: AppStrings.drawerTerms,
-                          onTap: () async {
-                            termsUriOpener();
-                          },
-                        ),
-                        const Divider(height: 1),
-                        AppDrawerTile(
-                          icon: Icons.logout_rounded,
-                          title: AppStrings.drawerLogout,
                           onTap: () {},
                         ),
                         const Divider(height: 1),

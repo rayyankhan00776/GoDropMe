@@ -19,6 +19,8 @@ class StorageKeys {
   static const childrenList = 'children_list';
   // Parent: store parent name similar to driver name for parity
   static const parentName = 'parent_name';
+  // Parent: phone number (national digits, e.g., 3XXXXXXXXX)
+  static const parentPhone = 'parent_phone';
 }
 
 /// A very small wrapper around SharedPreferences tailored for this app's
