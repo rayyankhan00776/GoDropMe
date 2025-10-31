@@ -43,6 +43,21 @@ class DriverDrawer extends StatelessWidget {
                 child: Column(
                   children: [
                     AppDrawerTile(
+                      icon: Icons.home_rounded,
+                      title: AppStrings.drawerMapScreen,
+                      onTap: () {
+                        // Navigate to the main driver nav bar (DriverHomeScreen)
+                        Get.offAllNamed(AppRoutes.driverMap);
+                      },
+                    ),
+                    AppDrawerTile(
+                      icon: Icons.receipt_long_rounded,
+                      title: AppStrings.report,
+                      onTap: () {
+                        Get.toNamed(AppRoutes.driverReport);
+                      },
+                    ),
+                    AppDrawerTile(
                       icon: Icons.settings_rounded,
                       title: AppStrings.drawerSettings,
                       onTap: () {

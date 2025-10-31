@@ -12,31 +12,36 @@ class DriverProfileAvatar extends StatelessWidget {
   const DriverProfileAvatar({super.key, this.size = 108, this.imagePath});
 
   Widget _buildAvatar(BuildContext context, String? path) {
-    if (path != null && path.isNotEmpty && !path.startsWith('assets/')) {
-      final file = File(path);
-      if (file.existsSync()) {
-        // Downscale decode to device-appropriate size to avoid jank
-        final dpr = MediaQuery.of(context).devicePixelRatio;
-        final target = (size * dpr).clamp(64, 1024).round();
-        return ClipOval(
-          child: Image.file(
-            file,
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-            cacheWidth: target,
-            cacheHeight: target,
-            filterQuality: FilterQuality.low,
-          ),
-        );
-      }
+    // If it's an asset placeholder or null/empty, show default SVG
+    if (path == null || path.isEmpty || path.startsWith('assets/')) {
+      return ClipOval(
+        child: SvgPicture.asset(
+          AppAssets.defaultPersonSvg,
+          width: size * 0.7,
+          height: size * 0.7,
+          fit: BoxFit.cover,
+        ),
+      );
     }
+
+    // Avoid synchronous disk I/O in build; rely on errorBuilder fallback.
+    final dpr = MediaQuery.of(context).devicePixelRatio;
+    final target = (size * dpr).clamp(64, 1024).round();
     return ClipOval(
-      child: SvgPicture.asset(
-        AppAssets.defaultPersonSvg,
-        width: size * 0.7,
-        height: size * 0.7,
+      child: Image.file(
+        File(path),
+        width: size,
+        height: size,
         fit: BoxFit.cover,
+        cacheWidth: target,
+        cacheHeight: target,
+        filterQuality: FilterQuality.low,
+        errorBuilder: (context, error, stack) => SvgPicture.asset(
+          AppAssets.defaultPersonSvg,
+          width: size * 0.7,
+          height: size * 0.7,
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }

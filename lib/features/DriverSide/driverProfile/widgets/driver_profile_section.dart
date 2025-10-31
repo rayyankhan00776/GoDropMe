@@ -7,7 +7,10 @@ class DriverProfileSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DriverDrawerCard(child: Column(children: _withDividers(children)));
+    // Isolate expensive paints (card with shadow) from scroll to reduce jank
+    return RepaintBoundary(
+      child: DriverDrawerCard(child: Column(children: _withDividers(children))),
+    );
   }
 
   List<Widget> _withDividers(List<Widget> items) {

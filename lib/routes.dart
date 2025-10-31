@@ -40,6 +40,7 @@ import 'package:godropme/features/driverSide/driverRegistration/pages/service_de
 import 'package:godropme/features/driverSide/driverRegistration/binding/service_details_binding.dart';
 import 'package:godropme/features/driverSide/settings/pages/settings_screen.dart';
 import 'package:godropme/features/driverSide/driverProfile/pages/profile_screen.dart';
+import 'package:godropme/features/driverSide/report/pages/driver_report_screen.dart';
 
 // Add more imports for other screens as you create them
 
@@ -68,6 +69,7 @@ class AppRoutes {
   static const String parentSettings = '/parent_settings';
   static const String driverSettings = '/driver_settings';
   static const String driverProfile = '/driver_profile';
+  static const String driverReport = '/driver_report';
 
   static final routes = [
     GetPage(
@@ -167,5 +169,7 @@ class AppRoutes {
     GetPage(name: driverSettings, page: () => const DriverSettingsScreen()),
     // Driver Profile Screen
     GetPage(name: driverProfile, page: () => const DriverProfileScreen()),
+    // Driver Report Screen
+    GetPage(name: driverReport, page: () => const DriverReportScreen()),
   ];
 }

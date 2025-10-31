@@ -91,188 +91,180 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
         body: SafeArea(
           child: _loading
               ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
+              : ListView(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Leave space beneath the overlaid drawer button
-                      SizedBox(
-                        height: Responsive.scaleClamped(context, 60, 48, 72),
-                      ),
+                  children: [
+                    // Leave space beneath the overlaid drawer button
+                    SizedBox(
+                      height: Responsive.scaleClamped(context, 60, 48, 72),
+                    ),
 
-                      // Title centered
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 14),
-                          child: Text(
-                            AppStrings.profileTitle,
-                            textAlign: TextAlign.center,
-                            style: AppTypography.optionHeading,
-                          ),
+                    // Title centered
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: Text(
+                          AppStrings.profileTitle,
+                          textAlign: TextAlign.center,
+                          style: AppTypography.optionHeading,
                         ),
                       ),
+                    ),
 
-                      // Avatar + Name
-                      Center(
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: DriverProfileAvatar(
-                                size: Responsive.scaleClamped(
-                                  context,
-                                  108,
-                                  96,
-                                  128,
-                                ),
-                                imagePath:
-                                    _personalInfo?['imagePath'] as String?,
+                    // Avatar + Name
+                    Center(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: DriverProfileAvatar(
+                              size: Responsive.scaleClamped(
+                                context,
+                                108,
+                                96,
+                                128,
                               ),
+                              imagePath: _personalInfo?['imagePath'] as String?,
                             ),
-                            Text(
-                              (() {
-                                final name = _fullName(
-                                  _personalInfo,
-                                  _driverName,
-                                );
-                                return name.isEmpty ? 'Driver' : name;
+                          ),
+                          Text(
+                            (() {
+                              final name = _fullName(
+                                _personalInfo,
+                                _driverName,
+                              );
+                              return name.isEmpty ? 'Driver' : name;
+                            })(),
+                            style: AppTypography.optionLineSecondary.copyWith(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const DriverProfileCaption('Verification'),
+                    DriverProfileSection(
+                      children: [
+                        () {
+                          final number = (_licence?['licenceNumber'] ?? '')
+                              .toString()
+                              .trim();
+                          final expiry = (_licence?['expiryDate'] ?? '')
+                              .toString()
+                              .trim();
+                          final sub = [
+                            if (number.isNotEmpty) 'Number: $number',
+                            if (expiry.isNotEmpty) 'Expiry: $expiry',
+                          ].join(' • ');
+                          return DriverProfileTile(
+                            title: 'Driver Licence',
+                            subtitle: sub.isEmpty ? 'Not set' : sub,
+                            showIosChevron: true,
+                          );
+                        }(),
+                        DriverProfileTile(
+                          title: 'CNIC',
+                          subtitle: _maskCnic(
+                            (_identification?['cnicNumber'] ?? '').toString(),
+                          ),
+                          showIosChevron: true,
+                        ),
+                      ],
+                    ),
+
+                    const DriverProfileCaption('Vehicle'),
+                    DriverProfileSection(
+                      children: [
+                        Column(
+                          children: [
+                            DriverProfileTile(
+                              title: 'Vehicle',
+                              subtitle: [
+                                (_vehicle?['brand'] ?? '').toString().trim(),
+                                (_vehicle?['model'] ?? '').toString().trim(),
+                              ].where((e) => e.isNotEmpty).join(' '),
+                              showIosChevron: true,
+                            ),
+                            const Divider(height: 1),
+                            DriverProfileTile(
+                              title: 'Seat Capacity',
+                              subtitle: _vehicle?['seatCapacity'] == null
+                                  ? 'Not set'
+                                  : _vehicle!['seatCapacity'].toString(),
+                              showIosChevron: true,
+                            ),
+                            const Divider(height: 1),
+                            DriverProfileTile(
+                              title: 'Number Plate',
+                              subtitle: (() {
+                                final p = (_vehicle?['plate'] ?? '')
+                                    .toString()
+                                    .trim();
+                                return p.isEmpty ? 'Not set' : p;
                               })(),
-                              style: AppTypography.optionLineSecondary.copyWith(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.black,
-                              ),
+                              showIosChevron: true,
                             ),
                           ],
                         ),
-                      ),
+                      ],
+                    ),
 
-                      const DriverProfileCaption('Verification'),
-                      DriverProfileSection(
-                        children: [
-                          () {
-                            final number = (_licence?['licenceNumber'] ?? '')
-                                .toString()
-                                .trim();
-                            final expiry = (_licence?['expiryDate'] ?? '')
-                                .toString()
-                                .trim();
-                            final sub = [
-                              if (number.isNotEmpty) 'Number: $number',
-                              if (expiry.isNotEmpty) 'Expiry: $expiry',
-                            ].join(' • ');
-                            return DriverProfileTile(
-                              title: 'Driver Licence',
-                              subtitle: sub.isEmpty ? 'Not set' : sub,
+                    const DriverProfileCaption('Service details'),
+                    DriverProfileSection(
+                      children: [
+                        Column(
+                          children: [
+                            DriverProfileTile(
+                              title: 'School(s)',
+                              subtitle: _joinSchools(_service?['schoolNames']),
                               showIosChevron: true,
-                            );
-                          }(),
-                          DriverProfileTile(
-                            title: 'CNIC',
-                            subtitle: _maskCnic(
-                              (_identification?['cnicNumber'] ?? '').toString(),
                             ),
-                            showIosChevron: true,
-                          ),
-                        ],
-                      ),
+                            const Divider(height: 1),
+                            DriverProfileTile(
+                              title: 'Duty Type',
+                              subtitle: (() {
+                                final duty = (_service?['dutyType'] ?? '')
+                                    .toString()
+                                    .trim();
+                                return duty.isEmpty ? 'Not set' : duty;
+                              })(),
+                              showIosChevron: true,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
 
-                      const DriverProfileCaption('Vehicle'),
-                      DriverProfileSection(
-                        children: [
-                          Column(
-                            children: [
-                              DriverProfileTile(
-                                title: 'Vehicle',
-                                subtitle: [
-                                  (_vehicle?['brand'] ?? '').toString().trim(),
-                                  (_vehicle?['model'] ?? '').toString().trim(),
-                                ].where((e) => e.isNotEmpty).join(' '),
-                                showIosChevron: true,
-                              ),
-                              const Divider(height: 1),
-                              DriverProfileTile(
-                                title: 'Seat Capacity',
-                                subtitle: _vehicle?['seatCapacity'] == null
-                                    ? 'Not set'
-                                    : _vehicle!['seatCapacity'].toString(),
-                                showIosChevron: true,
-                              ),
-                              const Divider(height: 1),
-                              DriverProfileTile(
-                                title: 'Number Plate',
-                                subtitle: (() {
-                                  final p = (_vehicle?['plate'] ?? '')
-                                      .toString()
-                                      .trim();
-                                  return p.isEmpty ? 'Not set' : p;
-                                })(),
-                                showIosChevron: true,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                      const DriverProfileCaption('Service details'),
-                      DriverProfileSection(
-                        children: [
-                          Column(
-                            children: [
-                              DriverProfileTile(
-                                title: 'School(s)',
-                                subtitle: _joinSchools(
-                                  _service?['schoolNames'],
-                                ),
-                                showIosChevron: true,
-                              ),
-                              const Divider(height: 1),
-                              DriverProfileTile(
-                                title: 'Duty Type',
-                                subtitle: (() {
-                                  final duty = (_service?['dutyType'] ?? '')
-                                      .toString()
-                                      .trim();
-                                  return duty.isEmpty ? 'Not set' : duty;
-                                })(),
-                                showIosChevron: true,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                      const DriverProfileCaption('Account'),
-                      DriverProfileSection(
-                        children: const [
-                          // Terms opens external link
-                          // Using non-const onTap wrapper below
-                        ],
-                      ),
-                      // Use a separate section to keep onTap non-const
-                      DriverProfileSection(
-                        children: [
-                          DriverProfileTile(
-                            title: AppStrings.drawerTerms,
-                            onTap: () async => termsUriOpener(),
-                          ),
-                          const Divider(height: 1),
-                          const DriverProfileTile(
-                            title: AppStrings.drawerLogout,
-                          ),
-                          const Divider(height: 1),
-                          const DriverProfileTile(
-                            title: 'Delete Account',
-                            isDestructive: true,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    const DriverProfileCaption('Account'),
+                    DriverProfileSection(
+                      children: const [
+                        // Terms opens external link
+                        // Using non-const onTap wrapper below
+                      ],
+                    ),
+                    // Use a separate section to keep onTap non-const
+                    DriverProfileSection(
+                      children: [
+                        DriverProfileTile(
+                          title: AppStrings.drawerTerms,
+                          onTap: () async => termsUriOpener(),
+                        ),
+                        const Divider(height: 1),
+                        const DriverProfileTile(title: AppStrings.drawerLogout),
+                        const Divider(height: 1),
+                        const DriverProfileTile(
+                          title: 'Delete Account',
+                          isDestructive: true,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
         ),
       ),
