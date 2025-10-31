@@ -9,7 +9,6 @@ class ServiceDetailsController extends GetxController {
   final routeStartLat = RxnDouble();
   final routeStartLng = RxnDouble();
   final availableSeats = 0.obs;
-  final perChildMonthlyFare = ''.obs; // accept range string or numeric
   final operatingDays = RxnString();
   final extraNotes = ''.obs;
   final isActive = true.obs;
@@ -37,7 +36,6 @@ class ServiceDetailsController extends GetxController {
       'pickupRangeKm': pickupRangeKm.value,
       'routeStart': _coordsOrNull(routeStartLat.value, routeStartLng.value),
       'availableSeats': availableSeats.value,
-      'perChildMonthlyFare': perChildMonthlyFare.value,
       'operatingDays': operatingDays.value,
       'extraNotes': extraNotes.value,
       'active': isActive.value,

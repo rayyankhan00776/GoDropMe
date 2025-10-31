@@ -42,6 +42,8 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
   late LatLng _selected;
   bool _locating = false;
   bool _hasPermission = false;
+  bool _userChangedSelection =
+      false; // prevent auto-recenter after user interaction
 
   // Fallback only if GPS is unavailable/denied — set to Peshawar
   static const LatLng _fallback = LatLng(34.0151, 71.5249); // Peshawar
@@ -50,7 +52,11 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
   void initState() {
     super.initState();
     _selected = widget.initial ?? _fallback;
-    _initLocation();
+    // Only auto-locate if caller didn't provide an initial position.
+    // This avoids surprising jumps when an initial location is already meaningful.
+    if (widget.initial == null) {
+      _initLocation();
+    }
   }
 
   Future<void> _initLocation() async {
@@ -67,14 +73,17 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
       );
       final latLng = LatLng(pos.latitude, pos.longitude);
       if (!mounted) return;
-      setState(() => _selected = latLng);
-      if (_mapController.isCompleted) {
-        final c = await _mapController.future;
-        c.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(target: latLng, zoom: 16),
-          ),
-        );
+      // If the user already interacted, don't override their selection.
+      if (!_userChangedSelection) {
+        setState(() => _selected = latLng);
+        if (_mapController.isCompleted) {
+          final c = await _mapController.future;
+          await c.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(target: latLng, zoom: 16),
+            ),
+          );
+        }
       }
     } catch (_) {}
   }
@@ -219,11 +228,15 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
             child: Stack(
               children: [
                 GoogleMap(
-                  key: ValueKey(_hasPermission),
                   initialCameraPosition: _initialCamera,
                   onMapCreated: (c) => _mapController.complete(c),
                   myLocationButtonEnabled: true,
                   myLocationEnabled: _hasPermission,
+                  onCameraMoveStarted: () {
+                    if (!_userChangedSelection) {
+                      setState(() => _userChangedSelection = true);
+                    }
+                  },
                   gestureRecognizers: {
                     Factory<OneSequenceGestureRecognizer>(
                       () => EagerGestureRecognizer(),
@@ -235,13 +248,19 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
                   tiltGesturesEnabled: true,
                   padding: const EdgeInsets.only(bottom: 72, right: 12),
                   zoomControlsEnabled: false,
-                  onTap: (pos) => setState(() => _selected = pos),
+                  onTap: (pos) => setState(() {
+                    _selected = pos;
+                    _userChangedSelection = true;
+                  }),
                   markers: {
                     Marker(
                       markerId: const MarkerId('selected'),
                       position: _selected,
                       draggable: true,
-                      onDragEnd: (pos) => setState(() => _selected = pos),
+                      onDragEnd: (pos) => setState(() {
+                        _selected = pos;
+                        _userChangedSelection = true;
+                      }),
                     ),
                   },
                 ),

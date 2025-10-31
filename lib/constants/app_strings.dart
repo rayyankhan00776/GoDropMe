@@ -61,7 +61,6 @@ class AppStrings {
       'Please fill the name according to the CNIC';
 
   // Personal info form hints
-  static const whatsappHint = 'WhatsApp Number';
   static const firstNameHint = 'First Name';
   static const surNameHint = 'Sur Name';
   static const lastNameHint = 'Last Name';
@@ -231,8 +230,7 @@ class AppStrings {
   static const dutyTypeHint = 'Duty Type';
   static const pickupRangeKmHint = 'Pickup Range (km)';
   static const routeStartPointLabel = 'Route Start Point';
-  static const fareHint = 'Per Child Monthly Fare (PKR)';
-  static const fareRequired = 'Please enter fare or range';
+  // Removed: fareRequired (fare field removed from the app)
   static const operatingDaysHint = 'Operating Days';
   static const extraNotesHint = 'Extra Notes (optional)';
   static const activeStatus = 'Active Status';

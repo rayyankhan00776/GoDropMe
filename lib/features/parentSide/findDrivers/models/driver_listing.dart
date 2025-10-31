@@ -6,7 +6,6 @@ class DriverListing {
   final int seatsAvailable;
   final String serving; // e.g., school name or area
   final String pickupRange; // e.g., "3 km"
-  final String fare; // e.g., "Rs. 2500/month"
   final String operatingDays; // e.g., "Mon–Fri"
   final String dutyType; // e.g., "Morning"
   final String extraNotes;
@@ -20,7 +19,6 @@ class DriverListing {
     required this.seatsAvailable,
     required this.serving,
     required this.pickupRange,
-    required this.fare,
     required this.operatingDays,
     required this.dutyType,
     required this.extraNotes,
@@ -36,7 +34,6 @@ class DriverListing {
     seatsAvailable: 2,
     serving: 'Allied School (Town Campus)',
     pickupRange: '3 km',
-    fare: 'Rs. 2500/month',
     operatingDays: 'Mon–Fri',
     dutyType: 'Morning',
     extraNotes: 'Punctual driver with 3 years of experience',

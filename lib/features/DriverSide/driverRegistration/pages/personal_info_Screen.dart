@@ -27,7 +27,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _surNameController = TextEditingController();
-  final TextEditingController _whatsappController = TextEditingController();
   String? _selectedImagePath;
   bool _submitted = false;
   bool _showGlobalError = false;
@@ -38,7 +37,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _surNameController.dispose();
-    _whatsappController.dispose();
     super.dispose();
   }
 
@@ -55,7 +53,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     _firstNameController.text = '';
     _surNameController.text = '';
     _lastNameController.text = '';
-    _whatsappController.text = '';
     _selectedImagePath = null;
   }
 
@@ -155,7 +152,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                     // Form fields for personal info (first name optional, last name required)
                     PersonalinfoForm(
                       formKey: _formKey,
-                      whatsappController: _whatsappController,
                       firstNameController: _firstNameController,
                       surNameController: _surNameController,
                       lastNameController: _lastNameController,
@@ -197,9 +193,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                   _piController.setFirstName(_firstNameController.text.trim());
                   _piController.setSurName(_surNameController.text.trim());
                   _piController.setLastName(_lastNameController.text.trim());
-                  _piController.setWhatsappNumber(
-                    _whatsappController.text.trim(),
-                  );
                   _piController.setImagePath(_selectedImagePath);
                   await _piController.savePersonalInfo();
 

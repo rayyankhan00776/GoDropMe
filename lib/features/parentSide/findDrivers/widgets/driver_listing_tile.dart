@@ -100,7 +100,6 @@ class _DriverListingTileState extends State<DriverListingTile> {
                   ),
                   _DetailLine(label: 'Serving', value: d.serving),
                   _DetailLine(label: 'Pickup Range', value: d.pickupRange),
-                  _DetailLine(label: 'Fare', value: d.fare),
                   _DetailLine(label: 'Operating Days', value: d.operatingDays),
                   _DetailLine(label: 'Duty Type', value: d.dutyType),
                   _DetailLine(label: 'Extra Notes', value: d.extraNotes),

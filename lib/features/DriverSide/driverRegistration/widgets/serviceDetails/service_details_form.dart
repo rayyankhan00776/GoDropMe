@@ -37,7 +37,6 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
   LatLng? _routeStart;
 
   // fields
-  final _fareCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
   bool _active = true;
   bool _showGlobalError = false;
@@ -56,7 +55,6 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
 
   @override
   void dispose() {
-    _fareCtrl.dispose();
     _notesCtrl.dispose();
     super.dispose();
   }
@@ -140,18 +138,7 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
 
           _gap(context),
 
-          // Fare
-          CustomTextField(
-            controller: _fareCtrl,
-            hintText: AppStrings.fareHint,
-            borderColor: AppColors.gray,
-            validator: (v) {
-              if ((v ?? '').trim().isEmpty) return AppStrings.fareRequired;
-              return null;
-            },
-          ),
-
-          _gap(context),
+          // Fare field removed as per requirement
 
           // Operating days dropdown
           AppDropdown(
@@ -211,7 +198,6 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
       'dutyType': _dutyType,
       'pickupRangeKm': _pickupRange,
       'routeStart': _routeStart,
-      'fare': _fareCtrl.text.trim(),
       'operatingDays': _operatingDays,
       // Treat extra notes as optional; send null when empty so it never
       // participates in validation logic upstream.

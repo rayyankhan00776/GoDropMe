@@ -94,8 +94,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             ..routeStartLat.value = start.latitude
                             ..routeStartLng.value = start.longitude;
                         }
-                        _controller.perChildMonthlyFare.value =
-                            values['fare'] as String? ?? '';
                         _controller.operatingDays.value =
                             values['operatingDays'] as String?;
                         // Extra notes are optional; use empty string if null.
