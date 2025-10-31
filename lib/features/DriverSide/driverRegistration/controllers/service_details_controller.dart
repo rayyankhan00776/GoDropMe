@@ -5,7 +5,6 @@ class ServiceDetailsController extends GetxController {
   // Selected fields
   final selectedSchools = <String>[].obs; // multi-select
   final dutyType = RxnString();
-  final pickupRangeKm = RxnString(); // e.g., "3–5"
   final routeStartLat = RxnDouble();
   final routeStartLng = RxnDouble();
   final availableSeats = 0.obs;
@@ -33,7 +32,6 @@ class ServiceDetailsController extends GetxController {
     await LocalStorage.setJson(StorageKeys.driverServiceDetails, {
       'schoolNames': selectedSchools.toList(),
       'dutyType': dutyType.value,
-      'pickupRangeKm': pickupRangeKm.value,
       'routeStart': _coordsOrNull(routeStartLat.value, routeStartLng.value),
       'availableSeats': availableSeats.value,
       'operatingDays': operatingDays.value,

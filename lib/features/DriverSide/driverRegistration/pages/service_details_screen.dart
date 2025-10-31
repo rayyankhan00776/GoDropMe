@@ -86,8 +86,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                         );
                         _controller.dutyType.value =
                             values['dutyType'] as String?;
-                        _controller.pickupRangeKm.value =
-                            values['pickupRangeKm'] as String?;
                         final start = values['routeStart'];
                         if (start != null) {
                           _controller

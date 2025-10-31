@@ -30,7 +30,6 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
   DriverServiceOptions? _options;
   String? _dutyType;
   String? _operatingDays;
-  String? _pickupRange;
   List<String> _selectedSchools = [];
 
   // coords
@@ -119,14 +118,7 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
           _gap(context),
 
           // Pickup range dropdown
-          AppDropdown(
-            hint: AppStrings.pickupRangeKmHint,
-            value: _pickupRange,
-            items: options.pickupRangeKmOptions,
-            onSelect: (v) => setState(() => _pickupRange = v),
-          ),
-
-          _gap(context),
+          // Pickup range removed
 
           // Route start / end pickers
           _MapPickField(
@@ -184,7 +176,6 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
     final requiredOk =
         _selectedSchools.isNotEmpty &&
         _dutyType != null &&
-        _pickupRange != null &&
         _routeStart != null &&
         _operatingDays != null;
     setState(() => _showGlobalError = !(valid && requiredOk));
@@ -196,7 +187,6 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
     widget.onSubmit({
       'schoolNames': _selectedSchools,
       'dutyType': _dutyType,
-      'pickupRangeKm': _pickupRange,
       'routeStart': _routeStart,
       'operatingDays': _operatingDays,
       // Treat extra notes as optional; send null when empty so it never
