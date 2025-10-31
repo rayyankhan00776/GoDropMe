@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/features/driverSide/driverHome/pages/driver_requests_screen.dart';
 import 'package:godropme/features/driverSide/driverHome/pages/driver_orders_screen.dart';
@@ -28,6 +29,20 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   @override
   void initState() {
     super.initState();
+    // Read optional deep-link argument to select a tab (0..3). Fallback to Maps (2).
+    try {
+      final args = Get.arguments;
+      int initialIndex = 2;
+      if (args is Map) {
+        final t = args['tab'];
+        if (t is int && t >= 0 && t <= 3) {
+          initialIndex = t;
+        }
+      }
+      _currentIndex = initialIndex;
+    } catch (_) {
+      _currentIndex = 2;
+    }
     _pages = [
       DriverRequestsScreen(),
       DriverOrdersScreen(),

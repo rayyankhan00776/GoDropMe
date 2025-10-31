@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/common widgets/custom_button.dart';
+import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/features/driverSide/report/controllers/driver_report_controller.dart';
 
 class DriverReportScreen extends StatefulWidget {
   const DriverReportScreen({super.key});
@@ -21,6 +25,7 @@ class _DriverReportScreenState extends State<DriverReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ctrl = Get.find<DriverReportController>();
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       body: DriverDrawerShell(
@@ -42,10 +47,11 @@ class _DriverReportScreenState extends State<DriverReportScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Please describe your issue clearly and provide any relevant details.',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(fontSize: 16),
+                            AppStrings.reportGuideline1,
+                            style: AppTypography.helperSmall.copyWith(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
                       ],
@@ -58,10 +64,11 @@ class _DriverReportScreenState extends State<DriverReportScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Avoid sharing sensitive information. Our team will review and respond promptly.',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(fontSize: 16),
+                            AppStrings.reportGuideline2,
+                            style: AppTypography.helperSmall.copyWith(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
                       ],
@@ -78,7 +85,7 @@ class _DriverReportScreenState extends State<DriverReportScreen> {
                   maxLines: null,
                   expands: true,
                   decoration: InputDecoration(
-                    hintText: 'Describe your issue...',
+                    hintText: AppStrings.reportHint,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: AppColors.primary),
@@ -99,15 +106,18 @@ class _DriverReportScreenState extends State<DriverReportScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: CustomButton(
-                  text: 'Send',
+                  text: AppStrings.send,
                   borderRadius: BorderRadius.circular(12),
                   width: double.infinity,
-                  onTap: () {
-                    // TODO: Implement send logic
+                  onTap: () async {
                     FocusScope.of(context).unfocus();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Report sent!')),
-                    );
+                    final ok = await ctrl.submitReport(_controller.text);
+                    if (ok) {
+                      _controller.clear();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text(AppStrings.reportSent)),
+                      );
+                    }
                   },
                 ),
               ),

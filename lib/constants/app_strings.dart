@@ -177,6 +177,7 @@ class AppStrings {
   static const settings = 'Settings';
   static const enable = 'Enable';
   static const report = 'Report';
+  static const send = 'Send';
 
   // Driver nav labels
   static const driverTabRequests = 'Requests';
@@ -224,6 +225,14 @@ class AppStrings {
 
   // Camera error prefix used in help screens
   static const unableToOpenCameraPrefix = 'Unable to open camera: ';
+
+  // Report screen
+  static const reportGuideline1 =
+      'Please describe your issue clearly and provide any relevant details.';
+  static const reportGuideline2 =
+      'Avoid sharing sensitive information. Our team will review and respond promptly.';
+  static const reportHint = 'Describe your issue...';
+  static const reportSent = 'Report sent!';
 
   // Service details hints/labels
   static const schoolNamesHint = 'School Name(s)';

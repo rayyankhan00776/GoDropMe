@@ -7,12 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_header.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_card.dart';
 import 'package:godropme/shared/widgets/drawer_button.dart';
+import 'package:godropme/shared/widgets/drawer_version_label.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer widgets/profile_tile.dart';
 
 class ParentDrawer extends StatelessWidget {
@@ -101,17 +101,7 @@ class ParentDrawer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  Center(
-                    child: Text(
-                      AppStrings.drawerVersionLabel,
-                      style: AppTypography.optionLineSecondary.copyWith(
-                        color: AppColors.darkGray,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 7),
+                  const DrawerVersionLabel(),
                 ],
               ),
             ),

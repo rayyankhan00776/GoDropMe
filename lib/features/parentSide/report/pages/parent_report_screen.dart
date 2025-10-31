@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/common widgets/custom_button.dart';
+import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/features/parentSide/report/controllers/parent_report_controller.dart';
 
 class ParentReportScreen extends StatefulWidget {
   const ParentReportScreen({super.key});
@@ -21,6 +25,7 @@ class _ParentReportScreenState extends State<ParentReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ctrl = Get.find<ParentReportController>();
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       body: ParentDrawerShell(
@@ -42,10 +47,11 @@ class _ParentReportScreenState extends State<ParentReportScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Please describe your issue clearly and provide any relevant details.',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(fontSize: 16),
+                            AppStrings.reportGuideline1,
+                            style: AppTypography.helperSmall.copyWith(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
                       ],
@@ -58,10 +64,11 @@ class _ParentReportScreenState extends State<ParentReportScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Avoid sharing sensitive information. Our team will review and respond promptly.',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(fontSize: 16),
+                            AppStrings.reportGuideline2,
+                            style: AppTypography.helperSmall.copyWith(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
                       ],
@@ -78,7 +85,7 @@ class _ParentReportScreenState extends State<ParentReportScreen> {
                   maxLines: null,
                   expands: true,
                   decoration: InputDecoration(
-                    hintText: 'Describe your issue...',
+                    hintText: AppStrings.reportHint,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppColors.primary),
@@ -99,15 +106,18 @@ class _ParentReportScreenState extends State<ParentReportScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: CustomButton(
-                  text: 'Send',
+                  text: AppStrings.send,
                   borderRadius: BorderRadius.circular(12),
                   width: double.infinity,
-                  onTap: () {
-                    // TODO: Implement send logic
+                  onTap: () async {
                     FocusScope.of(context).unfocus();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Report sent!')),
-                    );
+                    final ok = await ctrl.submitReport(_controller.text);
+                    if (ok) {
+                      _controller.clear();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text(AppStrings.reportSent)),
+                      );
+                    }
                   },
                 ),
               ),

@@ -9,6 +9,7 @@ import 'package:godropme/features/driverSide/common widgets/drawer widgets/drive
 import 'package:godropme/routes.dart';
 import 'package:godropme/shared/widgets/drawer_button.dart';
 import 'package:godropme/theme/colors.dart';
+import 'package:godropme/shared/widgets/drawer_version_label.dart';
 import 'package:godropme/utils/app_typography.dart';
 
 class DriverDrawer extends StatelessWidget {
@@ -51,6 +52,36 @@ class DriverDrawer extends StatelessWidget {
                       },
                     ),
                     AppDrawerTile(
+                      icon: Icons.list_alt,
+                      title: AppStrings.driverTabRequests,
+                      onTap: () {
+                        Get.offAllNamed(
+                          AppRoutes.driverMap,
+                          arguments: {'tab': 0},
+                        );
+                      },
+                    ),
+                    AppDrawerTile(
+                      icon: Icons.assignment,
+                      title: AppStrings.driverTabOrders,
+                      onTap: () {
+                        Get.offAllNamed(
+                          AppRoutes.driverMap,
+                          arguments: {'tab': 1},
+                        );
+                      },
+                    ),
+                    AppDrawerTile(
+                      icon: Icons.chat_bubble_outline,
+                      title: AppStrings.driverTabChat,
+                      onTap: () {
+                        Get.offAllNamed(
+                          AppRoutes.driverMap,
+                          arguments: {'tab': 3},
+                        );
+                      },
+                    ),
+                    AppDrawerTile(
                       icon: Icons.receipt_long_rounded,
                       title: AppStrings.report,
                       onTap: () {
@@ -69,22 +100,10 @@ class DriverDrawer extends StatelessWidget {
               ),
             ),
 
-            const Spacer(),
+            const SizedBox(height: 5),
 
-            // Version label
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Center(
-                child: Text(
-                  AppStrings.drawerVersionLabel,
-                  style: AppTypography.optionLineSecondary.copyWith(
-                    color: AppColors.darkGray,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
+            // Version label (shared, consistent)
+            const DrawerVersionLabel(),
           ],
         ),
       ),

@@ -36,11 +36,13 @@ import 'package:godropme/features/parentSide/parentChat/pages/parent_chat_screen
 import 'package:godropme/features/driverSide/driverHome/pages/driver_home_screen.dart';
 import 'package:godropme/features/driverSide/driverHome/binding/driver_home_binding.dart';
 import 'package:godropme/features/parentSide/report/pages/parent_report_screen.dart';
+import 'package:godropme/features/parentSide/report/binding/parent_report_binding.dart';
 import 'package:godropme/features/driverSide/driverRegistration/pages/service_details_screen.dart';
 import 'package:godropme/features/driverSide/driverRegistration/binding/service_details_binding.dart';
 import 'package:godropme/features/driverSide/settings/pages/settings_screen.dart';
 import 'package:godropme/features/driverSide/driverProfile/pages/profile_screen.dart';
 import 'package:godropme/features/driverSide/report/pages/driver_report_screen.dart';
+import 'package:godropme/features/driverSide/report/binding/driver_report_binding.dart';
 
 // Add more imports for other screens as you create them
 
@@ -162,7 +164,11 @@ class AppRoutes {
       binding: DriverMapBinding(),
     ),
     // Parent Report Screen
-    GetPage(name: parentReport, page: () => const ParentReportScreen()),
+    GetPage(
+      name: parentReport,
+      page: () => const ParentReportScreen(),
+      binding: ParentReportBinding(),
+    ),
     // Parent Settings Screen
     GetPage(name: parentSettings, page: () => const ParentSettingsScreen()),
     // Driver Settings Screen
@@ -170,6 +176,10 @@ class AppRoutes {
     // Driver Profile Screen
     GetPage(name: driverProfile, page: () => const DriverProfileScreen()),
     // Driver Report Screen
-    GetPage(name: driverReport, page: () => const DriverReportScreen()),
+    GetPage(
+      name: driverReport,
+      page: () => const DriverReportScreen(),
+      binding: DriverReportBinding(),
+    ),
   ];
 }
