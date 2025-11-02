@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/features/driverSide/driverRegistration/models/vehicle_registration.dart';
 
 /// Controller for Vehicle Registration step.
 /// Keeps persistence logic centralized without altering the UI layer.
@@ -16,16 +17,28 @@ class VehicleRegistrationController extends GetxController {
     required String? certFrontPath,
     required String? certBackPath,
   }) async {
+    final vr = VehicleRegistration(
+      brand: brand,
+      model: model,
+      color: color,
+      productionYear: year,
+      numberPlate: plate,
+      seatCapacity: seatCapacity,
+      vehiclePhotoPath: vehiclePhotoPath,
+      certificateFrontPath: certFrontPath,
+      certificateBackPath: certBackPath,
+    );
+    // Persist with existing storage keys to avoid behavior changes
     await LocalStorage.setJson(StorageKeys.vehicleRegistration, {
-      'brand': brand,
-      'model': model,
-      'color': color,
-      'year': year,
-      'plate': plate,
-      'seatCapacity': seatCapacity,
-      'vehiclePhotoPath': vehiclePhotoPath,
-      'certFrontPath': certFrontPath,
-      'certBackPath': certBackPath,
+      'brand': vr.brand,
+      'model': vr.model,
+      'color': vr.color,
+      'year': vr.productionYear,
+      'plate': vr.numberPlate,
+      'seatCapacity': vr.seatCapacity,
+      'vehiclePhotoPath': vr.vehiclePhotoPath,
+      'certFrontPath': vr.certificateFrontPath,
+      'certBackPath': vr.certificateBackPath,
     });
   }
 }

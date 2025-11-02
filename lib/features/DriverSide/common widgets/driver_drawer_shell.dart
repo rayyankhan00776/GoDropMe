@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/features/driverSide/common widgets/driver_drawer.dart';
 import 'package:godropme/features/driverSide/common widgets/driver_drawer_button.dart';
+import 'package:godropme/features/driverSide/common widgets/driver_notification_button.dart';
 import 'package:godropme/utils/responsive.dart';
 
 class DriverDrawerShell extends StatefulWidget {
@@ -37,6 +38,19 @@ class _DriverDrawerShellState extends State<DriverDrawerShell> {
                 top: Responsive.scaleClamped(context, 12, 12, 12),
               ),
               child: DriverGlassDrawerButton(onPressed: _toggle),
+            ),
+          ),
+        ),
+        // Top-right notifications button mirroring the drawer button style
+        SafeArea(
+          child: Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: EdgeInsets.only(
+                right: Responsive.scaleClamped(context, 12, 12, 12),
+                top: Responsive.scaleClamped(context, 12, 12, 12),
+              ),
+              child: const DriverGlassNotificationButton(),
             ),
           ),
         ),

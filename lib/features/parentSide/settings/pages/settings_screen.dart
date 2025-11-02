@@ -7,7 +7,7 @@ import 'package:godropme/features/parentSide/settings/widgets/settings_caption.d
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/models/parent_profile.dart';
 import 'package:godropme/services/Terms_uri_opener.dart';
 
 class ParentSettingsScreen extends StatefulWidget {
@@ -27,7 +27,8 @@ class _ParentSettingsScreenState extends State<ParentSettingsScreen> {
   }
 
   Future<void> _loadPhone() async {
-    final raw = await LocalStorage.getString(StorageKeys.parentPhone);
+    final profile = await ParentProfile.loadFromLocal();
+    final raw = profile.phone.national;
     if (!mounted) return;
     setState(() => _phone = raw);
   }

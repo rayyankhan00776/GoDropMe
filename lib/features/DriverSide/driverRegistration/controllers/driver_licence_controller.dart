@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/features/driverSide/driverRegistration/models/driver_licence.dart';
 
 class DriverLicenceController extends GetxController {
   final licenceImagePath = RxnString();
@@ -19,20 +20,41 @@ class DriverLicenceController extends GetxController {
     debugPrint(
       'DriverLicenceController: licence=${licenceNumber.value}, expiry=${expiryDate.value}, licenceImage=${licenceImagePath.value}, selfie=${selfieWithLicencePath.value}',
     );
+    // Build typed model but persist using existing storage keys
+    final model = DriverLicence(
+      licenceNumber: licenceNumber.value,
+      expiry: expiryDate.value,
+      licencePhotoPath: licenceImagePath.value,
+      selfieWithLicencePath: selfieWithLicencePath.value,
+    );
     await LocalStorage.setJson(StorageKeys.driverLicence, {
-      'licenceImagePath': licenceImagePath.value,
-      'selfieWithLicencePath': selfieWithLicencePath.value,
-      'licenceNumber': licenceNumber.value,
-      'expiryDate': expiryDate.value,
+      'licenceImagePath': model.licencePhotoPath,
+      'selfieWithLicencePath': model.selfieWithLicencePath,
+      'licenceNumber': model.licenceNumber,
+      'expiryDate': model.expiry,
     });
   }
 
   Future<void> loadDriverLicence() async {
     final data = await LocalStorage.getJson(StorageKeys.driverLicence);
     if (data == null) return;
-    licenceImagePath.value = data['licenceImagePath'] as String?;
-    selfieWithLicencePath.value = data['selfieWithLicencePath'] as String?;
-    licenceNumber.value = (data['licenceNumber'] ?? '') as String;
-    expiryDate.value = (data['expiryDate'] ?? '') as String;
+    // Map storage keys to model, then populate fields from model
+    final model = DriverLicence(
+      licenceNumber: (data['licenceNumber'] ?? '') as String,
+      expiry: (data['expiryDate'] ?? '') as String,
+      licencePhotoPath: data['licenceImagePath'] as String?,
+      selfieWithLicencePath: data['selfieWithLicencePath'] as String?,
+    );
+    licenceImagePath.value = model.licencePhotoPath;
+    selfieWithLicencePath.value = model.selfieWithLicencePath;
+    licenceNumber.value = model.licenceNumber;
+    expiryDate.value = model.expiry;
   }
+
+  DriverLicence get model => DriverLicence(
+    licenceNumber: licenceNumber.value,
+    expiry: expiryDate.value,
+    licencePhotoPath: licenceImagePath.value,
+    selfieWithLicencePath: selfieWithLicencePath.value,
+  );
 }

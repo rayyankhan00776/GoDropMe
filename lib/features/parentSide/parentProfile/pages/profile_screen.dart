@@ -8,6 +8,7 @@ import 'package:godropme/features/parentSide/parentProfile/widgets/profile_tile.
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/models/parent_profile.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
@@ -55,10 +56,10 @@ class ProfileScreen extends StatelessWidget {
                 ProfileSection(
                   children: [
                     // Name tile: show stored parent name as subtitle
-                    FutureBuilder<String?>(
-                      future: LocalStorage.getString(StorageKeys.parentName),
+                    FutureBuilder<ParentProfile>(
+                      future: ParentProfile.loadFromLocal(),
                       builder: (context, snapshot) {
-                        final name = (snapshot.data ?? '').trim();
+                        final name = (snapshot.data?.fullName ?? '').trim();
                         return ProfileTile(
                           title: 'Name',
                           subtitle: name.isEmpty ? 'Not set' : name,

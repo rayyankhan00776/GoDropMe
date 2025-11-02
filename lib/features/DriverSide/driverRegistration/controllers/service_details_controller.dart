@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/features/driverSide/driverRegistration/models/service_details.dart';
+import 'package:godropme/models/value_objects.dart';
 
 class ServiceDetailsController extends GetxController {
   // Selected fields
@@ -44,4 +46,20 @@ class ServiceDetailsController extends GetxController {
     if (lat == null || lng == null) return null;
     return {'lat': lat, 'lng': lng};
   }
+
+  /// A typed snapshot of current selections. Persistence stays unchanged.
+  ServiceDetails get model => ServiceDetails(
+    schoolNames: selectedSchools.toList(),
+    dutyType: dutyType.value ?? '',
+    pickupRangeKm: '', // not part of current controller state
+    operatingDays: operatingDays.value == null
+        ? const []
+        : [operatingDays.value!],
+    routeStartPoint:
+        (routeStartLat.value != null && routeStartLng.value != null)
+        ? LatLngLite(lat: routeStartLat.value!, lng: routeStartLng.value!)
+        : null,
+    extraNotes: extraNotes.value.isEmpty ? null : extraNotes.value,
+    isActive: isActive.value,
+  );
 }

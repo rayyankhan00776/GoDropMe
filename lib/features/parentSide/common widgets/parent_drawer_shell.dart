@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer.dart';
 import 'package:godropme/features/parentSide/common widgets/drawer_button.dart';
+import 'package:godropme/features/parentSide/common widgets/notification_button.dart';
 import 'package:godropme/utils/responsive.dart';
 
 class ParentDrawerShell extends StatefulWidget {
@@ -42,6 +43,20 @@ class _ParentDrawerShellState extends State<ParentDrawerShell> {
                 top: Responsive.scaleClamped(context, 12, 12, 12),
               ),
               child: GlassDrawerButton(onPressed: _toggle),
+            ),
+          ),
+        ),
+
+        // Top-right notifications button mirroring the drawer button style
+        SafeArea(
+          child: Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: EdgeInsets.only(
+                right: Responsive.scaleClamped(context, 12, 12, 12),
+                top: Responsive.scaleClamped(context, 12, 12, 12),
+              ),
+              child: const GlassNotificationButton(),
             ),
           ),
         ),

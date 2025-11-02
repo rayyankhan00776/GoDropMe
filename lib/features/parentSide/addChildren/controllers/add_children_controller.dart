@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/features/parentSide/addChildren/models/child.dart';
 
 class AddChildrenController extends GetxController {
   final RxList<Map<String, dynamic>> children = <Map<String, dynamic>>[].obs;
@@ -32,5 +33,23 @@ class AddChildrenController extends GetxController {
     list[index] = data;
     await LocalStorage.replaceJsonList(StorageKeys.childrenList, list);
     children.assignAll(list);
+  }
+
+  // -------- Typed helpers (non-breaking) --------
+
+  /// Returns a typed view of the child at [index] without altering storage.
+  ChildModel? childModelAt(int index) {
+    if (index < 0 || index >= children.length) return null;
+    return ChildModel.fromJson(children[index]);
+  }
+
+  /// Adds a child using the typed model while persisting the same JSON shape.
+  Future<void> addChildModel(ChildModel child) async {
+    await addChild(child.toJson());
+  }
+
+  /// Updates an existing child using the typed model while keeping keys identical.
+  Future<void> updateChildModel(int index, ChildModel child) async {
+    await updateChild(index, child.toJson());
   }
 }

@@ -21,6 +21,7 @@ class DriverProfileScreen extends StatefulWidget {
 class _DriverProfileScreenState extends State<DriverProfileScreen> {
   Map<String, dynamic>? _personalInfo;
   String? _driverName;
+  String? _driverPhone;
   Map<String, dynamic>? _licence;
   Map<String, dynamic>? _identification;
   Map<String, dynamic>? _vehicle;
@@ -60,6 +61,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
     final results = await Future.wait<dynamic>([
       LocalStorage.getJson(StorageKeys.personalInfo),
       LocalStorage.getString(StorageKeys.driverName),
+      LocalStorage.getString(StorageKeys.driverPhone),
       LocalStorage.getJson(StorageKeys.driverLicence),
       LocalStorage.getJson(StorageKeys.driverIdentification),
       LocalStorage.getJson(StorageKeys.vehicleRegistration),
@@ -69,10 +71,11 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
     setState(() {
       _personalInfo = results[0] as Map<String, dynamic>?;
       _driverName = results[1] as String?;
-      _licence = results[2] as Map<String, dynamic>?;
-      _identification = results[3] as Map<String, dynamic>?;
-      _vehicle = results[4] as Map<String, dynamic>?;
-      _service = results[5] as Map<String, dynamic>?;
+      _driverPhone = results[2] as String?;
+      _licence = results[3] as Map<String, dynamic>?;
+      _identification = results[4] as Map<String, dynamic>?;
+      _vehicle = results[5] as Map<String, dynamic>?;
+      _service = results[6] as Map<String, dynamic>?;
       _loading = false;
     });
   }
@@ -251,6 +254,18 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                     // Use a separate section to keep onTap non-const
                     DriverProfileSection(
                       children: [
+                        DriverProfileTile(
+                          title: 'Phone Number',
+                          subtitle: (() {
+                            String? n = _driverPhone?.trim();
+                            if (n == null || n.isEmpty) return 'Not set';
+                            if (n.startsWith('+92')) n = n.substring(3);
+                            if (n.startsWith('92')) n = n.substring(2);
+                            return '+92 ${n.trim()}';
+                          })(),
+                          showIosChevron: true,
+                        ),
+                        const Divider(height: 1),
                         DriverProfileTile(
                           title: AppStrings.drawerTerms,
                           onTap: () async => termsUriOpener(),

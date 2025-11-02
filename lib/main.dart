@@ -18,7 +18,7 @@ class GoDropMe extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: AppRoutes.onboard,
+      initialRoute: AppRoutes.parentmapScreen,
       getPages: AppRoutes.routes,
     );
   }

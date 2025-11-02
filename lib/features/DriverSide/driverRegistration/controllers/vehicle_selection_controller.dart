@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/features/driverSide/driverRegistration/models/vehicle_selection.dart';
 
 class VehicleSelectionController extends GetxController {
   // 'car' or 'rikshaw' or null
@@ -28,4 +29,10 @@ class VehicleSelectionController extends GetxController {
     final v = await LocalStorage.getString(StorageKeys.vehicleSelection);
     if (v != null && v.isNotEmpty) selected.value = v;
   }
+
+  /// Typed view over the current selection. Storage remains a raw string.
+  VehicleSelection? get model =>
+      selected.value == null || selected.value!.isEmpty
+      ? null
+      : VehicleSelection(type: VehicleTypeCodec.parse(selected.value!));
 }
