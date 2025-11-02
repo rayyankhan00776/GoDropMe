@@ -1,24 +1,20 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
-import 'package:godropme/features/parentSide/parentChat/controllers/parent_chat_controller.dart';
-import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_card.dart';
+import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/driverSide/driverChat/controllers/driver_chat_controller.dart';
+import 'package:godropme/features/driverSide/common widgets/drawer widgets/driver_drawer_card.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/theme/colors.dart';
 import 'package:godropme/routes.dart';
 
-class ParentChatScreen extends StatelessWidget {
-  const ParentChatScreen({super.key});
+class DriverChatScreen extends StatelessWidget {
+  const DriverChatScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = Get.find<ParentChatController>();
-    return ParentDrawerShell(
-      body: Scaffold(
-        backgroundColor: AppColors.white,
+    final ctrl = Get.put(DriverChatController());
+    return Scaffold(
+      body: DriverDrawerShell(
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -37,7 +33,7 @@ class ParentChatScreen extends StatelessWidget {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final c = ctrl.contacts[index];
-                        return DrawerCard(
+                        return DriverDrawerCard(
                           child: ListTile(
                             leading: CircleAvatar(child: Text(c.name[0])),
                             title: Text(
@@ -51,7 +47,7 @@ class ParentChatScreen extends StatelessWidget {
                               size: 18,
                             ),
                             onTap: () => Get.toNamed(
-                              AppRoutes.parentConversation,
+                              AppRoutes.driverConversation,
                               arguments: {'contactId': c.id, 'name': c.name},
                             ),
                           ),

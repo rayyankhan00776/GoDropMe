@@ -47,6 +47,11 @@ import 'package:godropme/features/parentSide/notifications/pages/parents_notific
 import 'package:godropme/features/parentSide/notifications/binding/parent_notifications_binding.dart';
 import 'package:godropme/features/driverSide/notifications/pages/driver_notifications_screen.dart';
 import 'package:godropme/features/driverSide/notifications/binding/driver_notifications_binding.dart';
+import 'package:godropme/features/parentSide/parentChat/binding/parent_chat_binding.dart';
+import 'package:godropme/features/parentSide/parentChat/pages/parent_conversation_screen.dart';
+import 'package:godropme/features/parentSide/parentChat/binding/parent_conversation_binding.dart';
+import 'package:godropme/features/driverSide/driverChat/pages/driver_conversation_screen.dart';
+import 'package:godropme/features/driverSide/driverChat/binding/driver_conversation_binding.dart';
 
 // Add more imports for other screens as you create them
 
@@ -78,6 +83,8 @@ class AppRoutes {
   static const String driverReport = '/driver_report';
   static const String parentNotifications = '/parent_notifications';
   static const String driverNotifications = '/driver_notifications';
+  static const String parentConversation = '/parent_conversation';
+  static const String driverConversation = '/driver_conversation';
 
   static final routes = [
     GetPage(
@@ -151,7 +158,11 @@ class AppRoutes {
       page: () => const ParentMapScreen(),
       binding: ParentMapBinding(),
     ),
-    GetPage(name: parentChat, page: () => const ParentChatScreen()),
+    GetPage(
+      name: parentChat,
+      page: () => const ParentChatScreen(),
+      binding: ParentChatBinding(),
+    ),
     GetPage(
       name: addChildren,
       page: () => const AddChildrenScreen(),
@@ -197,6 +208,17 @@ class AppRoutes {
       name: driverNotifications,
       page: () => const DriverNotificationsScreen(),
       binding: DriverNotificationsBinding(),
+    ),
+    // Conversations
+    GetPage(
+      name: parentConversation,
+      page: () => const ParentConversationScreen(),
+      binding: ParentConversationBinding(),
+    ),
+    GetPage(
+      name: driverConversation,
+      page: () => const DriverConversationScreen(),
+      binding: DriverConversationBinding(),
     ),
   ];
 }
