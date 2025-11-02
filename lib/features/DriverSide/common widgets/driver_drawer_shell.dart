@@ -5,12 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:godropme/features/driverSide/common widgets/driver_drawer.dart';
 import 'package:godropme/features/driverSide/common widgets/driver_drawer_button.dart';
 import 'package:godropme/features/driverSide/common widgets/driver_notification_button.dart';
+import 'package:get/get.dart';
+import 'package:godropme/routes.dart';
 import 'package:godropme/utils/responsive.dart';
 
 class DriverDrawerShell extends StatefulWidget {
   final Widget body;
+  final bool showNotificationButton;
 
-  const DriverDrawerShell({super.key, required this.body});
+  const DriverDrawerShell({
+    super.key,
+    required this.body,
+    this.showNotificationButton = false,
+  });
 
   @override
   State<DriverDrawerShell> createState() => _DriverDrawerShellState();
@@ -41,19 +48,22 @@ class _DriverDrawerShellState extends State<DriverDrawerShell> {
             ),
           ),
         ),
-        // Top-right notifications button mirroring the drawer button style
-        SafeArea(
-          child: Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: EdgeInsets.only(
-                right: Responsive.scaleClamped(context, 12, 12, 12),
-                top: Responsive.scaleClamped(context, 12, 12, 12),
+        // Optional top-right notifications button
+        if (widget.showNotificationButton)
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: Responsive.scaleClamped(context, 12, 12, 12),
+                  top: Responsive.scaleClamped(context, 12, 12, 12),
+                ),
+                child: DriverGlassNotificationButton(
+                  onPressed: () => Get.toNamed(AppRoutes.driverNotifications),
+                ),
               ),
-              child: const DriverGlassNotificationButton(),
             ),
           ),
-        ),
         if (_isOpen) ...[
           Positioned.fill(
             child: GestureDetector(

@@ -34,6 +34,7 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
   @override
   Widget build(BuildContext context) {
     return ParentDrawerShell(
+      showNotificationButton: true,
       body: Scaffold(
         body: Stack(
           children: [

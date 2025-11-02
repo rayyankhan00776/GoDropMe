@@ -1,22 +1,20 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
-import 'package:godropme/features/parentSide/notifications/controllers/parent_notifications_controller.dart';
-import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_card.dart';
+import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/driverSide/notifications/controllers/driver_notifications_controller.dart';
+import 'package:godropme/features/driverSide/common widgets/drawer widgets/driver_drawer_card.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/theme/colors.dart';
 
-class ParentsNotificationScreen extends StatelessWidget {
-  const ParentsNotificationScreen({super.key});
+class DriverNotificationsScreen extends StatelessWidget {
+  const DriverNotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<ParentNotificationsController>();
+    final controller = Get.find<DriverNotificationsController>();
 
-    return ParentDrawerShell(
+    return DriverDrawerShell(
       body: Scaffold(
         backgroundColor: AppColors.white,
         body: SafeArea(
@@ -25,14 +23,11 @@ class ParentsNotificationScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Space under top overlay buttons
                 SizedBox(height: Responsive.scaleClamped(context, 60, 48, 72)),
-
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0, bottom: 8),
                   child: Text('Notifications', style: AppTypography.titleLarge),
                 ),
-
                 Expanded(
                   child: Obx(
                     () => ListView.separated(
@@ -40,7 +35,7 @@ class ParentsNotificationScreen extends StatelessWidget {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final item = controller.notifications[index];
-                        return DrawerCard(
+                        return DriverDrawerCard(
                           child: ListTile(
                             leading: CircleAvatar(
                               backgroundColor: AppColors.primary.withOpacity(

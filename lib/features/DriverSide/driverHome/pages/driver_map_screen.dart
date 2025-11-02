@@ -24,6 +24,7 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: DriverDrawerShell(
+        showNotificationButton: true,
         body: GoogleMap(
           initialCameraPosition: const CameraPosition(
             target: LatLng(34.0000, 71.57849),

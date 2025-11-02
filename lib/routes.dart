@@ -43,6 +43,10 @@ import 'package:godropme/features/driverSide/settings/pages/settings_screen.dart
 import 'package:godropme/features/driverSide/driverProfile/pages/profile_screen.dart';
 import 'package:godropme/features/driverSide/report/pages/driver_report_screen.dart';
 import 'package:godropme/features/driverSide/report/binding/driver_report_binding.dart';
+import 'package:godropme/features/parentSide/notifications/pages/parents_notification_Screen.dart';
+import 'package:godropme/features/parentSide/notifications/binding/parent_notifications_binding.dart';
+import 'package:godropme/features/driverSide/notifications/pages/driver_notifications_screen.dart';
+import 'package:godropme/features/driverSide/notifications/binding/driver_notifications_binding.dart';
 
 // Add more imports for other screens as you create them
 
@@ -72,6 +76,8 @@ class AppRoutes {
   static const String driverSettings = '/driver_settings';
   static const String driverProfile = '/driver_profile';
   static const String driverReport = '/driver_report';
+  static const String parentNotifications = '/parent_notifications';
+  static const String driverNotifications = '/driver_notifications';
 
   static final routes = [
     GetPage(
@@ -180,6 +186,17 @@ class AppRoutes {
       name: driverReport,
       page: () => const DriverReportScreen(),
       binding: DriverReportBinding(),
+    ),
+    // Notifications
+    GetPage(
+      name: parentNotifications,
+      page: () => const ParentsNotificationScreen(),
+      binding: ParentNotificationsBinding(),
+    ),
+    GetPage(
+      name: driverNotifications,
+      page: () => const DriverNotificationsScreen(),
+      binding: DriverNotificationsBinding(),
     ),
   ];
 }
