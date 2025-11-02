@@ -1,5 +1,5 @@
-/// Shared small value objects and enums used across models.
-/// These are pure Dart types with simple parsing helpers.
+// Shared small value objects and enums used across models.
+// These are pure Dart types with simple parsing helpers.
 
 class PhoneNumber {
   /// National significant number without country code, e.g., 3XXXXXXXXX for PK.

@@ -112,6 +112,7 @@ class _DriverReportScreenState extends State<DriverReportScreen> {
                   onTap: () async {
                     FocusScope.of(context).unfocus();
                     final ok = await ctrl.submitReport(_controller.text);
+                    if (!context.mounted) return;
                     if (ok) {
                       _controller.clear();
                       ScaffoldMessenger.of(context).showSnackBar(

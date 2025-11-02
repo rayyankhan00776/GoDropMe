@@ -59,29 +59,35 @@ class DriverOnboardingDraft {
   };
 
   factory DriverOnboardingDraft.fromJson(Map<String, dynamic> json) {
-    T? _map<T>(String key, T Function(Map<String, dynamic>) f) {
+    T? mapOrNull<T>(String key, T Function(Map<String, dynamic>) f) {
       final v = json[key];
       if (v is Map<String, dynamic>) return f(v);
       return null;
     }
 
     return DriverOnboardingDraft(
-      driverName: _map('driverName', (j) => DriverName.fromJson(j)),
-      vehicleSelection: _map(
+      driverName: mapOrNull('driverName', (j) => DriverName.fromJson(j)),
+      vehicleSelection: mapOrNull(
         'vehicleSelection',
         (j) => VehicleSelection.fromJson(j),
       ),
-      personalInfo: _map('personalInfo', (j) => PersonalInfo.fromJson(j)),
-      driverLicence: _map('driverLicence', (j) => DriverLicence.fromJson(j)),
-      driverIdentification: _map(
+      personalInfo: mapOrNull('personalInfo', (j) => PersonalInfo.fromJson(j)),
+      driverLicence: mapOrNull(
+        'driverLicence',
+        (j) => DriverLicence.fromJson(j),
+      ),
+      driverIdentification: mapOrNull(
         'driverIdentification',
         (j) => DriverIdentification.fromJson(j),
       ),
-      vehicleRegistration: _map(
+      vehicleRegistration: mapOrNull(
         'vehicleRegistration',
         (j) => VehicleRegistration.fromJson(j),
       ),
-      serviceDetails: _map('serviceDetails', (j) => ServiceDetails.fromJson(j)),
+      serviceDetails: mapOrNull(
+        'serviceDetails',
+        (j) => ServiceDetails.fromJson(j),
+      ),
     );
   }
 }
