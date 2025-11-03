@@ -35,6 +35,20 @@ class AddChildrenController extends GetxController {
     children.assignAll(list);
   }
 
+  /// Delete a child entry at [index] from local storage and update state.
+  ///
+  /// Backend integration note:
+  /// When a backend is available, add a call here to delete the child
+  /// document/server record before removing locally. Consider optimistic
+  /// updates with rollback on failure.
+  Future<void> deleteChild(int index) async {
+    final list = await LocalStorage.getJsonList(StorageKeys.childrenList);
+    if (index < 0 || index >= list.length) return;
+    list.removeAt(index);
+    await LocalStorage.replaceJsonList(StorageKeys.childrenList, list);
+    children.assignAll(list);
+  }
+
   // -------- Typed helpers (non-breaking) --------
 
   /// Returns a typed view of the child at [index] without altering storage.
@@ -51,5 +65,10 @@ class AddChildrenController extends GetxController {
   /// Updates an existing child using the typed model while keeping keys identical.
   Future<void> updateChildModel(int index, ChildModel child) async {
     await updateChild(index, child.toJson());
+  }
+
+  /// Typed delete variant for future use if models include IDs.
+  Future<void> deleteChildModel(int index) async {
+    await deleteChild(index);
   }
 }

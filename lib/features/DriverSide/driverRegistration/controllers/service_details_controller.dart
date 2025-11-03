@@ -9,6 +9,7 @@ class ServiceDetailsController extends GetxController {
   final dutyType = RxnString();
   final routeStartLat = RxnDouble();
   final routeStartLng = RxnDouble();
+  final routeStartAddress = RxnString();
   final availableSeats = 0.obs;
   final operatingDays = RxnString();
   final extraNotes = ''.obs;
@@ -35,6 +36,7 @@ class ServiceDetailsController extends GetxController {
       'schoolNames': selectedSchools.toList(),
       'dutyType': dutyType.value,
       'routeStart': _coordsOrNull(routeStartLat.value, routeStartLng.value),
+      'routeStartAddress': routeStartAddress.value,
       'availableSeats': availableSeats.value,
       'operatingDays': operatingDays.value,
       'extraNotes': extraNotes.value,

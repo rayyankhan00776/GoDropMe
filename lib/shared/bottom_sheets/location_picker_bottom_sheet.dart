@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart' as gc;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:godropme/theme/colors.dart';
@@ -25,13 +26,42 @@ Future<LatLng?> showLocationPickerBottomSheet(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
-    builder: (ctx) => _LocationPickerSheet(initial: initial),
+    builder: (ctx) =>
+        _LocationPickerSheet(initial: initial, returnAddress: false),
+  );
+}
+
+/// Address + coordinates selection result.
+class LocationSelection {
+  final LatLng position;
+  final String address;
+  const LocationSelection({required this.position, required this.address});
+}
+
+/// Variant that returns both address string and LatLng. Use this when you want
+/// to store/show the human-readable address instead of raw coordinates.
+Future<LocationSelection?> showAddressLocationPickerBottomSheet(
+  BuildContext context, {
+  LatLng? initial,
+}) async {
+  return showModalBottomSheet<LocationSelection?>(
+    context: context,
+    isScrollControlled: true,
+    enableDrag: false,
+    isDismissible: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    builder: (ctx) =>
+        _LocationPickerSheet(initial: initial, returnAddress: true),
   );
 }
 
 class _LocationPickerSheet extends StatefulWidget {
   final LatLng? initial;
-  const _LocationPickerSheet({this.initial});
+  final bool returnAddress;
+  const _LocationPickerSheet({this.initial, required this.returnAddress});
 
   @override
   State<_LocationPickerSheet> createState() => _LocationPickerSheetState();
@@ -44,6 +74,8 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
   bool _hasPermission = false;
   bool _userChangedSelection =
       false; // prevent auto-recenter after user interaction
+  String? _address; // resolved address for the selected coordinate
+  bool _resolving = false; // throttle reverse geocoding
 
   // Fallback only if GPS is unavailable/denied — set to Peshawar
   static const LatLng _fallback = LatLng(34.0151, 71.5249); // Peshawar
@@ -57,6 +89,8 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
     if (widget.initial == null) {
       _initLocation();
     }
+    // Resolve initial address
+    _resolveAddress(_selected);
   }
 
   Future<void> _initLocation() async {
@@ -84,6 +118,8 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
             ),
           );
         }
+        // Update address when we programmatically move to current location
+        _resolveAddress(latLng);
       }
     } catch (_) {}
   }
@@ -145,10 +181,56 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
           ),
         );
       }
+      _resolveAddress(latLng);
     } catch (_) {
       _showSnack('Unable to fetch current location.');
     } finally {
       if (mounted) setState(() => _locating = false);
+    }
+  }
+
+  /// Reverse geocode current selection into a human-readable address.
+  Future<void> _resolveAddress(LatLng p) async {
+    if (_resolving) return;
+    setState(() => _resolving = true);
+    try {
+      final placemarks = await gc.placemarkFromCoordinates(
+        p.latitude,
+        p.longitude,
+      );
+      if (!mounted) return;
+      if (placemarks.isNotEmpty) {
+        final pm = placemarks.first;
+        final parts = <String>[
+          if ((pm.name ?? '').trim().isNotEmpty) pm.name!.trim(),
+          if ((pm.street ?? '').trim().isNotEmpty) pm.street!.trim(),
+          if ((pm.subLocality ?? '').trim().isNotEmpty) pm.subLocality!.trim(),
+          if ((pm.locality ?? '').trim().isNotEmpty) pm.locality!.trim(),
+          if ((pm.administrativeArea ?? '').trim().isNotEmpty)
+            pm.administrativeArea!.trim(),
+          if ((pm.country ?? '').trim().isNotEmpty) pm.country!.trim(),
+        ];
+        final addr = parts.where((e) => e.isNotEmpty).toList().join(', ');
+        setState(
+          () => _address = addr.isNotEmpty
+              ? addr
+              : '${p.latitude.toStringAsFixed(6)}, ${p.longitude.toStringAsFixed(6)}',
+        );
+      } else {
+        setState(
+          () => _address =
+              '${p.latitude.toStringAsFixed(6)}, ${p.longitude.toStringAsFixed(6)}',
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _address =
+              '${p.latitude.toStringAsFixed(6)}, ${p.longitude.toStringAsFixed(6)}',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _resolving = false);
     }
   }
 
@@ -188,7 +270,9 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
                     children: [
                       Flexible(
                         child: Text(
-                          '${_selected.latitude.toStringAsFixed(6)}, ${_selected.longitude.toStringAsFixed(6)}',
+                          _address == null
+                              ? '${_selected.latitude.toStringAsFixed(6)}, ${_selected.longitude.toStringAsFixed(6)}'
+                              : _address!,
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.black54,
@@ -200,11 +284,14 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
                       InkWell(
                         borderRadius: BorderRadius.circular(6),
                         onTap: () async {
-                          final coords =
-                              '${_selected.latitude.toStringAsFixed(6)}, ${_selected.longitude.toStringAsFixed(6)}';
-                          await Clipboard.setData(ClipboardData(text: coords));
+                          final textToCopy = _address == null
+                              ? '${_selected.latitude.toStringAsFixed(6)}, ${_selected.longitude.toStringAsFixed(6)}'
+                              : _address!;
+                          await Clipboard.setData(
+                            ClipboardData(text: textToCopy),
+                          );
                           if (mounted) {
-                            _showSnack('Copied: $coords');
+                            _showSnack('Copied: $textToCopy');
                           }
                         },
                         child: const Padding(
@@ -237,6 +324,14 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
                       setState(() => _userChangedSelection = true);
                     }
                   },
+                  onCameraMove: (pos) {
+                    // Move marker with camera while dragging
+                    setState(() => _selected = pos.target);
+                  },
+                  onCameraIdle: () {
+                    // Resolve address once user finishes dragging
+                    _resolveAddress(_selected);
+                  },
                   gestureRecognizers: {
                     Factory<OneSequenceGestureRecognizer>(
                       () => EagerGestureRecognizer(),
@@ -251,6 +346,7 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
                   onTap: (pos) => setState(() {
                     _selected = pos;
                     _userChangedSelection = true;
+                    _resolveAddress(pos);
                   }),
                   markers: {
                     Marker(
@@ -260,6 +356,7 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
                       onDragEnd: (pos) => setState(() {
                         _selected = pos;
                         _userChangedSelection = true;
+                        _resolveAddress(pos);
                       }),
                     ),
                   },
@@ -318,7 +415,18 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(_selected),
+                    onPressed: () {
+                      if (widget.returnAddress) {
+                        final addr =
+                            _address ??
+                            '${_selected.latitude.toStringAsFixed(6)}, ${_selected.longitude.toStringAsFixed(6)}';
+                        Navigator.of(context).pop(
+                          LocationSelection(position: _selected, address: addr),
+                        );
+                      } else {
+                        Navigator.of(context).pop(_selected);
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,

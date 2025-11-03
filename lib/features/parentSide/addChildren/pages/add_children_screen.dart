@@ -85,7 +85,12 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
                             ),
                             itemBuilder: (context, index) {
                               final c = _ctrl.children[index];
-                              return ChildTile(childData: c);
+                              return ChildTile(
+                                childData: c,
+                                onDelete: () async {
+                                  await _ctrl.deleteChild(index);
+                                },
+                              );
                             },
                           ),
                         ),

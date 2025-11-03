@@ -18,8 +18,12 @@ class ChildrenFormOptionsLoader {
       final schools = (form['schoolNames'] as List)
           .map((e) => e.toString())
           .toList();
-      final relations = (form['relationshipToChild'] as List)
+      final relationsRaw = (form['relationshipToChild'] as List)
           .map((e) => e.toString())
+          .toList();
+      // Remove 'Other' from relationship options per requirement
+      final relations = relationsRaw
+          .where((e) => e.trim().toLowerCase() != 'other')
           .toList();
       return ChildrenFormOptions(
         ages: ages.isNotEmpty ? ages : ChildrenFormOptions.fallback().ages,
@@ -31,7 +35,9 @@ class ChildrenFormOptionsLoader {
             : ChildrenFormOptions.fallback().schools,
         relations: relations.isNotEmpty
             ? relations
-            : ChildrenFormOptions.fallback().relations,
+            : ChildrenFormOptions.fallback().relations
+                  .where((e) => e.trim().toLowerCase() != 'other')
+                  .toList(),
       );
     } catch (_) {
       return ChildrenFormOptions.fallback();

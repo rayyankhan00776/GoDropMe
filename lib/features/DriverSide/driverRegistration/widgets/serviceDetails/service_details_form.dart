@@ -34,6 +34,7 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
 
   // coords
   LatLng? _routeStart;
+  String? _routeStartAddress; // human-readable address for display/storage
 
   // fields
   final _notesCtrl = TextEditingController();
@@ -62,11 +63,16 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
       SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18));
 
   Future<void> _pickStart() async {
-    final res = await showLocationPickerBottomSheet(
+    final res = await showAddressLocationPickerBottomSheet(
       context,
       initial: _routeStart,
     );
-    if (res != null && mounted) setState(() => _routeStart = res);
+    if (res != null && mounted) {
+      setState(() {
+        _routeStart = res.position;
+        _routeStartAddress = res.address;
+      });
+    }
   }
 
   // Removed Route End selection as per requirement
@@ -124,6 +130,7 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
           _MapPickField(
             label: AppStrings.routeStartPointLabel,
             value: _routeStart,
+            displayText: _routeStartAddress,
             onTap: _pickStart,
             required: true,
           ),
@@ -188,6 +195,7 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
       'schoolNames': _selectedSchools,
       'dutyType': _dutyType,
       'routeStart': _routeStart,
+      'routeStartAddress': _routeStartAddress,
       'operatingDays': _operatingDays,
       // Treat extra notes as optional; send null when empty so it never
       // participates in validation logic upstream.
@@ -206,19 +214,23 @@ class _MapPickField extends StatelessWidget {
   final LatLng? value;
   final VoidCallback onTap;
   final bool required;
+  final String? displayText; // optional, e.g., address
 
   const _MapPickField({
     required this.label,
     required this.value,
     required this.onTap,
     required this.required,
+    this.displayText,
   });
 
   @override
   Widget build(BuildContext context) {
     final display = (value == null)
         ? (required ? 'Tap to select' : 'Optional')
-        : '${value!.latitude.toStringAsFixed(5)}, ${value!.longitude.toStringAsFixed(5)}';
+        : (displayText == null || displayText!.trim().isEmpty
+              ? '${value!.latitude.toStringAsFixed(5)}, ${value!.longitude.toStringAsFixed(5)}'
+              : displayText!);
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: onTap,

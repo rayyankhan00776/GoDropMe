@@ -2,12 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 import 'package:godropme/features/parentSide/findDrivers/models/driver_listing.dart';
-import 'package:godropme/routes.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
-import 'package:godropme/common%20widgets/custom_button.dart';
 import 'package:godropme/utils/responsive.dart';
 
 class DriverListingTile extends StatefulWidget {
@@ -106,58 +103,25 @@ class _DriverListingTileState extends State<DriverListingTile> {
 
                   SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
-                  // Assign Driver button (primary)
-                  CustomButton(
-                    text: 'Assign Driver',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Driver assigned (demo)')),
-                      );
-                    },
-                    height: Responsive.scaleClamped(context, 56, 44, 66),
-                  ),
-
-                  SizedBox(height: Responsive.scaleClamped(context, 10, 8, 16)),
-
-                  // Chat and Request buttons at the end of the dropdown
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Get.toNamed(AppRoutes.parentChat),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.primary),
-                            foregroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text('Chat'),
+                  // Only Request button (full width)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Request sent (demo)')),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Request sent (demo)'),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text('Request'),
-                        ),
-                      ),
-                    ],
+                      child: const Text('Request'),
+                    ),
                   ),
                 ],
               ),

@@ -11,7 +11,8 @@ import 'package:godropme/common%20widgets/custom_button.dart';
 
 class ChildTile extends StatefulWidget {
   final Map<String, dynamic> childData;
-  const ChildTile({super.key, required this.childData});
+  final VoidCallback? onDelete;
+  const ChildTile({super.key, required this.childData, this.onDelete});
 
   @override
   State<ChildTile> createState() => _ChildTileState();
@@ -19,6 +20,34 @@ class ChildTile extends StatefulWidget {
 
 class _ChildTileState extends State<ChildTile> {
   bool _expanded = false;
+
+  Future<void> _confirmDelete() async {
+    if (widget.onDelete == null) return;
+    final res = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete child?'),
+          content: const Text(
+            'This will remove the child from your device. You can re-add them later. ',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+    if (res == true) {
+      widget.onDelete?.call();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +191,6 @@ class _ChildTileState extends State<ChildTile> {
                     ? widget.childData['pickup_time']
                     : AppStrings.timeNotSet),
               ),
-              SizedBox(height: Responsive.scaleClamped(context, 12, 8, 16)),
               // Centered 'Find Driver' button (no navigation yet)
               // TODO: Wire up navigation to find drivers for this child when flow is ready.
               Center(
@@ -171,6 +199,21 @@ class _ChildTileState extends State<ChildTile> {
                   child: CustomButton(
                     text: 'Find Driver',
                     onTap: () => Get.toNamed(AppRoutes.findDrivers),
+                  ),
+                ),
+              ),
+              SizedBox(height: Responsive.scaleClamped(context, 12, 8, 16)),
+              // Delete action centered beneath the Find Driver button
+              Center(
+                child: TextButton.icon(
+                  onPressed: widget.onDelete == null ? null : _confirmDelete,
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  label: Text(
+                    'Delete',
+                    style: AppTypography.optionTerms.copyWith(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

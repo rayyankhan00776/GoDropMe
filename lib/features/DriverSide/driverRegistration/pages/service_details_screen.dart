@@ -92,6 +92,10 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             ..routeStartLat.value = start.latitude
                             ..routeStartLng.value = start.longitude;
                         }
+                        // address from the bottom sheet (optional)
+                        final startAddress =
+                            values['routeStartAddress'] as String?;
+                        _controller.routeStartAddress.value = startAddress;
                         _controller.operatingDays.value =
                             values['operatingDays'] as String?;
                         // Extra notes are optional; use empty string if null.

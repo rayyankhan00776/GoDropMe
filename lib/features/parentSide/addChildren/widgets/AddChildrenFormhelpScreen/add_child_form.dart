@@ -32,8 +32,8 @@ class AddChildFormState extends State<AddChildForm> {
   // Text controllers kept only for text fields
   final _pickPointController = TextEditingController();
   final _dropPointController = TextEditingController();
-  LatLng? _pickLatLng;
-  LatLng? _dropLatLng;
+  LatLng? _pickLatLng; // kept for re-centering map when reopening picker
+  LatLng? _dropLatLng; // kept for re-centering map when reopening picker
   bool _sameAsPick = false;
   TimeOfDay? _pickupTime;
   // Single global error message shown when any required field is missing
@@ -111,10 +111,6 @@ class AddChildFormState extends State<AddChildForm> {
       'school': school,
       'pick_point': pick,
       'drop_point': drop,
-      'pick_lat': _pickLatLng?.latitude,
-      'pick_lng': _pickLatLng?.longitude,
-      'drop_lat': _dropLatLng?.latitude,
-      'drop_lng': _dropLatLng?.longitude,
       'relationship': rel,
       'pickup_time': _pickupTime?.format(context) ?? '',
     };
@@ -127,17 +123,16 @@ class AddChildFormState extends State<AddChildForm> {
   void submitForm() => _save();
 
   Future<void> _selectPickLocation() async {
-    final result = await showLocationPickerBottomSheet(
+    final result = await showAddressLocationPickerBottomSheet(
       context,
       initial: _pickLatLng,
     );
     if (result != null) {
       setState(() {
-        _pickLatLng = result;
-        _pickPointController.text =
-            '${result.latitude.toStringAsFixed(6)}, ${result.longitude.toStringAsFixed(6)}';
+        _pickLatLng = result.position;
+        _pickPointController.text = result.address; // store/show address
         if (_sameAsPick) {
-          _dropLatLng = result;
+          _dropLatLng = result.position;
           _dropPointController.text = _pickPointController.text;
         }
       });
@@ -146,15 +141,14 @@ class AddChildFormState extends State<AddChildForm> {
 
   Future<void> _selectDropLocation() async {
     if (_sameAsPick) return; // disabled when same-as-pick is on
-    final result = await showLocationPickerBottomSheet(
+    final result = await showAddressLocationPickerBottomSheet(
       context,
       initial: _dropLatLng ?? _pickLatLng,
     );
     if (result != null) {
       setState(() {
-        _dropLatLng = result;
-        _dropPointController.text =
-            '${result.latitude.toStringAsFixed(6)}, ${result.longitude.toStringAsFixed(6)}';
+        _dropLatLng = result.position;
+        _dropPointController.text = result.address; // store/show address
       });
     }
   }

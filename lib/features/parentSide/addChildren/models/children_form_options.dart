@@ -24,7 +24,6 @@ class ChildrenFormOptions {
       'Guardian',
       'Grandfather',
       'Grandmother',
-      'Other',
     ];
     const schools = [
       'Peshawar Model School Boys I (Hayatabad)',
