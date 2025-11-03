@@ -54,7 +54,7 @@ class _OtpScreenState extends State<OtpScreen> {
     // to the DOP option screen. The button is already enabled only when
     // each field has one character, so this is a safe local bypass.
     if (_otpController.allFilled.value) {
-      Get.offNamed(AppRoutes.dopOption);
+      Get.toNamed(AppRoutes.dopOption);
       return;
     }
 

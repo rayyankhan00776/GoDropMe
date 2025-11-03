@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/add_child_form.dart';
-import 'package:godropme/routes.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/common widgets/custom_button.dart';
 import 'package:godropme/theme/colors.dart';
@@ -31,8 +30,8 @@ class _AddChildHelpScreenState extends State<AddChildHelpScreen> {
       final ctrl = Get.find<AddChildrenController>();
       await ctrl.addChild(data);
       if (!mounted) return;
-      // Navigate to Add Children screen after successful save
-      Get.offNamed(AppRoutes.addChildren);
+      // Pop back to Add Children screen after successful save
+      Get.back();
     }();
   }
 
@@ -61,7 +60,7 @@ class _AddChildHelpScreenState extends State<AddChildHelpScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
-                  onPressed: () => Get.offNamed(AppRoutes.addChildren),
+                  onPressed: () => Get.back(),
                   icon: const Icon(
                     Icons.arrow_back,
                     size: 28,

@@ -75,7 +75,7 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    Get.offNamed(AppRoutes.parentChat);
+                    Get.toNamed(AppRoutes.parentChat);
                   },
                   borderRadius: BorderRadius.circular(28),
                   child: Container(

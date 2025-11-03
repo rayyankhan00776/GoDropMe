@@ -99,7 +99,7 @@ class _ParentNameScreenState extends State<ParentNameScreen> {
                           c.setName(_textController.text.trim());
                           await c.saveName();
                           // For now just go back once saved
-                          Get.offNamed(AppRoutes.parentmapScreen);
+                          Get.toNamed(AppRoutes.parentmapScreen);
                         },
                         height: Responsive.scaleClamped(context, 64, 48, 80),
                       ),

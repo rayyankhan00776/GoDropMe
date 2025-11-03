@@ -40,7 +40,7 @@ class ParentDrawer extends StatelessWidget {
                   // Profile tile with polished look
                   DrawerCard(
                     child: ProfileTile(
-                      onTap: () => Get.offNamed(AppRoutes.profile),
+                      onTap: () => Get.toNamed(AppRoutes.profile),
                     ),
                   ),
 
@@ -53,37 +53,37 @@ class ParentDrawer extends StatelessWidget {
                         AppDrawerTile(
                           icon: Icons.drive_eta_rounded,
                           title: AppStrings.drawerMapScreen,
-                          onTap: () => Get.offNamed(AppRoutes.parentmapScreen),
+                          onTap: () => Get.toNamed(AppRoutes.parentmapScreen),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
                           icon: Icons.child_care_rounded,
                           title: AppStrings.drawerAddChildren,
-                          onTap: () => Get.offNamed(AppRoutes.addChildren),
+                          onTap: () => Get.toNamed(AppRoutes.addChildren),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
                           icon: Icons.directions_bus_filled_rounded,
                           title: AppStrings.drawerFindDrivers,
-                          onTap: () => Get.offNamed(AppRoutes.findDrivers),
+                          onTap: () => Get.toNamed(AppRoutes.findDrivers),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
                           icon: Icons.directions_bus_filled_rounded,
                           title: AppStrings.parentChatHeading,
-                          onTap: () => Get.offNamed(AppRoutes.parentChat),
+                          onTap: () => Get.toNamed(AppRoutes.parentChat),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
                           icon: Icons.settings_rounded,
                           title: AppStrings.drawerSettings,
-                          onTap: () => Get.offNamed(AppRoutes.parentSettings),
+                          onTap: () => Get.toNamed(AppRoutes.parentSettings),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
                           icon: Icons.report_gmailerrorred_rounded,
                           title: AppStrings.report,
-                          onTap: () => Get.offNamed(AppRoutes.parentReport),
+                          onTap: () => Get.toNamed(AppRoutes.parentReport),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(

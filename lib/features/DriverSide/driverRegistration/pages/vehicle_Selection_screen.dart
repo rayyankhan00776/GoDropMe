@@ -28,7 +28,7 @@ class VehicleSelectionScreen extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
-                onPressed: () => Get.offNamed(AppRoutes.driverName),
+                onPressed: () => Get.back(),
                 icon: const Icon(
                   Icons.arrow_back_ios,
                   size: 25,
@@ -61,7 +61,7 @@ class VehicleSelectionScreen extends StatelessWidget {
                     controller.select(AppStrings.vehicleCar);
                     controller.saveSelection();
                     // Navigate to personal info screen
-                    Get.offNamed(AppRoutes.personalInfo);
+                    Get.toNamed(AppRoutes.personalInfo);
                   },
                 ),
                 SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
@@ -72,7 +72,7 @@ class VehicleSelectionScreen extends StatelessWidget {
                     controller.select(AppStrings.vehicleRickshaw);
                     controller.saveSelection();
                     // Navigate to personal info screen
-                    Get.offNamed(AppRoutes.personalInfo);
+                    Get.toNamed(AppRoutes.personalInfo);
                   },
                 ),
               ],

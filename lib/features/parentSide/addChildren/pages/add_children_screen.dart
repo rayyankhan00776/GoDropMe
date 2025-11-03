@@ -30,7 +30,7 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
   }
 
   Future<void> _addChild() async {
-    await Get.offNamed(AppRoutes.addChildHelp);
+    await Get.toNamed(AppRoutes.addChildHelp);
     await _ctrl.loadChildren();
   }
 

@@ -189,7 +189,7 @@ class _DriverIdentificationScreenState
                   Get.toNamed(AppRoutes.vehicleRegistration);
                 },
                 onPrevious: () {
-                  Get.offNamed(AppRoutes.driverLicence);
+                  Get.back();
                 },
                 previousBackgroundColor: Colors.grey.shade300,
                 previousIconColor: Colors.grey.shade900,

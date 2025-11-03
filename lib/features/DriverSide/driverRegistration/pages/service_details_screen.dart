@@ -53,8 +53,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: IconButton(
-                        onPressed: () =>
-                            Get.offNamed(AppRoutes.vehicleRegistration),
+                        onPressed: () => Get.back(),
                         icon: const Icon(
                           Icons.arrow_back,
                           size: 28,
@@ -177,7 +176,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 onNext: () {
                   _formWidgetKey.currentState?.submit();
                 },
-                onPrevious: () => Get.offNamed(AppRoutes.vehicleRegistration),
+                onPrevious: () => Get.back(),
                 previousBackgroundColor: Colors.grey.shade300,
                 previousIconColor: Colors.grey.shade900,
               ),

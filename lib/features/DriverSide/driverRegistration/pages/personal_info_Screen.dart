@@ -86,8 +86,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: IconButton(
-                            onPressed: () =>
-                                Get.offNamed(AppRoutes.vehicleSelection),
+                            onPressed: () => Get.back(),
                             icon: const Icon(
                               Icons.close,
                               size: 29,

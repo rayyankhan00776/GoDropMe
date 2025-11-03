@@ -83,8 +83,7 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: IconButton(
-                            onPressed: () =>
-                                Get.offNamed(AppRoutes.vehicleSelection),
+                            onPressed: () => Get.back(),
                             icon: const Icon(
                               Icons.close,
                               size: 29,
@@ -212,7 +211,7 @@ class _DriverLicenceScreenState extends State<DriverLicenceScreen> {
                   Get.toNamed(AppRoutes.driverIdentification);
                 },
                 onPrevious: () {
-                  Get.offNamed(AppRoutes.personalInfo);
+                  Get.back();
                 },
                 previousBackgroundColor: Colors.grey.shade300,
                 previousIconColor: Colors.grey.shade900,

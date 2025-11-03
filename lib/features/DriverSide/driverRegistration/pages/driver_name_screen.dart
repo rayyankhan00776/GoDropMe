@@ -97,8 +97,8 @@ class _DriverNameScreenState extends State<DriverNameScreen> {
                           final c = Get.find<DriverNameController>();
                           c.setName(_textController.text.trim());
                           await c.saveName();
-                          // For now just go back once saved
-                          Get.offNamed(AppRoutes.vehicleSelection);
+                          // Move forward; allow back to return here
+                          Get.toNamed(AppRoutes.vehicleSelection);
                         },
                         height: Responsive.scaleClamped(context, 64, 48, 80),
                       ),
