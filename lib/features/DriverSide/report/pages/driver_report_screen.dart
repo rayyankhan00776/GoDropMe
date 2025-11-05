@@ -84,6 +84,7 @@ class _DriverReportScreenState extends State<DriverReportScreen> {
                   controller: _controller,
                   maxLines: null,
                   expands: true,
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
                   decoration: InputDecoration(
                     hintText: AppStrings.reportHint,
                     border: OutlineInputBorder(

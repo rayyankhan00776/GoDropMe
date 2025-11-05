@@ -154,6 +154,8 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
             controller: _notesCtrl,
             hintText: AppStrings.extraNotesHint,
             borderColor: AppColors.gray,
+            // Make notes optional: do not validate this field
+            validator: (_) => null,
           ),
 
           _gap(context),

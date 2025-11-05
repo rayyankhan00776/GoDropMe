@@ -86,24 +86,24 @@ class _AddChildHelpScreenState extends State<AddChildHelpScreen> {
               Expanded(
                 child: AddChildForm(key: _formKey, onSave: _onSave),
               ),
-
-              // Match driver-side pattern: spacing + action button inside body
-              SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
-              SafeArea(
-                top: false,
-                child: CustomButton(
-                  text: AppStrings.addChildSave,
-                  onTap: _handleSave,
-                  height: Responsive.scaleClamped(context, 64, 48, 80),
-                  width: double.infinity,
-                  borderRadius: BorderRadius.circular(
-                    AppButtonDimensions.borderRadius,
-                  ),
-                  textColor: AppColors.white,
-                ),
-              ),
-              SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
             ],
+          ),
+        ),
+      ),
+      // Pin the save button to the bottom so it doesn't move with fields/dropdowns/map
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+          child: CustomButton(
+            text: AppStrings.addChildSave,
+            onTap: _handleSave,
+            height: Responsive.scaleClamped(context, 64, 48, 80),
+            width: double.infinity,
+            borderRadius: BorderRadius.circular(
+              AppButtonDimensions.borderRadius,
+            ),
+            textColor: AppColors.white,
           ),
         ),
       ),

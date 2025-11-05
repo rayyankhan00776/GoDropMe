@@ -1,17 +1,48 @@
 class AppStrings {
+  // ------------------------------
+  // Common actions / labels
+  // ------------------------------
+  static const next = 'Next';
+  static const close = 'Close';
+  static const ok = 'OK';
+  static const cancel = 'Cancel';
+  static const settings = 'Settings';
+  static const enable = 'Enable';
+  static const report = 'Report';
+  static const send = 'Send';
+  static const done = 'Done';
+
+  // Generic labels
+  static const optionalLabel = 'Optional';
+  static const tapToSelect = 'Tap to select';
+  static const tapToSelectOnMap = 'Tap to select on map';
+  static const sameAsPick = 'Same as pick';
+  static const useThisLocation = 'Use this location';
+
+  // Loading / progress labels
+  static const loadingOptions = 'Loading options...';
+  static const loadingCatalog = 'Loading catalog...';
+
+  // Generic error and form labels
+  static const error = 'Error';
+  // Generic form global error shown when required inputs/images are missing
+  static const formGlobalError = 'Please complete all fields and add images';
+  // Camera error prefix used in help screens
+  static const unableToOpenCameraPrefix = 'Unable to open camera: ';
+
+  // ------------------------------
+  // Onboarding & Entry
+  // ------------------------------
   // Onboard page strings
   static const onboardTitle1 = 'Request Ride';
   static const onboardSubtitle1 =
       'Quick and easy request system connects you with nearby drivers for a fast, reliable, and affordable ride';
-
   static const onboardTitle2 = 'Confirm Your Driver';
   static const onboardSubtitle2 =
       'Huge drivers network helps you find comfortable, safe and cheap ride';
-
   static const onboardTitle3 = 'Track Your Ride';
   static const onboardSubtitle3 =
       'Know your driver in advance and be able to view current location in real time on the map';
-
   static const onboardButton = 'Get Started';
   static const onboardSkip = 'Skip';
 
@@ -25,6 +56,10 @@ class AppStrings {
   static const optionTermsText = 'Terms and Conditions';
   static const optionPrivacyText = 'Privacy Policy';
 
+  // Driver or Parent selection strings
+  static const dopheading = 'Are you a Parent or a Driver?';
+  static const dopsubheading = 'You can change the mode later';
+
   // Phone verification strings
   static const phoneTitle = 'Join us via phone number';
   static const phoneSubtitle = "We'll text a code to verify your phone";
@@ -34,10 +69,61 @@ class AppStrings {
   static const otpverify = 'Verify';
   static const changeNumber = 'Change the phone number';
 
-  // Driver or Parent selection strings
-  static const dopheading = 'Are you a Parent or a Driver?';
-  static const dopsubheading = 'You can change the mode later';
+  // ------------------------------
+  // Parent flow
+  // ------------------------------
+  // Parent name collection strings
+  static const parentNameTitle = 'Welcome to GoDropMe!';
+  static const parentNameSubtitle = 'Please introduce yourself';
+  static const parentNameButton = 'Next';
 
+  // Drawer strings
+  static const drawerAddChildren = 'Add Children';
+  static const drawerFindDrivers = 'Find Drivers';
+  static const drawerSettings = 'Settings';
+  static const drawerSupport = 'Support';
+  static const drawerHelp = 'Help';
+  static const drawerTerms = 'Terms & Conditions';
+  static const drawerMapScreen = 'Home Screen';
+  static const drawerRateUs = 'Rate Us';
+  static const drawerLogout = 'Logout';
+  static const drawerVersionLabel = 'GoDropMe v1.0.0';
+  static const drawerProfileNamePlaceholder = 'John Doe';
+  static const drawerProfileRoleParent = 'Parent';
+
+  // Add Children form strings
+  static const addChildTitle = 'Add your Child Details';
+  static const childNameHint = 'Child Name';
+  static const childAgeHint = 'Age ';
+  static const childGenderHint = 'Gender';
+  static const childSchoolHint = 'School Name';
+  static const childPickPointHint = 'Pick Point';
+  static const childDropPointHint = 'Drop Point';
+  static const childRelationshipHint = 'Relationship to Child';
+  static const childPickupTimePref = 'Pickup Time';
+  static const addChildSave = 'Save Child';
+  static const parentChatHeading = 'Chat';
+  static const profileTitle = 'Profile';
+
+  // Add Children helpers
+  static const childFormGlobalError = 'Please fill all the details';
+  static const timeNotSet = 'Not set';
+  static const unableToSubmitForm = 'Unable to submit form';
+  static const addChildrenTitle = 'Add Children';
+  static const noChildrenAdded = 'No child added';
+  static const yourChildren = 'Your Children';
+
+  // ------------------------------
+  // Driver home / map status
+  // ------------------------------
+  static const driverOnlineLabel = 'Online';
+  static const driverOfflineLabel = 'Offline';
+  static const driverOfflineMessage =
+      'You are offline. Go online to start receiving rides.';
+
+  // ------------------------------
+  // Driver onboarding flow
+  // ------------------------------
   // Driver name collection strings
   static const driverNameTitle = 'Welcome to GoDropMe!';
   static const driverNameSubtitle = 'Please introduce yourself';
@@ -65,7 +151,7 @@ class AppStrings {
   static const surNameHint = 'Sur Name';
   static const lastNameHint = 'Last Name';
 
-  // Validation messages
+  // Validation messages (personal info)
   static const firstNameRequired = 'Please enter first name';
 
   // Driver licence collection strings
@@ -119,122 +205,20 @@ class AppStrings {
       'Avoid glare; use natural light if possible';
   static const vehicleTakeNewPicture = 'Take a New picture';
 
-  // Generic
-  static const done = 'Done';
+  // Generic (driver)
   static const vehicleDetailsSaved = 'Vehicle details saved';
 
-  // parent name collection strings
-  static const parentNameTitle = 'Welcome to GoDropMe!';
-  static const parentNameSubtitle = 'Please introduce yourself';
-  static const parentNameButton = 'Next';
-
-  // Drawer strings
-  static const drawerAddChildren = 'Add Children';
-  static const drawerFindDrivers = 'Find Drivers';
-  static const drawerSettings = 'Settings';
-  static const drawerSupport = 'Support';
-  static const drawerHelp = 'Help';
-  static const drawerTerms = 'Terms & Conditions';
-  static const drawerMapScreen = 'Home Screen';
-  static const drawerRateUs = 'Rate Us';
-  static const drawerLogout = 'Logout';
-  static const drawerVersionLabel = 'GoDropMe v1.0.0';
-  static const drawerProfileNamePlaceholder = 'John Doe';
-  static const drawerProfileRoleParent = 'Parent';
-  // Add Children form strings
-  static const addChildTitle = 'Add your Child Details';
-  static const childNameHint = 'Child Name';
-  static const childAgeHint = 'Age ';
-  static const childGenderHint = 'Gender';
-  static const childSchoolHint = 'School Name';
-  static const childPickPointHint = 'Pick Point';
-  static const childDropPointHint = 'Drop Point';
-  static const childRelationshipHint = 'Relationship to Child';
-  static const childPickupTimePref = 'Pickup Time';
-  static const addChildSave = 'Save Child';
-  static const parentChatHeading = 'Chat';
-  static const profileTitle = 'Profile';
-
-  // Add Children helpers
-  static const childFormGlobalError = 'Please fill all the details';
-  static const timeNotSet = 'Not set';
-  static const unableToSubmitForm = 'Unable to submit form';
-  static const addChildrenTitle = 'Add Children';
-  static const noChildrenAdded = 'No child added';
-  static const yourChildren = 'Your Children';
-
-  // Driver home / map
-  static const driverOnlineLabel = 'Online';
-  static const driverOfflineLabel = 'Offline';
-  static const driverOfflineMessage =
-      'You are offline. Go online to start receiving rides.';
-
-  // Common actions / labels (added for centralization)
-  static const next = 'Next';
-  static const close = 'Close';
-  static const ok = 'OK';
-  static const cancel = 'Cancel';
-  static const settings = 'Settings';
-  static const enable = 'Enable';
-  static const report = 'Report';
-  static const send = 'Send';
-
-  // Driver nav labels
+  // ------------------------------
+  // Driver navigation
+  // ------------------------------
   static const driverTabRequests = 'Requests';
   static const driverTabOrders = 'My Orders';
   static const driverTabMaps = 'Maps';
   static const driverTabChat = 'Chat';
 
-  // Generic error title
-  static const error = 'Error';
-
-  // Validation and helper messages (centralized)
-  static const errorCnicDigits = 'CNIC must be 13 digits';
-  static const errorCnicNumeric = 'CNIC must be numeric';
-  static const errorExpiryRequired = 'Please enter expiry date';
-  static const errorExpiryFormat = 'Enter date as DD-MM-YYYY';
-  static const errorExpiryMonth = 'Enter valid month';
-  static const errorExpiryDay = 'Enter valid day';
-
-  static const errorSeatCapacityRequired = 'Please enter seat capacity';
-  static const errorSeatCapacityInvalid = 'Enter a valid capacity';
-  // Prefix used for label and error message where a max value is appended, e.g., "Max allowed seats: 9"
-  static const seatCapacityMaxLabelPrefix = 'Max allowed seats:';
-
-  static const errorYearRequired = 'Please enter production year';
-  static const errorYearLength = 'Year must be 4 digits';
-  static const errorYearInvalid = 'Enter a valid year';
-
-  static const errorPlateRequired = 'Please enter number plate';
-
-  // Generic form global error shown when required inputs/images are missing
-  static const formGlobalError = 'Please complete all fields and add images';
-
-  // Loading / progress labels
-  static const loadingCatalog = 'Loading catalog...';
-
-  // Generic loading labels
-  static const loadingOptions = 'Loading options...';
-
-  // Common action labels
-  static const useThisLocation = 'Use this location';
-  static const tapToSelect = 'Tap to select';
-  static const optionalLabel = 'Optional';
-  static const sameAsPick = 'Same as pick';
-  static const tapToSelectOnMap = 'Tap to select on map';
-
-  // Camera error prefix used in help screens
-  static const unableToOpenCameraPrefix = 'Unable to open camera: ';
-
-  // Report screen
-  static const reportGuideline1 =
-      'Please describe your issue clearly and provide any relevant details.';
-  static const reportGuideline2 =
-      'Avoid sharing sensitive information. Our team will review and respond promptly.';
-  static const reportHint = 'Describe your issue...';
-  static const reportSent = 'Report sent!';
-
-  // Service details hints/labels
+  // ------------------------------
+  // Service details
+  // ------------------------------
   static const schoolNamesHint = 'School Name(s)';
   static const dutyTypeHint = 'Duty Type';
   static const pickupRangeKmHint = 'Pickup Range (km)';
@@ -245,6 +229,34 @@ class AppStrings {
   static const activeStatus = 'Active Status';
   static const activeStatusSubtitle = 'Mark as available/unavailable';
   static const requiredFieldsMissing = 'Please complete required fields';
+
+  // ------------------------------
+  // Report
+  // ------------------------------
+  static const reportGuideline1 =
+      'Please describe your issue clearly and provide any relevant details.';
+  static const reportGuideline2 =
+      'Avoid sharing sensitive information. Our team will review and respond promptly.';
+  static const reportHint = 'Describe your issue...';
+  static const reportSent = 'Report sent!';
+
+  // ------------------------------
+  // Validation & helper messages (centralized)
+  // ------------------------------
+  static const errorCnicDigits = 'CNIC must be 13 digits';
+  static const errorCnicNumeric = 'CNIC must be numeric';
+  static const errorExpiryRequired = 'Please enter expiry date';
+  static const errorExpiryFormat = 'Enter date as DD-MM-YYYY';
+  static const errorExpiryMonth = 'Enter valid month';
+  static const errorExpiryDay = 'Enter valid day';
+  static const errorSeatCapacityRequired = 'Please enter seat capacity';
+  static const errorSeatCapacityInvalid = 'Enter a valid capacity';
+  // Prefix used for label and error message where a max value is appended, e.g., "Max allowed seats: 9"
+  static const seatCapacityMaxLabelPrefix = 'Max allowed seats:';
+  static const errorYearRequired = 'Please enter production year';
+  static const errorYearLength = 'Year must be 4 digits';
+  static const errorYearInvalid = 'Enter a valid year';
+  static const errorPlateRequired = 'Please enter number plate';
 
   // Names input
   static const fullNameHint = 'Full Name';

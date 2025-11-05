@@ -66,6 +66,8 @@ class CustonPhoneTextField extends StatelessWidget {
       ),
       cursorHeight: (AppTypography.optionLineSecondary.fontSize ?? 16) * 1.2,
       cursorWidth: 2,
+      // Dismiss keyboard when user taps anywhere outside this field
+      onTapOutside: (event) => FocusScope.of(context).unfocus(),
       // Keep the text and caret vertically centered and stable
       textAlignVertical: TextAlignVertical.center,
       minLines: 1,

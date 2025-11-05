@@ -197,20 +197,12 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
       final placemarks = await gc.placemarkFromCoordinates(
         p.latitude,
         p.longitude,
+        localeIdentifier: 'en',
       );
       if (!mounted) return;
       if (placemarks.isNotEmpty) {
         final pm = placemarks.first;
-        final parts = <String>[
-          if ((pm.name ?? '').trim().isNotEmpty) pm.name!.trim(),
-          if ((pm.street ?? '').trim().isNotEmpty) pm.street!.trim(),
-          if ((pm.subLocality ?? '').trim().isNotEmpty) pm.subLocality!.trim(),
-          if ((pm.locality ?? '').trim().isNotEmpty) pm.locality!.trim(),
-          if ((pm.administrativeArea ?? '').trim().isNotEmpty)
-            pm.administrativeArea!.trim(),
-          if ((pm.country ?? '').trim().isNotEmpty) pm.country!.trim(),
-        ];
-        final addr = parts.where((e) => e.isNotEmpty).toList().join(', ');
+        final addr = _formatPlacemark(pm);
         setState(
           () => _address = addr.isNotEmpty
               ? addr
@@ -316,7 +308,16 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
               children: [
                 GoogleMap(
                   initialCameraPosition: _initialCamera,
-                  onMapCreated: (c) => _mapController.complete(c),
+                  onMapCreated: (c) async {
+                    _mapController.complete(c);
+                    // Ensure we start centered on the selected position (Peshawar by default)
+                    // even if location permissions/services are unavailable initially.
+                    await c.moveCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(target: _selected, zoom: 14),
+                      ),
+                    );
+                  },
                   myLocationButtonEnabled: true,
                   myLocationEnabled: _hasPermission,
                   onCameraMoveStarted: () {
@@ -445,4 +446,108 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
       ),
     );
   }
+}
+
+/// Build a clean, human-readable address string from a placemark.
+String _formatPlacemark(gc.Placemark pm) {
+  // Collect candidates in a preferred order for clarity.
+  final rawParts = <String>[
+    (pm.street ?? '').trim(),
+    (pm.subLocality ?? '').trim(),
+    (pm.locality ?? '').trim(),
+    (pm.subAdministrativeArea ?? '').trim(),
+    (pm.administrativeArea ?? '').trim(),
+    (pm.postalCode ?? '').trim(),
+    (pm.country ?? '').trim(),
+  ];
+
+  // Some providers put a Plus Code or short house code into name; clean it first.
+  final name = (pm.name ?? '').trim();
+  final cleanedName = _cleanNameCandidate(name, pm);
+  if (cleanedName != null) {
+    rawParts.insert(0, cleanedName);
+  }
+
+  // Normalize, remove placeholders and duplicates while preserving order.
+  final seen = <String>{};
+  final cleaned = <String>[];
+  for (final part in rawParts) {
+    final normalized = _normalize(part);
+    if (normalized.isEmpty) continue;
+    if (_isPlaceholder(normalized)) continue;
+    final key = normalized.toLowerCase();
+    if (seen.add(key)) cleaned.add(normalized);
+  }
+
+  // If everything was filtered out, try a minimal fallback with locality/admin/country.
+  if (cleaned.isEmpty) {
+    final minimal = <String>[
+      _normalize(pm.locality ?? ''),
+      _normalize(pm.administrativeArea ?? ''),
+      _normalize(pm.country ?? ''),
+    ].where((e) => e.isNotEmpty).toList();
+    return minimal.join(', ');
+  }
+
+  return cleaned.join(', ');
+}
+
+String? _cleanNameCandidate(String s, gc.Placemark pm) {
+  if (s.isEmpty) return null;
+  var name = _stripPlusCodePrefix(s).trim();
+  if (name.isEmpty) return null;
+  if (_isPlusCode(name)) return null;
+  if (_isPlaceholder(name)) return null;
+  // Ignore short house-like codes such as "H23" without spaces.
+  if (name.length <= 5 && RegExp(r'\d').hasMatch(name) && !name.contains(' ')) {
+    return null;
+  }
+  // Drop if identical to common fields.
+  final norm = _normalize(name).toLowerCase();
+  final eqTo = <String>[
+    _normalize(pm.street ?? '').toLowerCase(),
+    _normalize(pm.subLocality ?? '').toLowerCase(),
+    _normalize(pm.locality ?? '').toLowerCase(),
+    _normalize(pm.administrativeArea ?? '').toLowerCase(),
+    _normalize(pm.country ?? '').toLowerCase(),
+  ];
+  if (eqTo.contains(norm)) return null;
+  return _normalize(name);
+}
+
+bool _isPlaceholder(String s) {
+  final lower = s.toLowerCase();
+  return lower == 'unnamed road' ||
+      lower == 'unknown' ||
+      lower == 'null' ||
+      lower == 'n/a';
+}
+
+bool _isPlusCode(String s) {
+  final v = s.trim().toUpperCase();
+  // Open Location Code character set: 23456789CFGHJMPQRVWX
+  final re = RegExp(
+    r'^[23456789CFGHJMPQRVWX]{4,8}\+[23456789CFGHJMPQRVWX]{2,}$',
+  );
+  if (re.hasMatch(v)) return true;
+  // Sometimes appears like "Q23X+GX Peshawar"; detect leading code.
+  final lead = RegExp(r'^[23456789CFGHJMPQRVWX]{4,8}\+');
+  return lead.hasMatch(v);
+}
+
+String _stripPlusCodePrefix(String s) {
+  // Remove a leading Plus Code and optional separator/space afterwards.
+  final re = RegExp(
+    r'^(?:[23456789CFGHJMPQRVWX]{4,8}\+[23456789CFGHJMPQRVWX]{0,8})(?:\s+|-|,)?',
+    caseSensitive: false,
+  );
+  return s.replaceFirst(re, '').trim();
+}
+
+String _normalize(String s) {
+  // Collapse multiple spaces and stray commas.
+  var out = s.replaceAll(RegExp(r'\s+'), ' ').trim();
+  out = out.replaceAll(RegExp(r'^,+|,+\s*,+'), ',');
+  out = out.replaceAll(RegExp(r',\s*,+'), ', ');
+  return out.trim();
 }

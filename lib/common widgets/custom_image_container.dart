@@ -34,13 +34,14 @@ class CustomImageContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: borderRadius ?? BorderRadius.circular(7),
+      borderRadius: borderRadius ?? BorderRadius.circular(12),
       child: Container(
         width: width,
         height: height,
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: backgroundColor ?? Colors.grey[50],
-          borderRadius: borderRadius ?? BorderRadius.circular(7),
+          borderRadius: borderRadius ?? BorderRadius.circular(12),
           image: imagePath != null
               ? DecorationImage(
                   // If the path looks like an asset path (starts with 'assets/'),

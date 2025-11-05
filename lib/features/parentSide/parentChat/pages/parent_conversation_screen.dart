@@ -85,6 +85,7 @@ class _ParentConversationScreenState extends State<ParentConversationScreen> {
                   Expanded(
                     child: TextField(
                       controller: _input,
+                      onTapOutside: (event) => FocusScope.of(context).unfocus(),
                       decoration: const InputDecoration(
                         hintText: 'Type a message',
                         border: OutlineInputBorder(),

@@ -52,6 +52,8 @@ class _DriverIdentificationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Keep bottom progress bar stable when keyboard appears (do not resize body)
+      resizeToAvoidBottomInset: false,
       appBar: const CustomBlurAppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

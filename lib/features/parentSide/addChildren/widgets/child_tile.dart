@@ -61,10 +61,11 @@ class _ChildTileState extends State<ChildTile> {
     return Material(
       color: Colors.transparent,
       child: Container(
+        // Ensure inner content respects the rounded corners so the border is visible on corners
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.grayLight, width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.03),
@@ -72,6 +73,11 @@ class _ChildTileState extends State<ChildTile> {
               offset: const Offset(0, 4),
             ),
           ],
+        ),
+        // Paint the border ABOVE the child so ExpansionTile/Material backgrounds can't cover it
+        foregroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.grayLight, width: 1),
         ),
         child: Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),

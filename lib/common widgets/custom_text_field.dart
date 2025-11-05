@@ -48,6 +48,8 @@ class CustomTextField extends StatelessWidget {
       // Keep caret size stable to avoid visual jumps
       cursorHeight: (AppTypography.optionLineSecondary.fontSize ?? 16) * 1.2,
       cursorWidth: 2,
+      // Dismiss keyboard when user taps anywhere outside this field
+      onTapOutside: (event) => FocusScope.of(context).unfocus(),
       // Keep the text vertically centered inside the fixed-height container
       // so validation state changes won't adjust the container size.
       textAlignVertical: TextAlignVertical.center,
