@@ -44,7 +44,7 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
                 zoom: 15,
               ),
               zoomControlsEnabled: false,
-              myLocationButtonEnabled: true,
+              myLocationButtonEnabled: false,
               myLocationEnabled: true,
               onMapCreated: (c) => _controller = c,
               mapType: MapType.normal,
@@ -67,38 +67,63 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
               },
             ),
 
-            // Rounded chat button at bottom-left
+            // Chat button bottom-right
             Positioned(
               right: 16,
               bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    Get.toNamed(AppRoutes.parentChat);
-                  },
-                  borderRadius: BorderRadius.circular(28),
-                  child: Container(
-                    height: 56,
-                    width: 56,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.9),
-                      border: Border.all(
-                        color: AppColors.primaryDark.withOpacity(0.8),
-                        width: 0.6,
-                      ),
-                      shape: BoxShape.circle,
-                      // boxShadow: [BoxShadow(color: AppColors.primary, blurRadius: 8)],
-                    ),
-                    child: const Icon(
-                      Icons.chat_bubble_outline_sharp,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
+              child: _RoundFab(
+                icon: Icons.chat_bubble_outline_sharp,
+                onTap: () => Get.toNamed(AppRoutes.parentChat),
+              ),
+            ),
+            // Relocated custom "locate me" button bottom-left (avoid overlap)
+            Positioned(
+              left: 16,
+              bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
+              child: _RoundFab(
+                icon: Icons.my_location,
+                onTap: () async {
+                  final c = _controller;
+                  if (c != null) {
+                    // (Optional) animate to target for demo; real implementation would use geolocator.
+                    await c.animateCamera(
+                      CameraUpdate.newLatLngZoom(_target, 15),
+                    );
+                  }
+                },
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RoundFab extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  const _RoundFab({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(28),
+        child: Container(
+          height: 56,
+          width: 56,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.9),
+            border: Border.all(
+              color: AppColors.primaryDark.withOpacity(0.8),
+              width: 0.6,
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: AppColors.white),
         ),
       ),
     );

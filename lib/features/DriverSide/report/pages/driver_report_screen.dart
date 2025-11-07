@@ -116,8 +116,15 @@ class _DriverReportScreenState extends State<DriverReportScreen> {
                     if (!context.mounted) return;
                     if (ok) {
                       _controller.clear();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text(AppStrings.reportSent)),
+                      Get.snackbar(
+                        'Report',
+                        AppStrings.reportSent,
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.black.withOpacity(0.85),
+                        colorText: Colors.white,
+                        margin: const EdgeInsets.all(12),
+                        borderRadius: 12,
+                        duration: const Duration(seconds: 2),
                       );
                     }
                   },

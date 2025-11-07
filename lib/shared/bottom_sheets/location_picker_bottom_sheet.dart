@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:geocoding/geocoding.dart' as gc;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -125,13 +126,24 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
   }
 
   void _showSnack(String msg, {String? actionLabel, VoidCallback? onAction}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        action: (actionLabel != null && onAction != null)
-            ? SnackBarAction(label: actionLabel, onPressed: onAction)
-            : null,
-      ),
+    Get.snackbar(
+      'Notice',
+      msg,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.black.withOpacity(0.85),
+      colorText: Colors.white,
+      margin: const EdgeInsets.all(12),
+      borderRadius: 12,
+      duration: const Duration(seconds: 2),
+      mainButton: (actionLabel != null && onAction != null)
+          ? TextButton(
+              onPressed: onAction,
+              child: Text(
+                actionLabel,
+                style: const TextStyle(color: Colors.white),
+              ),
+            )
+          : null,
     );
   }
 

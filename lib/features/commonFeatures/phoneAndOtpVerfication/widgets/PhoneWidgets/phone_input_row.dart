@@ -37,48 +37,70 @@ class PhoneInputRow extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          height: height,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.primary, width: 2),
-          ),
-          child: Row(
-            children: [
-              Image.asset(
-                AppAssets.flag,
-                width: height * 0.6,
-                height: height * 0.6,
+        Stack(
+          alignment: Alignment.centerRight,
+          children: [
+            CustonPhoneTextField(
+              controller: controller,
+              hintText: 'e.g. 3001234567',
+              hintColor: AppColors.black.withOpacity(0.6),
+              textColor: AppColors.black,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly,
+                PakistanPhoneNumberFormatter(),
+              ],
+              validator: validator,
+              height: height,
+              prefix: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    AppAssets.flag,
+                    width: height * 0.6,
+                    height: height * 0.6,
+                  ),
+                  SizedBox(width: Responsive.scaleClamped(context, 12, 6, 22)),
+                  Text(
+                    '+92',
+                    style: AppTypography.optionLineSecondary.copyWith(
+                      color: AppColors.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: Responsive.scaleClamped(context, 15, 8, 28)),
-              // country code removed (we show +92 inside the text field)
-              Expanded(
-                child: CustonPhoneTextField(
-                  controller: controller,
-                  hintText: 'e.g. 3001234567',
-                  hintColor: AppColors.black.withOpacity(0.6),
-                  textColor: AppColors.black,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly,
-                    PakistanPhoneNumberFormatter(),
-                  ],
-                  validator: validator,
-                  height: height,
-                  showContainer: false,
-                ),
-              ),
-              IconButton(
-                onPressed: () => controller.clear(),
-                icon: const Icon(Icons.clear, color: AppColors.black),
-              ),
-            ],
-          ),
+            ),
+            // Clear icon overlay (maintains original vertical centering)
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller,
+              builder: (context, value, _) {
+                final hasText = value.text.trim().isNotEmpty;
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 150),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  child: hasText
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 4.0),
+                          child: IconButton(
+                            key: const ValueKey('clear-visible'),
+                            onPressed: () => controller.clear(),
+                            icon: const Icon(
+                              Icons.clear,
+                              color: AppColors.black,
+                            ),
+                          ),
+                        )
+                      : const SizedBox(
+                          key: ValueKey('clear-hidden'),
+                          width: 0,
+                          height: 0,
+                        ),
+                );
+              },
+            ),
+          ],
         ),
-
-        // Fixed-height area for validation messages so showing an error does
-        // not resize surrounding widgets. We intentionally keep the height
-        // small and consistent with typical form error text.
         SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
         SizedBox(
           height: 18,

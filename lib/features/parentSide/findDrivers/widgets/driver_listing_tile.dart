@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:godropme/features/parentSide/findDrivers/models/driver_listing.dart';
 import 'package:godropme/theme/colors.dart';
@@ -108,8 +109,15 @@ class _DriverListingTileState extends State<DriverListingTile> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Request sent (demo)')),
+                        Get.snackbar(
+                          'Request',
+                          'Request sent (demo)',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.black.withOpacity(0.85),
+                          colorText: Colors.white,
+                          margin: const EdgeInsets.all(12),
+                          borderRadius: 12,
+                          duration: const Duration(seconds: 2),
                         );
                       },
                       style: ElevatedButton.styleFrom(

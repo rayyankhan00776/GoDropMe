@@ -35,11 +35,22 @@ class DriverChatScreen extends StatelessWidget {
                         final c = ctrl.contacts[index];
                         return DriverDrawerCard(
                           child: ListTile(
-                            leading: CircleAvatar(child: Text(c.name[0])),
-                            title: Text(
-                              c.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            leading: const CircleAvatar(
+                              radius: 22,
+                              child: Icon(Icons.person),
+                            ),
+                            title: Padding(
+                              padding: const EdgeInsets.only(bottom: 2.0),
+                              child: Text(
+                                c.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                             trailing: const Icon(

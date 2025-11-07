@@ -44,8 +44,14 @@ class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppStrings.unableToOpenCameraPrefix}$e')),
+        Get.snackbar(
+          'Camera',
+          '${AppStrings.unableToOpenCameraPrefix}$e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.black.withOpacity(0.85),
+          colorText: Colors.white,
+          margin: const EdgeInsets.all(12),
+          borderRadius: 12,
         );
       }
     }

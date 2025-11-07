@@ -6,30 +6,29 @@ class PakistanPhoneNumberFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    // Keep only digits from the raw input
+    // Digits only from user input.
     final rawDigits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
 
-    // Normalize to national part (without country code)
+    // Normalize: strip leading country code or 0, keep national part.
     String national = rawDigits;
-    if (national.startsWith('92')) {
-      national = national.substring(2);
-    } else if (national.startsWith('0')) {
-      national = national.substring(1);
+    if (national.startsWith('92')) national = national.substring(2);
+    if (national.startsWith('0')) national = national.substring(1);
+
+    // Clamp to 10 digits (Pakistani mobile national significant number).
+    if (national.length > 10) national = national.substring(0, 10);
+
+    // If user cleared everything, keep field truly empty (fixes stray '9').
+    if (national.isEmpty) {
+      return const TextEditingValue(
+        text: '',
+        selection: TextSelection.collapsed(offset: 0),
+      );
     }
 
-    // Enforce maximum of 10 digits for the national part
-    if (national.length > 10) {
-      national = national.substring(0, 10);
-    }
-
-    // Build the displayed value: always show +92 prefix when there is any input,
-    // otherwise keep just '+92' as the starter for clarity.
-    final newText = '+92$national';
-
+    // Display just the national part; UI elsewhere shows +92 context.
     return TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newText.length),
-      composing: TextRange.empty,
+      text: national,
+      selection: TextSelection.collapsed(offset: national.length),
     );
   }
 }

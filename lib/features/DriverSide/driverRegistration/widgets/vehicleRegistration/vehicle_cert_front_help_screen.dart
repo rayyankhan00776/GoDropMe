@@ -43,9 +43,15 @@ class _VehicleCertFrontHelpScreenState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Unable to open camera: $e')));
+        Get.snackbar(
+          'Camera',
+          'Unable to open camera: $e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.black.withOpacity(0.85),
+          colorText: Colors.white,
+          margin: const EdgeInsets.all(12),
+          borderRadius: 12,
+        );
       }
     }
   }

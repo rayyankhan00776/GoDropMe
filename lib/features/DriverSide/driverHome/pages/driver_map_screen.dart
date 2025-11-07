@@ -25,25 +25,76 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
     return Scaffold(
       body: DriverDrawerShell(
         showNotificationButton: true,
-        body: GoogleMap(
-          initialCameraPosition: const CameraPosition(
-            target: LatLng(34.0000, 71.57849),
-            zoom: 14,
-          ),
-          myLocationEnabled: true,
-          myLocationButtonEnabled: true,
-          zoomControlsEnabled: false,
-          // Improve gesture responsiveness inside scrollable/drawer shells
-          gestureRecognizers: {
-            Factory<OneSequenceGestureRecognizer>(
-              () => EagerGestureRecognizer(),
+        body: Stack(
+          children: [
+            GoogleMap(
+              initialCameraPosition: const CameraPosition(
+                target: LatLng(34.0000, 71.57849),
+                zoom: 14,
+              ),
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              padding: const EdgeInsets.only(right: 12, bottom: 80),
+              zoomControlsEnabled: false,
+              // Improve gesture responsiveness inside scrollable/drawer shells
+              gestureRecognizers: {
+                Factory<OneSequenceGestureRecognizer>(
+                  () => EagerGestureRecognizer(),
+                ),
+              },
+              scrollGesturesEnabled: true,
+              zoomGesturesEnabled: true,
+              rotateGesturesEnabled: true,
+              tiltGesturesEnabled: true,
+              onMapCreated: (c) => _mapController = c,
             ),
-          },
-          scrollGesturesEnabled: true,
-          zoomGesturesEnabled: true,
-          rotateGesturesEnabled: true,
-          tiltGesturesEnabled: true,
-          onMapCreated: (c) => _mapController = c,
+            Positioned(
+              left: 16,
+              bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
+              child: _RoundFab(
+                icon: Icons.my_location,
+                onTap: () async {
+                  final c = _mapController;
+                  if (c != null) {
+                    await c.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        const CameraPosition(
+                          target: LatLng(34.0000, 71.57849),
+                          zoom: 15,
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RoundFab extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  const _RoundFab({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(28),
+        child: Container(
+          height: 56,
+          width: 56,
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.75),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: Colors.white),
         ),
       ),
     );
