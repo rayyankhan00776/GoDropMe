@@ -116,9 +116,9 @@ class _RoundFab extends StatelessWidget {
           height: 56,
           width: 56,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.9),
+            color: AppColors.primary.withValues(alpha: 0.9),
             border: Border.all(
-              color: AppColors.primaryDark.withOpacity(0.8),
+              color: AppColors.primaryDark.withValues(alpha: 0.8),
               width: 0.6,
             ),
             shape: BoxShape.circle,

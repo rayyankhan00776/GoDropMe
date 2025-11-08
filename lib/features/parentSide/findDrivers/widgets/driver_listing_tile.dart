@@ -30,7 +30,7 @@ class _DriverListingTileState extends State<DriverListingTile> {
         border: Border.all(color: AppColors.grayLight, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -113,7 +113,7 @@ class _DriverListingTileState extends State<DriverListingTile> {
                           'Request',
                           'Request sent (demo)',
                           snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.black.withOpacity(0.85),
+                          backgroundColor: Colors.black.withValues(alpha: 0.85),
                           colorText: Colors.white,
                           margin: const EdgeInsets.all(12),
                           borderRadius: 12,
@@ -150,7 +150,7 @@ class _DriverAvatar extends StatelessWidget {
       width: 52,
       height: 52,
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.06),
+        color: AppColors.primary.withValues(alpha: 0.06),
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,

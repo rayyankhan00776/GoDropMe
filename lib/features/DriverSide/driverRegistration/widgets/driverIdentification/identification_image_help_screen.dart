@@ -56,7 +56,7 @@ class _IdentificationImageHelpScreenState
           'Camera',
           'Unable to open camera',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.black.withOpacity(0.85),
+          backgroundColor: Colors.black.withValues(alpha: 0.85),
           colorText: Colors.white,
           margin: const EdgeInsets.all(12),
           borderRadius: 12,

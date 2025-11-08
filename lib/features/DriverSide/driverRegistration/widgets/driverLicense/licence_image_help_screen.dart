@@ -48,7 +48,7 @@ class _LicenceImageHelpScreenState extends State<LicenceImageHelpScreen> {
           'Camera',
           '${AppStrings.unableToOpenCameraPrefix}$e',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.black.withOpacity(0.85),
+          backgroundColor: Colors.black.withValues(alpha: 0.85),
           colorText: Colors.white,
           margin: const EdgeInsets.all(12),
           borderRadius: 12,

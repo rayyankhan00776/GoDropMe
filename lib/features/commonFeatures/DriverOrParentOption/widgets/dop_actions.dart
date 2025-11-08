@@ -46,7 +46,9 @@ class DopActions extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.primary.withOpacity(0.14)),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.14),
+                ),
               ),
               child: Material(
                 color: Colors.transparent,

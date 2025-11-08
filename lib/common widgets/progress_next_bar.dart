@@ -71,7 +71,7 @@ class ProgressNextBar extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: (currentStep / totalSteps).clamp(0.0, 1.0),
                     minHeight: 6,
-                    backgroundColor: AppColors.grayLight.withOpacity(0.6),
+                    backgroundColor: AppColors.grayLight.withValues(alpha: 0.6),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       AppColors.primary,
                     ),
@@ -97,7 +97,7 @@ class ProgressNextBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
+                  color: Colors.black.withValues(alpha: 0.06),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),

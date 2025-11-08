@@ -91,7 +91,7 @@ class _RoundFab extends StatelessWidget {
           height: 56,
           width: 56,
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.75),
+            color: Colors.black.withValues(alpha: 0.75),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: Colors.white),

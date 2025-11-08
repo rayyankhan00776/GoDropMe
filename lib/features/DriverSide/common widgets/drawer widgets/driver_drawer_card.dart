@@ -14,12 +14,12 @@ class DriverDrawerCard extends StatelessWidget {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppColors.grayLight.withOpacity(0.6),
+          color: AppColors.grayLight.withValues(alpha: 0.6),
           width: 0.8,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

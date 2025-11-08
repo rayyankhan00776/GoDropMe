@@ -120,7 +120,7 @@ class _ParentReportScreenState extends State<ParentReportScreen> {
                         'Report',
                         AppStrings.reportSent,
                         snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.black.withOpacity(0.85),
+                        backgroundColor: Colors.black.withValues(alpha: 0.85),
                         colorText: Colors.white,
                         margin: const EdgeInsets.all(12),
                         borderRadius: 12,

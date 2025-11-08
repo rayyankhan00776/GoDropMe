@@ -45,7 +45,7 @@ class CustomBlurAppBar extends StatelessWidget implements PreferredSizeWidget {
       flexibleSpace: ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(color: Colors.black.withOpacity(0.03)),
+          child: Container(color: Colors.black.withValues(alpha: 0.03)),
         ),
       ),
     );
