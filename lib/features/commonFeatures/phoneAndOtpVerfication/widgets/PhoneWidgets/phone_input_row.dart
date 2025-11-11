@@ -60,13 +60,8 @@ class PhoneInputRow extends StatelessWidget {
                     height: height * 0.6,
                   ),
                   SizedBox(width: Responsive.scaleClamped(context, 12, 6, 22)),
-                  Text(
-                    '+92',
-                    style: AppTypography.optionLineSecondary.copyWith(
-                      color: AppColors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  // Keep +92 the same size and baseline as the input text
+                  const Text('+92'),
                 ],
               ),
             ),

@@ -40,6 +40,10 @@ class CustonPhoneTextField extends StatelessWidget {
   final Color? hintColor;
   final Color? textColor;
   final Color? borderColor;
+  // If true and a prefix is provided, we attempt to unify its text style
+  // with the input field style so the country code (+92) and the user
+  // entered digits share identical font size, weight, and baseline.
+  final bool matchPrefixStyle;
 
   const CustonPhoneTextField({
     this.controller,
@@ -52,6 +56,7 @@ class CustonPhoneTextField extends StatelessWidget {
     this.hintColor,
     this.textColor,
     this.borderColor = AppColors.primary,
+    this.matchPrefixStyle = true,
     super.key,
   });
 
@@ -63,6 +68,7 @@ class CustonPhoneTextField extends StatelessWidget {
       keyboardType: TextInputType.phone,
       style: AppTypography.optionLineSecondary.copyWith(
         color: textColor ?? AppColors.black,
+        fontWeight: FontWeight.w600, // match the weight used in prefix (+92)
       ),
       cursorHeight: (AppTypography.optionLineSecondary.fontSize ?? 16) * 1.2,
       cursorWidth: 2,
@@ -86,13 +92,16 @@ class CustonPhoneTextField extends StatelessWidget {
         ),
         border: InputBorder.none,
         isDense: true,
-        // Symmetric padding maintains vertical centering without jumps.
+        // Add symmetric vertical padding so the text caret remains
+        // vertically centered and does not shift when error state toggles.
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
+        isCollapsed: true,
         errorStyle: const TextStyle(
           height: 0,
           color: Colors.transparent,
           fontSize: 0,
         ),
+        errorMaxLines: 1,
       ),
       validator: validator ?? pakistanPhoneValidator,
       autovalidateMode: AutovalidateMode.disabled,
@@ -112,7 +121,18 @@ class CustonPhoneTextField extends StatelessWidget {
       child: Row(
         children: [
           if (prefix != null) ...[
-            prefix!,
+            // Optionally enforce consistent text styling for the prefix so
+            // '+92' matches the phone number input size and weight.
+            if (matchPrefixStyle)
+              DefaultTextStyle.merge(
+                style: AppTypography.optionLineSecondary.copyWith(
+                  color: textColor ?? AppColors.black,
+                  fontWeight: FontWeight.w600,
+                ),
+                child: prefix!,
+              )
+            else
+              prefix!,
             SizedBox(width: Responsive.scaleClamped(context, 8, 6, 14)),
           ],
           Expanded(child: input),

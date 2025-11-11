@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
-import 'package:godropme/features/driverSide/driverProfile/widgets/driver_profile_avatar.dart';
 import 'package:godropme/features/driverSide/driverProfile/widgets/driver_profile_caption.dart';
 import 'package:godropme/features/driverSide/driverProfile/widgets/driver_profile_section.dart';
 import 'package:godropme/features/driverSide/driverProfile/widgets/driver_profile_tile.dart';
+import 'package:godropme/features/driverSide/driverProfile/widgets/profile_header.dart';
+import 'package:godropme/features/driverSide/driverProfile/widgets/profile_documents_section.dart';
+import 'package:godropme/features/driverSide/driverProfile/widgets/profile_actions_section.dart';
+import 'package:godropme/features/driverSide/driverProfile/utils/profile_utils.dart';
 import 'package:godropme/services/Terms_uri_opener.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/theme/colors.dart';
@@ -28,34 +31,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
   Map<String, dynamic>? _service;
   bool _loading = true;
 
-  String _fullName(Map<String, dynamic>? personalInfo, String? fallback) {
-    final f = (personalInfo?['firstName'] ?? '').toString().trim();
-    final s = (personalInfo?['surName'] ?? '').toString().trim();
-    final l = (personalInfo?['lastName'] ?? '').toString().trim();
-    final combined = [f, s, l].where((e) => e.isNotEmpty).join(' ');
-    if (combined.isNotEmpty) return combined;
-    return (fallback ?? '').trim();
-  }
-
-  String _maskCnic(String? cnic) {
-    if (cnic == null || cnic.trim().isEmpty) return 'Not set';
-    final digits = cnic.replaceAll(RegExp(r'\D'), '');
-    if (digits.length <= 5) return '*****$digits';
-    return '*****${digits.substring(digits.length - 5)}';
-  }
-
-  String _joinSchools(dynamic schools) {
-    if (schools is List) {
-      final list = schools
-          .whereType<String>()
-          .map((e) => e.trim())
-          .where((e) => e.isNotEmpty)
-          .toList();
-      if (list.isEmpty) return 'Not set';
-      return list.join(', ');
-    }
-    return 'Not set';
-  }
+  // Helpers moved to profile_utils.dart
 
   Future<void> _loadAll() async {
     final results = await Future.wait<dynamic>([
@@ -117,68 +93,19 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                       ),
                     ),
 
-                    // Avatar + Name
-                    Center(
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: DriverProfileAvatar(
-                              size: Responsive.scaleClamped(
-                                context,
-                                108,
-                                96,
-                                128,
-                              ),
-                              imagePath: _personalInfo?['imagePath'] as String?,
-                            ),
-                          ),
-                          Text(
-                            (() {
-                              final name = _fullName(
-                                _personalInfo,
-                                _driverName,
-                              );
-                              return name.isEmpty ? 'Driver' : name;
-                            })(),
-                            style: AppTypography.optionLineSecondary.copyWith(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.black,
-                            ),
-                          ),
-                        ],
+                    // Avatar + Name (refactored)
+                    ProfileHeader(
+                      personalInfo: _personalInfo,
+                      displayName: fullNameFromPersonalInfo(
+                        _personalInfo,
+                        _driverName,
                       ),
                     ),
 
                     const DriverProfileCaption('Verification'),
-                    DriverProfileSection(
-                      children: [
-                        () {
-                          final number = (_licence?['licenceNumber'] ?? '')
-                              .toString()
-                              .trim();
-                          final expiry = (_licence?['expiryDate'] ?? '')
-                              .toString()
-                              .trim();
-                          final sub = [
-                            if (number.isNotEmpty) 'Number: $number',
-                            if (expiry.isNotEmpty) 'Expiry: $expiry',
-                          ].join(' • ');
-                          return DriverProfileTile(
-                            title: 'Driver Licence',
-                            subtitle: sub.isEmpty ? 'Not set' : sub,
-                            showIosChevron: true,
-                          );
-                        }(),
-                        DriverProfileTile(
-                          title: 'CNIC',
-                          subtitle: _maskCnic(
-                            (_identification?['cnicNumber'] ?? '').toString(),
-                          ),
-                          showIosChevron: true,
-                        ),
-                      ],
+                    ProfileDocumentsSection(
+                      licence: _licence,
+                      identification: _identification,
                     ),
 
                     const DriverProfileCaption('Vehicle'),
@@ -225,7 +152,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                           children: [
                             DriverProfileTile(
                               title: 'School(s)',
-                              subtitle: _joinSchools(_service?['schoolNames']),
+                              subtitle: joinSchools(_service?['schoolNames']),
                               showIosChevron: true,
                             ),
                             const Divider(height: 1),
@@ -245,39 +172,10 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                     ),
 
                     const DriverProfileCaption('Account'),
-                    DriverProfileSection(
-                      children: const [
-                        // Terms opens external link
-                        // Using non-const onTap wrapper below
-                      ],
-                    ),
-                    // Use a separate section to keep onTap non-const
-                    DriverProfileSection(
-                      children: [
-                        DriverProfileTile(
-                          title: 'Phone Number',
-                          subtitle: (() {
-                            String? n = _driverPhone?.trim();
-                            if (n == null || n.isEmpty) return 'Not set';
-                            if (n.startsWith('+92')) n = n.substring(3);
-                            if (n.startsWith('92')) n = n.substring(2);
-                            return '+92 ${n.trim()}';
-                          })(),
-                          showIosChevron: true,
-                        ),
-                        const Divider(height: 1),
-                        DriverProfileTile(
-                          title: AppStrings.drawerTerms,
-                          onTap: () async => termsUriOpener(),
-                        ),
-                        const Divider(height: 1),
-                        const DriverProfileTile(title: AppStrings.drawerLogout),
-                        const Divider(height: 1),
-                        const DriverProfileTile(
-                          title: 'Delete Account',
-                          isDestructive: true,
-                        ),
-                      ],
+                    ProfileActionsSection(
+                      phoneNumber: _driverPhone,
+                      onOpenTerms: () async => termsUriOpener(),
+                      // Keep logout and delete as no-ops here to preserve behavior
                     ),
                   ],
                 ),

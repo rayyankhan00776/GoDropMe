@@ -1,19 +1,17 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
-import 'package:godropme/common%20widgets/custom_text_field.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/parentSide/addChildren/models/children_form_options.dart';
 import 'package:godropme/features/parentSide/addChildren/utils/children_form_options_loader.dart';
-import 'package:godropme/common%20widgets/app_dropdown.dart';
-import 'package:godropme/common%20widgets/form_error_line.dart';
 import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/time_picker_field.dart';
-import 'package:godropme/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:godropme/shared/bottom_sheets/location_picker_bottom_sheet.dart';
-import 'package:godropme/shared/widgets/section_header.dart';
-import 'package:godropme/utils/app_typography.dart';
+// section header and typography now used within extracted widgets
+import 'child_basic_info_fields.dart';
+import 'child_pickup_section.dart';
+import 'child_drop_section.dart';
+import 'child_relationship_section.dart';
+import 'child_global_error_line.dart';
 
 typedef OnSaveChild = void Function(Map<String, dynamic> childData);
 
@@ -160,110 +158,52 @@ class AddChildFormState extends State<AddChildForm> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Name
-          CustomTextField(
-            borderColor: AppColors.gray,
-            controller: _nameController,
-            hintText: AppStrings.childNameHint,
+          ChildBasicInfoFields(
+            nameController: _nameController,
+            selectedAge: _selectedAge,
+            selectedGender: _selectedGender,
+            selectedSchool: _selectedSchool,
+            options: _options,
+            onAgeChanged: (sel) => setState(() => _selectedAge = sel),
+            onGenderChanged: (sel) => setState(() => _selectedGender = sel),
+            onSchoolChanged: (sel) => setState(() => _selectedSchool = sel),
           ),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
-          // Age dropdown
-          AppDropdown(
-            hint: AppStrings.childAgeHint,
-            value: _selectedAge,
-            items: _options.ages,
-            onSelect: (sel) => setState(() => _selectedAge = sel),
+          ChildPickupSection(
+            controller: _pickPointController,
+            value: _pickLatLng,
+            onPickLocation: _selectPickLocation,
           ),
-          SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
-
-          // Gender
-          AppDropdown(
-            hint: AppStrings.childGenderHint,
-            value: _selectedGender,
-            items: _options.genders,
-            onSelect: (sel) => setState(() => _selectedGender = sel),
-          ),
-          SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
-
-          // School
-          AppDropdown(
-            hint: AppStrings.childSchoolHint,
-            value: _selectedSchool,
-            items: _options.schools,
-            onSelect: (sel) => setState(() => _selectedSchool = sel),
-          ),
-          SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
-
-          // Pick point (map picker)
-          GestureDetector(
-            onTap: _selectPickLocation,
-            child: AbsorbPointer(
-              child: CustomTextField(
-                borderColor: AppColors.gray,
-                controller: _pickPointController,
-                hintText: AppStrings.childPickPointHint,
-              ),
-            ),
-          ),
-          SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
           // Drop point header with Same as pick toggle (centralized SectionHeader)
-          SectionHeader(
-            title: AppStrings.childDropPointHint,
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(AppStrings.sameAsPick, style: AppTypography.helperSmall),
-                const SizedBox(width: 8),
-                Switch(
-                  value: _sameAsPick,
-                  activeColor: AppColors.primary,
-                  onChanged: (val) {
-                    setState(() {
-                      _sameAsPick = val;
-                      if (_sameAsPick) {
-                        _dropLatLng = _pickLatLng;
-                        _dropPointController.text = _pickPointController.text;
-                      } else {
-                        _dropLatLng = null;
-                        _dropPointController.clear();
-                      }
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: _selectDropLocation,
-            child: AbsorbPointer(
-              child: CustomTextField(
-                borderColor: _sameAsPick ? AppColors.grayLight : AppColors.gray,
-                controller: _dropPointController,
-                hintText: AppStrings.tapToSelectOnMap,
-              ),
-            ),
-          ),
-          SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
-
-          // Relationship
-          AppDropdown(
-            hint: AppStrings.childRelationshipHint,
-            value: _selectedRelation,
-            items: _options.relations,
-            onSelect: (sel) => setState(() => _selectedRelation = sel),
+          ChildDropSection(
+            controller: _dropPointController,
+            value: _dropLatLng,
+            sameAsPick: _sameAsPick,
+            onSameAsPickChanged: (val) {
+              setState(() {
+                _sameAsPick = val;
+                if (_sameAsPick) {
+                  _dropLatLng = _pickLatLng;
+                  _dropPointController.text = _pickPointController.text;
+                } else {
+                  _dropLatLng = null;
+                  _dropPointController.clear();
+                }
+              });
+            },
+            onPickDropLocation: _selectDropLocation,
           ),
 
-          SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
-          // Time picker row
+          ChildRelationshipSection(
+            selectedRelation: _selectedRelation,
+            options: _options,
+            onRelationChanged: (sel) => setState(() => _selectedRelation = sel),
+          ),
           TimePickerField(time: _pickupTime, onPick: _pickTime),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
-          // Global validation message area (fixed height)
-          FormErrorLine(
-            message: AppStrings.childFormGlobalError,
-            visible: _globalError != null,
-          ),
+          ChildGlobalErrorLine(visible: _globalError != null),
 
           SizedBox(height: Responsive.scaleClamped(context, 18, 12, 24)),
           SizedBox(height: Responsive.scaleClamped(context, 24, 16, 32)),

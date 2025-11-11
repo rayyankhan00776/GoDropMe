@@ -24,6 +24,7 @@ class SectionHeader extends StatelessWidget {
       padding: padding,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Column(
@@ -54,10 +55,7 @@ class SectionHeader extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) ...[
-            const SizedBox(width: 12),
-            Flexible(child: trailing!),
-          ],
+          if (trailing != null) trailing!,
         ],
       ),
     );

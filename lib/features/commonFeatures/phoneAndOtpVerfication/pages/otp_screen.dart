@@ -155,7 +155,12 @@ class _OtpScreenState extends State<OtpScreen> {
                       onPressed: () {
                         // Reset submission state and go back to phone screen for editing
                         _phoneController.submitted.value = false;
-                        Get.back();
+                        // Pop back through the stack until the phone screen is on top.
+                        // This avoids issues if an extra OTP was stacked earlier.
+                        Get.until(
+                          (route) =>
+                              route.settings.name == AppRoutes.phoneScreen,
+                        );
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,

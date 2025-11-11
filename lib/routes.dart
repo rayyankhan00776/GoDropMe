@@ -1,6 +1,18 @@
 import 'package:get/get.dart';
+
+// Keep imports centralized here so part files can reference the screens/bindings.
 import 'package:godropme/features/commonFeatures/driverOrParentOption/binding/dop_binding.dart';
 import 'package:godropme/features/commonFeatures/driverOrParentOption/pages/DOP_option_screen.dart';
+import 'package:godropme/features/commonFeatures/onboard/binding/onboard_binding.dart';
+import 'package:godropme/features/commonFeatures/onboard/pages/onboard_screen.dart';
+import 'package:godropme/features/commonFeatures/registrationOption/binding/option_binding.dart';
+import 'package:godropme/features/commonFeatures/registrationOption/pages/option_screen.dart';
+import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/binding/otp_binding.dart';
+import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/binding/phone_binding.dart';
+import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/pages/otp_screen.dart';
+import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/pages/phone_Screen.dart';
+
+// Driver side
 import 'package:godropme/features/driverSide/driverRegistration/pages/driver_identification_screen.dart';
 import 'package:godropme/features/driverSide/driverRegistration/pages/driver_licence_screen.dart';
 import 'package:godropme/features/driverSide/driverRegistration/pages/driver_name_screen.dart';
@@ -13,14 +25,22 @@ import 'package:godropme/features/driverSide/driverRegistration/pages/vehicle_Se
 import 'package:godropme/features/driverSide/driverRegistration/binding/vehicle_selection_binding.dart';
 import 'package:godropme/features/driverSide/driverRegistration/pages/vehicle_registration_Screen.dart';
 import 'package:godropme/features/driverSide/driverRegistration/binding/vehicle_registration_binding.dart';
-import 'package:godropme/features/commonFeatures/onboard/binding/onboard_binding.dart';
-import 'package:godropme/features/commonFeatures/onboard/pages/onboard_screen.dart';
-import 'package:godropme/features/commonFeatures/registrationOption/pages/option_screen.dart';
-import 'package:godropme/features/commonFeatures/registrationOption/binding/option_binding.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/pages/otp_screen.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/pages/phone_Screen.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/binding/phone_binding.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/binding/otp_binding.dart';
+import 'package:godropme/features/driverSide/driverRegistration/pages/service_details_screen.dart';
+import 'package:godropme/features/driverSide/driverRegistration/binding/service_details_binding.dart';
+import 'package:godropme/features/driverSide/driverHome/pages/driver_home_screen.dart';
+import 'package:godropme/features/driverSide/driverHome/binding/driver_home_binding.dart';
+import 'package:godropme/features/driverSide/settings/pages/settings_screen.dart'
+    as driver_settings;
+import 'package:godropme/features/driverSide/driverProfile/pages/profile_screen.dart'
+    as driver_profile;
+import 'package:godropme/features/driverSide/report/pages/driver_report_screen.dart';
+import 'package:godropme/features/driverSide/report/binding/driver_report_binding.dart';
+import 'package:godropme/features/driverSide/notifications/pages/driver_notifications_screen.dart';
+import 'package:godropme/features/driverSide/notifications/binding/driver_notifications_binding.dart';
+import 'package:godropme/features/driverSide/driverChat/pages/driver_conversation_screen.dart';
+import 'package:godropme/features/driverSide/driverChat/binding/driver_conversation_binding.dart';
+
+// Parent side
 // import 'package:godropme/features/parentSide/parentHome/extra/parent_Home_Screen.dart';
 import 'package:godropme/features/parentSide/parentHome/pages/parent_map_screen.dart';
 import 'package:godropme/features/parentSide/parentHome/binding/parent_map_binding.dart';
@@ -29,29 +49,23 @@ import 'package:godropme/features/parentSide/parentName/binding/parent_name_bind
 import 'package:godropme/features/parentSide/addChildren/pages/add_children_screen.dart';
 import 'package:godropme/features/parentSide/addChildren/binding/add_children_binding.dart';
 import 'package:godropme/features/parentSide/findDrivers/pages/find_drivers_screen.dart';
-import 'package:godropme/features/parentSide/parentProfile/pages/profile_screen.dart';
-import 'package:godropme/features/parentSide/settings/pages/settings_screen.dart';
+import 'package:godropme/features/parentSide/parentProfile/pages/profile_screen.dart'
+    as parent_profile;
+import 'package:godropme/features/parentSide/settings/pages/settings_screen.dart'
+    as parent_settings;
 import 'package:godropme/features/parentSide/addChildren/widgets/AddChildrenFormhelpScreen/add_child_help_screen.dart';
 import 'package:godropme/features/parentSide/parentChat/pages/parent_chat_screen.dart';
-import 'package:godropme/features/driverSide/driverHome/pages/driver_home_screen.dart';
-import 'package:godropme/features/driverSide/driverHome/binding/driver_home_binding.dart';
 import 'package:godropme/features/parentSide/report/pages/parent_report_screen.dart';
 import 'package:godropme/features/parentSide/report/binding/parent_report_binding.dart';
-import 'package:godropme/features/driverSide/driverRegistration/pages/service_details_screen.dart';
-import 'package:godropme/features/driverSide/driverRegistration/binding/service_details_binding.dart';
-import 'package:godropme/features/driverSide/settings/pages/settings_screen.dart';
-import 'package:godropme/features/driverSide/driverProfile/pages/profile_screen.dart';
-import 'package:godropme/features/driverSide/report/pages/driver_report_screen.dart';
-import 'package:godropme/features/driverSide/report/binding/driver_report_binding.dart';
 import 'package:godropme/features/parentSide/notifications/pages/parents_notification_Screen.dart';
 import 'package:godropme/features/parentSide/notifications/binding/parent_notifications_binding.dart';
-import 'package:godropme/features/driverSide/notifications/pages/driver_notifications_screen.dart';
-import 'package:godropme/features/driverSide/notifications/binding/driver_notifications_binding.dart';
 import 'package:godropme/features/parentSide/parentChat/binding/parent_chat_binding.dart';
 import 'package:godropme/features/parentSide/parentChat/pages/parent_conversation_screen.dart';
 import 'package:godropme/features/parentSide/parentChat/binding/parent_conversation_binding.dart';
-import 'package:godropme/features/driverSide/driverChat/pages/driver_conversation_screen.dart';
-import 'package:godropme/features/driverSide/driverChat/binding/driver_conversation_binding.dart';
+
+part 'routes/common_routes.dart';
+part 'routes/driver_routes.dart';
+part 'routes/parent_routes.dart';
 
 // Add more imports for other screens as you create them
 
@@ -86,139 +100,5 @@ class AppRoutes {
   static const String parentConversation = '/parent_conversation';
   static const String driverConversation = '/driver_conversation';
 
-  static final routes = [
-    GetPage(
-      name: onboard,
-      page: () => const OnboardScreen(),
-      binding: OnboardBinding(),
-    ),
-    GetPage(
-      name: optionScreen,
-      page: () => const OptionScreen(),
-      binding: OptionBinding(),
-    ),
-    GetPage(
-      name: phoneScreen,
-      page: () => const PhoneScreen(),
-      binding: PhoneBinding(),
-    ),
-    GetPage(
-      name: otpScreen,
-      page: () => const OtpScreen(),
-      binding: OtpBinding(),
-    ),
-    GetPage(
-      name: dopOption,
-      page: () => const DopOptionScreen(),
-      binding: DopBinding(),
-    ),
-    GetPage(
-      name: driverName,
-      page: () => DriverNameScreen(),
-      binding: DriverNameBinding(),
-    ),
-    GetPage(
-      name: parentName,
-      page: () => const ParentNameScreen(),
-      binding: ParentNameBinding(),
-    ),
-    GetPage(
-      name: vehicleSelection,
-      page: () => const VehicleSelectionScreen(),
-      binding: VehicleSelectionBinding(),
-    ),
-    GetPage(
-      name: personalInfo,
-      page: () => const PersonalInfoScreen(),
-      binding: PersonalInfoBinding(),
-    ),
-    GetPage(
-      name: driverLicence,
-      page: () => const DriverLicenceScreen(),
-      binding: DriverLicenceBinding(),
-    ),
-    GetPage(
-      name: driverIdentification,
-      page: () => const DriverIdentificationScreen(),
-      binding: DriverIdentificationBinding(),
-    ),
-    GetPage(
-      name: vehicleRegistration,
-      page: () => const VehicleRegistrationScreen(),
-      binding: VehicleRegistrationBinding(),
-    ),
-    GetPage(
-      name: driverServiceDetails,
-      page: () => const ServiceDetailsScreen(),
-      binding: ServiceDetailsBinding(),
-    ),
-    // parents Screens can be added here in the same manner
-    GetPage(
-      name: parentmapScreen,
-      page: () => const ParentMapScreen(),
-      binding: ParentMapBinding(),
-    ),
-    GetPage(
-      name: parentChat,
-      page: () => const ParentChatScreen(),
-      binding: ParentChatBinding(),
-    ),
-    GetPage(
-      name: addChildren,
-      page: () => const AddChildrenScreen(),
-      binding: AddChildrenBinding(),
-    ),
-    GetPage(
-      name: addChildHelp,
-      page: () => const AddChildHelpScreen(),
-      binding: AddChildrenBinding(),
-    ),
-    GetPage(name: findDrivers, page: () => const FindDriversScreen()),
-    GetPage(name: profile, page: () => const ProfileScreen()),
-    GetPage(
-      name: driverMap,
-      page: () => const DriverHomeScreen(),
-      binding: DriverMapBinding(),
-    ),
-    // Parent Report Screen
-    GetPage(
-      name: parentReport,
-      page: () => const ParentReportScreen(),
-      binding: ParentReportBinding(),
-    ),
-    // Parent Settings Screen
-    GetPage(name: parentSettings, page: () => const ParentSettingsScreen()),
-    // Driver Settings Screen
-    GetPage(name: driverSettings, page: () => const DriverSettingsScreen()),
-    // Driver Profile Screen
-    GetPage(name: driverProfile, page: () => const DriverProfileScreen()),
-    // Driver Report Screen
-    GetPage(
-      name: driverReport,
-      page: () => const DriverReportScreen(),
-      binding: DriverReportBinding(),
-    ),
-    // Notifications
-    GetPage(
-      name: parentNotifications,
-      page: () => const ParentsNotificationScreen(),
-      binding: ParentNotificationsBinding(),
-    ),
-    GetPage(
-      name: driverNotifications,
-      page: () => const DriverNotificationsScreen(),
-      binding: DriverNotificationsBinding(),
-    ),
-    // Conversations
-    GetPage(
-      name: parentConversation,
-      page: () => const ParentConversationScreen(),
-      binding: ParentConversationBinding(),
-    ),
-    GetPage(
-      name: driverConversation,
-      page: () => const DriverConversationScreen(),
-      binding: DriverConversationBinding(),
-    ),
-  ];
+  static final routes = [...commonRoutes, ...driverRoutes, ...parentRoutes];
 }

@@ -1,41 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/common%20widgets/forms/dynamic_form_builder.dart';
+import 'package:godropme/common%20widgets/forms/form_items.dart';
 import 'package:godropme/common%20widgets/custom_phone_text_field.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/responsive.dart';
+import 'package:godropme/utils/validators_extra.dart';
 
-/// Formats input as DD-MM-YYYY while the user types.
-/// It keeps only digits and inserts '-' after 2 and 4 digits.
-class DateInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    // Keep only digits from the new input
-    final onlyDigits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-
-    // Limit to 8 digits: DDMMYYYY
-    final limited = onlyDigits.length > 8
-        ? onlyDigits.substring(0, 8)
-        : onlyDigits;
-
-    final buffer = StringBuffer();
-    for (var i = 0; i < limited.length; i++) {
-      buffer.write(limited[i]);
-      if (i == 1 || i == 3) buffer.write('-');
-    }
-
-    final formatted = buffer.toString();
-
-    // Place cursor at the end of the formatted text
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
-    );
-  }
-}
+// Date input formatting now provided via ExtraInputFormatters.dateDmy
 
 class DriverLicenceForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -53,97 +26,100 @@ class DriverLicenceForm extends StatelessWidget {
     this.showGlobalError = false,
   });
 
+  List<FormItem> _buildItems(BuildContext context) {
+    return [
+      // Licence number field
+      LabelItem(
+        child: SizedBox(
+          width: double.infinity,
+          child: CustonPhoneTextField(
+            controller: licenceNumberController,
+            hintText: AppStrings.driverLicenceNumberHint,
+            borderColor: AppColors.gray,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(5),
+            ],
+            validator: (v) {
+              final val = v?.trim() ?? '';
+              if (val.length != 5) return 'Licence number must be 5 digits';
+              if (int.tryParse(val) == null) {
+                return 'Licence number must be numeric';
+              }
+              return null;
+            },
+          ),
+        ),
+      ),
+      GapItem(Responsive.scaleClamped(context, 12, 8, 18)),
+      // Expiry date field
+      LabelItem(
+        child: SizedBox(
+          width: double.infinity,
+          child: CustonPhoneTextField(
+            controller: expiryDateController,
+            hintText: AppStrings.driverLicenceExpiryHint,
+            borderColor: AppColors.gray,
+            inputFormatters: [
+              ExtraInputFormatters.dateDmy,
+              LengthLimitingTextInputFormatter(10),
+            ],
+            validator: (v) {
+              final val = v?.trim() ?? '';
+              if (val.isEmpty) return 'Please enter expiry date';
+              if (val.length != 10) return 'Enter date as DD-MM-YYYY';
+              final parts = val.split('-');
+              if (parts.length != 3) return 'Enter date as DD-MM-YYYY';
+              final day = int.tryParse(parts[0]);
+              final month = int.tryParse(parts[1]);
+              final year = int.tryParse(parts[2]);
+              if (day == null || month == null || year == null) {
+                return 'Enter date as DD-MM-YYYY';
+              }
+              if (parts[0].length != 2 ||
+                  parts[1].length != 2 ||
+                  parts[2].length != 4) {
+                return 'Enter date as DD-MM-YYYY';
+              }
+              if (month < 1 || month > 12) return 'Enter valid month';
+              if (day < 1 || day > 31) return 'Enter valid day';
+              return null;
+            },
+          ),
+        ),
+      ),
+      GapItem(Responsive.scaleClamped(context, 6, 4, 12)),
+      LabelItem(
+        child: SizedBox(
+          height: 18,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              showGlobalError
+                  ? 'Please complete all fields and add images'
+                  : '',
+              style: TextStyle(
+                color: showGlobalError
+                    ? const Color(0xFFFF6B6B)
+                    : Colors.transparent,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
       child: Form(
         key: formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              child: CustonPhoneTextField(
-                controller: licenceNumberController,
-                hintText: AppStrings.driverLicenceNumberHint,
-                borderColor: AppColors.gray,
-                // allow only digits and limit to 5 characters
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(5),
-                ],
-                // simple validator: ensure exactly 5 numeric digits (no regex)
-                validator: (v) {
-                  final val = v?.trim() ?? '';
-                  if (val.length != 5) return 'Licence number must be 5 digits';
-                  if (int.tryParse(val) == null) {
-                    return 'Licence number must be numeric';
-                  }
-                  return null;
-                },
-              ),
-            ),
-
-            SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
-
-            // expiry date in DD-MM-YYYY format
-            SizedBox(
-              width: double.infinity,
-              child: CustonPhoneTextField(
-                controller: expiryDateController,
-                hintText: AppStrings.driverLicenceExpiryHint,
-                borderColor: AppColors.gray,
-                // format as DD-MM-YYYY while typing and limit to 10 chars
-                inputFormatters: [
-                  DateInputFormatter(),
-                  LengthLimitingTextInputFormatter(10),
-                ],
-                validator: (v) {
-                  final val = v?.trim() ?? '';
-                  if (val.isEmpty) return 'Please enter expiry date';
-                  // Expect exactly 10 characters: DD-MM-YYYY
-                  if (val.length != 10) return 'Enter date as DD-MM-YYYY';
-                  final parts = val.split('-');
-                  if (parts.length != 3) return 'Enter date as DD-MM-YYYY';
-                  final day = int.tryParse(parts[0]);
-                  final month = int.tryParse(parts[1]);
-                  final year = int.tryParse(parts[2]);
-                  if (day == null || month == null || year == null) {
-                    return 'Enter date as DD-MM-YYYY';
-                  }
-                  if (parts[0].length != 2 ||
-                      parts[1].length != 2 ||
-                      parts[2].length != 4) {
-                    return 'Enter date as DD-MM-YYYY';
-                  }
-                  if (month < 1 || month > 12) return 'Enter valid month';
-                  if (day < 1 || day > 31) return 'Enter valid day';
-                  return null;
-                },
-              ),
-            ),
-
-            SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
-
-            SizedBox(
-              height: 18,
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  showGlobalError
-                      ? 'Please complete all fields and add images'
-                      : '',
-                  style: TextStyle(
-                    color: showGlobalError
-                        ? const Color(0xFFFF6B6B)
-                        : Colors.transparent,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ),
-          ],
+        child: DynamicFormBuilder(
+          items: _buildItems(context),
+          padding: EdgeInsets.zero,
         ),
       ),
     );

@@ -1,0 +1,31 @@
+String fullNameFromPersonalInfo(
+  Map<String, dynamic>? personalInfo,
+  String? fallback,
+) {
+  final f = (personalInfo?['firstName'] ?? '').toString().trim();
+  final s = (personalInfo?['surName'] ?? '').toString().trim();
+  final l = (personalInfo?['lastName'] ?? '').toString().trim();
+  final combined = [f, s, l].where((e) => e.isNotEmpty).join(' ');
+  if (combined.isNotEmpty) return combined;
+  return (fallback ?? '').trim();
+}
+
+String maskCnic(String? cnic) {
+  if (cnic == null || cnic.trim().isEmpty) return 'Not set';
+  final digits = cnic.replaceAll(RegExp(r'\D'), '');
+  if (digits.length <= 5) return '*****$digits';
+  return '*****${digits.substring(digits.length - 5)}';
+}
+
+String joinSchools(dynamic schools) {
+  if (schools is List) {
+    final list = schools
+        .whereType<String>()
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+    if (list.isEmpty) return 'Not set';
+    return list.join(', ');
+  }
+  return 'Not set';
+}

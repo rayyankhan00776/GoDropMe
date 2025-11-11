@@ -71,6 +71,7 @@ class CustomTextField extends StatelessWidget {
         // Provide symmetric vertical padding so the caret and text remain
         // vertically centered and do not jump on validation.
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
+        isCollapsed: true,
         errorStyle: const TextStyle(
           height: 0,
           color: Colors.transparent,

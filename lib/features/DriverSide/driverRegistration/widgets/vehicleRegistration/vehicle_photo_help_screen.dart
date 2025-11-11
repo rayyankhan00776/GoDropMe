@@ -1,161 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:godropme/common%20widgets/custom_Appbar.dart';
-import 'package:godropme/common%20widgets/custom_button.dart';
-import 'package:godropme/common%20widgets/custom_image_container.dart';
-import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/theme/colors.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:godropme/shared/widgets/document_help_screen.dart';
 
-class VehiclePhotoHelpScreen extends StatefulWidget {
+class VehiclePhotoHelpScreen extends StatelessWidget {
   final String imagePath;
   const VehiclePhotoHelpScreen({super.key, required this.imagePath});
 
   @override
-  State<VehiclePhotoHelpScreen> createState() => _VehiclePhotoHelpScreenState();
-}
-
-class _VehiclePhotoHelpScreenState extends State<VehiclePhotoHelpScreen> {
-  final ImagePicker _picker = ImagePicker();
-  late String _currentImagePath;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentImagePath = widget.imagePath;
-  }
-
-  Future<void> _takeNewPicture() async {
-    try {
-      final XFile? file = await _picker.pickImage(
-        source: ImageSource.camera,
-        preferredCameraDevice: CameraDevice.rear,
+  Widget build(BuildContext context) {
+    return DocumentHelpScreen(
+      title: AppStrings.vehiclePhotoLabel,
+      helpLines: const [
+        AppStrings.vehiclePhotoHelpLine1,
+        AppStrings.vehiclePhotoHelpLine2,
+      ],
+      initialImagePath: imagePath,
+      takeNewPictureLabel: AppStrings.vehicleTakeNewPicture,
+      camera: const CameraConfig(
+        device: CameraDevice.rear,
         imageQuality: 85,
         maxWidth: 1600,
         maxHeight: 1200,
-      );
-      if (file != null && mounted) {
-        setState(() => _currentImagePath = file.path);
-      }
-    } catch (e) {
-      if (mounted) {
-        Get.snackbar(
-          'Camera',
-          'Unable to open camera: $e',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.black.withValues(alpha: 0.85),
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(12),
-          borderRadius: 12,
-        );
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomBlurAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    onPressed: () => Get.back(),
-                    icon: const Icon(Icons.arrow_back, color: AppColors.black),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () =>
-                        Navigator.of(context).pop(_currentImagePath),
-                    child: Text(
-                      AppStrings.done,
-                      style: AppTypography.helpButton,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: Responsive.scaleClamped(context, 16, 12, 24)),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(
-                AppStrings.vehiclePhotoLabel,
-                style: AppTypography.optionHeading,
-              ),
-            ),
-            SizedBox(height: Responsive.scaleClamped(context, 16, 12, 24)),
-
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.check, color: Colors.black, size: 30),
-                SizedBox(width: Responsive.scaleClamped(context, 8, 6, 12)),
-                Expanded(
-                  child: Text(
-                    AppStrings.vehiclePhotoHelpLine1,
-                    style: AppTypography.personalInfoHelper,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: Responsive.scaleClamped(context, 8, 6, 12)),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.check, color: Colors.black, size: 30),
-                SizedBox(width: Responsive.scaleClamped(context, 8, 6, 12)),
-                Expanded(
-                  child: Text(
-                    AppStrings.vehiclePhotoHelpLine2,
-                    style: AppTypography.personalInfoHelper,
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: Responsive.scaleClamped(context, 12, 8, 20)),
-
-            Expanded(
-              child: Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: CustomImageContainer(
-                    imagePath: _currentImagePath,
-                    width: double.infinity,
-                    height: double.infinity,
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                    backgroundColor: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: null,
-                  ),
-                ),
-              ),
-            ),
-
-            SizedBox(height: Responsive.scaleClamped(context, 12, 8, 20)),
-
-            CustomButton(
-              text: AppStrings.vehicleTakeNewPicture,
-              onTap: _takeNewPicture,
-              height: 59,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            SizedBox(height: Responsive.scaleClamped(context, 20, 14, 30)),
-          ],
-        ),
       ),
     );
   }

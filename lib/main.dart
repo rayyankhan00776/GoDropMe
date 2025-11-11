@@ -8,6 +8,20 @@ import 'package:godropme/routes.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppwriteClient.instance;
+  // Set a global black status bar with light (white) icons across the app.
+  // - Android: statusBarColor + statusBarIconBrightness
+  // - iOS: statusBarBrightness (set to dark to get light content)
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.black, // Android status bar background
+      statusBarIconBrightness:
+          Brightness.light, // Android status bar icons (white)
+      statusBarBrightness: Brightness.dark, // iOS status bar content (light)
+      // Optional: make Android navigation bar match (safe, improves contrast)
+      systemNavigationBarColor: Colors.black,
+      systemNavigationBarIconBrightness: Brightness.light,
+    ),
+  );
   runApp(const GoDropMe());
 }
 
@@ -16,15 +30,6 @@ class GoDropMe extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Set status bar icons to dark (black) for light backgrounds
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark, // Android
-        statusBarBrightness: Brightness.light, // iOS
-      ),
-    );
-
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

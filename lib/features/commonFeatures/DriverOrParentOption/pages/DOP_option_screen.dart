@@ -6,7 +6,6 @@ import 'package:godropme/features/commonFeatures/driverOrParentOption/widgets/do
 import 'package:godropme/features/commonFeatures/driverOrParentOption/widgets/dop_illustration.dart';
 import 'package:godropme/features/commonFeatures/driverOrParentOption/widgets/dop_actions.dart';
 import 'package:godropme/features/commonFeatures/driverOrParentOption/controllers/dop_controller.dart';
-import 'package:godropme/routes.dart';
 import 'package:godropme/utils/responsive.dart';
 
 class DopOptionScreen extends StatelessWidget {
@@ -19,7 +18,9 @@ class DopOptionScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Get.toNamed(AppRoutes.otpScreen),
+          // Go back to the previous screen in the stack (OTP),
+          // do not push a new OTP instance to avoid stack duplication.
+          onPressed: () => Get.back(),
           icon: const Icon(Icons.arrow_back, size: 28),
         ),
       ),

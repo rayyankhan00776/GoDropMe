@@ -1,264 +1,199 @@
+// Barrel file exporting domain-specific string groups.
+// Existing imports of `app_strings.dart` remain valid.
+// For backward compatibility, AppStrings continues to expose the same static constants
+// but internally delegates to grouped domain classes.
+
+export 'common_strings.dart';
+export 'driver_strings.dart';
+export 'parent_strings.dart';
+export 'validation_strings.dart';
+
+import 'common_strings.dart';
+import 'driver_strings.dart';
+import 'parent_strings.dart';
+import 'validation_strings.dart';
+
 class AppStrings {
-  // ------------------------------
-  // Common actions / labels
-  // ------------------------------
-  static const next = 'Next';
-  static const close = 'Close';
-  static const ok = 'OK';
-  static const cancel = 'Cancel';
-  static const settings = 'Settings';
-  static const enable = 'Enable';
-  static const report = 'Report';
-  static const send = 'Send';
-  static const done = 'Done';
+  // Common
+  static const next = CommonStrings.next;
+  static const close = CommonStrings.close;
+  static const ok = CommonStrings.ok;
+  static const cancel = CommonStrings.cancel;
+  static const settings = CommonStrings.settings;
+  static const enable = CommonStrings.enable;
+  static const report = CommonStrings.report;
+  static const send = CommonStrings.send;
+  static const done = CommonStrings.done;
+  static const optionalLabel = CommonStrings.optionalLabel;
+  static const tapToSelect = CommonStrings.tapToSelect;
+  static const tapToSelectOnMap = CommonStrings.tapToSelectOnMap;
+  static const sameAsPick = CommonStrings.sameAsPick;
+  static const useThisLocation = CommonStrings.useThisLocation;
+  static const loadingOptions = CommonStrings.loadingOptions;
+  static const loadingCatalog = CommonStrings.loadingCatalog;
+  static const error = CommonStrings.error;
+  static const unableToOpenCameraPrefix =
+      CommonStrings.unableToOpenCameraPrefix;
+  static const onboardTitle1 = CommonStrings.onboardTitle1;
+  static const onboardSubtitle1 = CommonStrings.onboardSubtitle1;
+  static const onboardTitle2 = CommonStrings.onboardTitle2;
+  static const onboardSubtitle2 = CommonStrings.onboardSubtitle2;
+  static const onboardTitle3 = CommonStrings.onboardTitle3;
+  static const onboardSubtitle3 = CommonStrings.onboardSubtitle3;
+  static const onboardButton = CommonStrings.onboardButton;
+  static const onboardSkip = CommonStrings.onboardSkip;
+  static const optionHeading = CommonStrings.optionHeading;
+  static const optionLine1 = CommonStrings.optionLine1;
+  static const optionLine2 = CommonStrings.optionLine2;
+  static const continueWithPhone = CommonStrings.continueWithPhone;
+  static const continueWithGoogle = CommonStrings.continueWithGoogle;
+  static const optionTermsPrefix = CommonStrings.optionTermsPrefix;
+  static const optionTermsText = CommonStrings.optionTermsText;
+  static const optionPrivacyText = CommonStrings.optionPrivacyText;
+  static const dopheading = CommonStrings.dopheading;
+  static const dopsubheading = CommonStrings.dopsubheading;
+  static const phoneTitle = CommonStrings.phoneTitle;
+  static const phoneSubtitle = CommonStrings.phoneSubtitle;
+  static const phoneHint = CommonStrings.phoneHint;
+  static const otpTitle = CommonStrings.otpTitle;
+  static const otpSubtitle = CommonStrings.otpSubtitle;
+  static const otpverify = CommonStrings.otpverify;
+  static const changeNumber = CommonStrings.changeNumber;
+  static const reportGuideline1 = CommonStrings.reportGuideline1;
+  static const reportGuideline2 = CommonStrings.reportGuideline2;
+  static const reportHint = CommonStrings.reportHint;
+  static const reportSent = CommonStrings.reportSent;
 
-  // Generic labels
-  static const optionalLabel = 'Optional';
-  static const tapToSelect = 'Tap to select';
-  static const tapToSelectOnMap = 'Tap to select on map';
-  static const sameAsPick = 'Same as pick';
-  static const useThisLocation = 'Use this location';
+  // Parent
+  static const parentNameTitle = ParentStrings.parentNameTitle;
+  static const parentNameSubtitle = ParentStrings.parentNameSubtitle;
+  static const parentNameButton = ParentStrings.parentNameButton;
+  static const drawerAddChildren = ParentStrings.drawerAddChildren;
+  static const drawerFindDrivers = ParentStrings.drawerFindDrivers;
+  static const drawerSettings = ParentStrings.drawerSettings;
+  static const drawerSupport = ParentStrings.drawerSupport;
+  static const drawerHelp = ParentStrings.drawerHelp;
+  static const drawerTerms = ParentStrings.drawerTerms;
+  static const drawerMapScreen = ParentStrings.drawerMapScreen;
+  static const drawerRateUs = ParentStrings.drawerRateUs;
+  static const drawerLogout = ParentStrings.drawerLogout;
+  static const drawerVersionLabel = ParentStrings.drawerVersionLabel;
+  static const drawerProfileNamePlaceholder =
+      ParentStrings.drawerProfileNamePlaceholder;
+  static const drawerProfileRoleParent = ParentStrings.drawerProfileRoleParent;
+  static const addChildTitle = ParentStrings.addChildTitle;
+  static const childNameHint = ParentStrings.childNameHint;
+  static const childAgeHint = ParentStrings.childAgeHint;
+  static const childGenderHint = ParentStrings.childGenderHint;
+  static const childSchoolHint = ParentStrings.childSchoolHint;
+  static const childPickPointHint = ParentStrings.childPickPointHint;
+  static const childDropPointHint = ParentStrings.childDropPointHint;
+  static const childRelationshipHint = ParentStrings.childRelationshipHint;
+  static const childPickupTimePref = ParentStrings.childPickupTimePref;
+  static const addChildSave = ParentStrings.addChildSave;
+  static const parentChatHeading = ParentStrings.parentChatHeading;
+  static const profileTitle = ParentStrings.profileTitle;
+  static const addChildrenTitle = ParentStrings.addChildrenTitle;
+  static const noChildrenAdded = ParentStrings.noChildrenAdded;
+  static const yourChildren = ParentStrings.yourChildren;
+  static const timeNotSet = ParentStrings.timeNotSet;
 
-  // Loading / progress labels
-  static const loadingOptions = 'Loading options...';
-  static const loadingCatalog = 'Loading catalog...';
-
-  // Generic error and form labels
-  static const error = 'Error';
-  // Generic form global error shown when required inputs/images are missing
-  static const formGlobalError = 'Please complete all fields and add images';
-  // Camera error prefix used in help screens
-  static const unableToOpenCameraPrefix = 'Unable to open camera: ';
-
-  // ------------------------------
-  // Onboarding & Entry
-  // ------------------------------
-  // Onboard page strings
-  static const onboardTitle1 = 'Request Ride';
-  static const onboardSubtitle1 =
-      'Quick and easy request system connects you with nearby drivers for a fast, reliable, and affordable ride';
-  static const onboardTitle2 = 'Confirm Your Driver';
-  static const onboardSubtitle2 =
-      'Huge drivers network helps you find comfortable, safe and cheap ride';
-  static const onboardTitle3 = 'Track Your Ride';
-  static const onboardSubtitle3 =
-      'Know your driver in advance and be able to view current location in real time on the map';
-  static const onboardButton = 'Get Started';
-  static const onboardSkip = 'Skip';
-
-  // Option screen strings
-  static const optionHeading = 'GoDropMe';
-  static const optionLine1 = 'Your App for Fair Deals';
-  static const optionLine2 = 'Choose Rides that are Right for You';
-  static const continueWithPhone = 'Continue with Phone';
-  static const continueWithGoogle = 'Continue with Google';
-  static const optionTermsPrefix = 'By joining our app you agree with our ';
-  static const optionTermsText = 'Terms and Conditions';
-  static const optionPrivacyText = 'Privacy Policy';
-
-  // Driver or Parent selection strings
-  static const dopheading = 'Are you a Parent or a Driver?';
-  static const dopsubheading = 'You can change the mode later';
-
-  // Phone verification strings
-  static const phoneTitle = 'Join us via phone number';
-  static const phoneSubtitle = "We'll text a code to verify your phone";
-  static const phoneHint = 'e.g. 3012345678';
-  static const otpTitle = 'Enter Verification Code';
-  static const otpSubtitle = "we have sent code to your phone number";
-  static const otpverify = 'Verify';
-  static const changeNumber = 'Change the phone number';
-
-  // ------------------------------
-  // Parent flow
-  // ------------------------------
-  // Parent name collection strings
-  static const parentNameTitle = 'Welcome to GoDropMe!';
-  static const parentNameSubtitle = 'Please introduce yourself';
-  static const parentNameButton = 'Next';
-
-  // Drawer strings
-  static const drawerAddChildren = 'Add Children';
-  static const drawerFindDrivers = 'Find Drivers';
-  static const drawerSettings = 'Settings';
-  static const drawerSupport = 'Support';
-  static const drawerHelp = 'Help';
-  static const drawerTerms = 'Terms & Conditions';
-  static const drawerMapScreen = 'Home Screen';
-  static const drawerRateUs = 'Rate Us';
-  static const drawerLogout = 'Logout';
-  static const drawerVersionLabel = 'GoDropMe v1.0.0';
-  static const drawerProfileNamePlaceholder = 'John Doe';
-  static const drawerProfileRoleParent = 'Parent';
-
-  // Add Children form strings
-  static const addChildTitle = 'Add your Child Details';
-  static const childNameHint = 'Child Name';
-  static const childAgeHint = 'Age ';
-  static const childGenderHint = 'Gender';
-  static const childSchoolHint = 'School Name';
-  static const childPickPointHint = 'Pick Point';
-  static const childDropPointHint = 'Drop Point';
-  static const childRelationshipHint = 'Relationship to Child';
-  static const childPickupTimePref = 'Pickup Time';
-  static const addChildSave = 'Save Child';
-  static const parentChatHeading = 'Chat';
-  static const profileTitle = 'Profile';
-
-  // Add Children helpers
-  static const childFormGlobalError = 'Please fill all the details';
-  static const timeNotSet = 'Not set';
-  static const unableToSubmitForm = 'Unable to submit form';
-  static const addChildrenTitle = 'Add Children';
-  static const noChildrenAdded = 'No child added';
-  static const yourChildren = 'Your Children';
-
-  // ------------------------------
-  // Driver home / map status
-  // ------------------------------
-  static const driverOnlineLabel = 'Online';
-  static const driverOfflineLabel = 'Offline';
-  static const driverOfflineMessage =
-      'You are offline. Go online to start receiving rides.';
-
-  // ------------------------------
-  // Driver onboarding flow
-  // ------------------------------
-  // Driver name collection strings
-  static const driverNameTitle = 'Welcome to GoDropMe!';
-  static const driverNameSubtitle = 'Please introduce yourself';
-  static const driverNameButton = 'Next';
-
-  // Vehicle selection
-  static const chooseVehicleTitle = 'Choose your vehicle';
-  static const vehicleCar = 'Car';
-  static const vehicleRickshaw = 'Rikshaw';
-
-  // Personal info collection strings
-  static const personalInfoTitle = 'Personal Information';
-  static const help = 'Help';
-  static const personalInfoHelpLine1 = 'Take a clear picture in a good light';
-  static const personalInfoHelpLine2 = 'No filter, sunglasses or masks';
-  static const personalInfoTakeNewPicture = 'Take a New picture';
-
-  // Personal info helper texts
-  static const personalInfoImageLabel = 'Personal information';
-  static const personalInfoCnicNote =
-      'Please fill the name according to the CNIC';
-
-  // Personal info form hints
-  static const firstNameHint = 'First Name';
-  static const surNameHint = 'Sur Name';
-  static const lastNameHint = 'Last Name';
-
-  // Validation messages (personal info)
-  static const firstNameRequired = 'Please enter first name';
-
-  // Driver licence collection strings
-  static const driverLicenseNote =
-      'Please fill the Details according to the License';
-  static const driverLicenceTitle = 'Driver Licence';
-  static const driverLicenseSelfieLabel = 'Selfie with Licence';
-  static const driverLicenceHelpLine1 =
-      'Place the licence on a flat surface and ensure all details are visible';
-  static const driverLicenceHelpLine2 =
-      'Avoid glare; use natural light if possible';
+  // Driver
+  static const driverOnlineLabel = DriverStrings.driverOnlineLabel;
+  static const driverOfflineLabel = DriverStrings.driverOfflineLabel;
+  static const driverOfflineMessage = DriverStrings.driverOfflineMessage;
+  static const driverNameTitle = DriverStrings.driverNameTitle;
+  static const driverNameSubtitle = DriverStrings.driverNameSubtitle;
+  static const driverNameButton = DriverStrings.driverNameButton;
+  static const chooseVehicleTitle = DriverStrings.chooseVehicleTitle;
+  static const vehicleCar = DriverStrings.vehicleCar;
+  static const vehicleRickshaw = DriverStrings.vehicleRickshaw;
+  static const personalInfoTitle = DriverStrings.personalInfoTitle;
+  static const help = DriverStrings.help;
+  static const personalInfoHelpLine1 = DriverStrings.personalInfoHelpLine1;
+  static const personalInfoHelpLine2 = DriverStrings.personalInfoHelpLine2;
+  static const personalInfoTakeNewPicture =
+      DriverStrings.personalInfoTakeNewPicture;
+  static const personalInfoImageLabel = DriverStrings.personalInfoImageLabel;
+  static const personalInfoCnicNote = DriverStrings.personalInfoCnicNote;
+  static const firstNameHint = DriverStrings.firstNameHint;
+  static const surNameHint = DriverStrings.surNameHint;
+  static const lastNameHint = DriverStrings.lastNameHint;
+  static const driverLicenseNote = DriverStrings.driverLicenseNote;
+  static const driverLicenceTitle = DriverStrings.driverLicenceTitle;
+  static const driverLicenseSelfieLabel =
+      DriverStrings.driverLicenseSelfieLabel;
+  static const driverLicenceHelpLine1 = DriverStrings.driverLicenceHelpLine1;
+  static const driverLicenceHelpLine2 = DriverStrings.driverLicenceHelpLine2;
   static const driverLicenceSelfieHelpLine1 =
-      'Hold the licence next to your face so both are clearly visible';
+      DriverStrings.driverLicenceSelfieHelpLine1;
   static const driverLicenceSelfieHelpLine2 =
-      'Remove hats, sunglasses and ensure good lighting';
-  static const driverLicenceTakeNewPicture = 'Take a New picture';
-  static const driverLicenceNumberHint = 'Licence Number';
-  static const driverLicenceExpiryHint = 'Expiry Date (DD/MM/YYYY)';
-
-  // Driver Identification (CNIC / ID) strings
-  static const driverIdentificationTitle = 'Driver Identification';
-  static const cnicFrontHint = 'CNIC Number';
-  // static const cnicBackHint = 'CNIC Number (back)';
-  static const idFrontTitle = 'ID Front Side';
-  static const idBackTitle = 'ID Back Side';
+      DriverStrings.driverLicenceSelfieHelpLine2;
+  static const driverLicenceTakeNewPicture =
+      DriverStrings.driverLicenceTakeNewPicture;
+  static const driverLicenceNumberHint = DriverStrings.driverLicenceNumberHint;
+  static const driverLicenceExpiryHint = DriverStrings.driverLicenceExpiryHint;
+  static const driverIdentificationTitle =
+      DriverStrings.driverIdentificationTitle;
+  static const cnicFrontHint = DriverStrings.cnicFrontHint;
+  static const idFrontTitle = DriverStrings.idFrontTitle;
+  static const idBackTitle = DriverStrings.idBackTitle;
   static const driverIdentificationNote =
-      'Please fill the Details according to the CNIC';
+      DriverStrings.driverIdentificationNote;
+  static const vehicleRegistrationTitle =
+      DriverStrings.vehicleRegistrationTitle;
+  static const vehiclePhotoLabel = DriverStrings.vehiclePhotoLabel;
+  static const vehicleCertFrontLabel = DriverStrings.vehicleCertFrontLabel;
+  static const vehicleCertBackLabel = DriverStrings.vehicleCertBackLabel;
+  static const vehicleDetailsNote = DriverStrings.vehicleDetailsNote;
+  static const vehicleBrandHint = DriverStrings.vehicleBrandHint;
+  static const vehicleModelHint = DriverStrings.vehicleModelHint;
+  static const vehicleColorHint = DriverStrings.vehicleColorHint;
+  static const vehicleProductionYearHint =
+      DriverStrings.vehicleProductionYearHint;
+  static const vehicleNumberPlateHint = DriverStrings.vehicleNumberPlateHint;
+  static const vehicleSeatCapacityHint = DriverStrings.vehicleSeatCapacityHint;
+  static const vehiclePhotoHelpLine1 = DriverStrings.vehiclePhotoHelpLine1;
+  static const vehiclePhotoHelpLine2 = DriverStrings.vehiclePhotoHelpLine2;
+  static const vehicleCertHelpLine1 = DriverStrings.vehicleCertHelpLine1;
+  static const vehicleCertHelpLine2 = DriverStrings.vehicleCertHelpLine2;
+  static const vehicleTakeNewPicture = DriverStrings.vehicleTakeNewPicture;
+  static const vehicleDetailsSaved = DriverStrings.vehicleDetailsSaved;
+  static const driverTabRequests = DriverStrings.driverTabRequests;
+  static const driverTabOrders = DriverStrings.driverTabOrders;
+  static const driverTabMaps = DriverStrings.driverTabMaps;
+  static const driverTabChat = DriverStrings.driverTabChat;
+  static const schoolNamesHint = DriverStrings.schoolNamesHint;
+  static const dutyTypeHint = DriverStrings.dutyTypeHint;
+  static const pickupRangeKmHint = DriverStrings.pickupRangeKmHint;
+  static const routeStartPointLabel = DriverStrings.routeStartPointLabel;
+  static const operatingDaysHint = DriverStrings.operatingDaysHint;
+  static const extraNotesHint = DriverStrings.extraNotesHint;
+  static const activeStatus = DriverStrings.activeStatus;
+  static const activeStatusSubtitle = DriverStrings.activeStatusSubtitle;
 
-  // Vehicle registration strings
-  static const vehicleRegistrationTitle = 'Vehicle Information';
-  static const vehiclePhotoLabel = 'Vehicle Photo';
-  static const vehicleCertFrontLabel = 'Registration Certificate (Front)';
-  static const vehicleCertBackLabel = 'Registration Certificate (Back)';
-  static const vehicleDetailsNote =
-      'Fill the following details of your vehicle';
-  static const vehicleBrandHint = 'Vehicle Brand';
-  static const vehicleModelHint = 'Vehicle Model';
-  static const vehicleColorHint = 'Vehicle Color';
-  static const vehicleProductionYearHint = 'Production Year';
-  static const vehicleNumberPlateHint = 'Number Plate';
-  static const vehicleSeatCapacityHint = 'Seat Capacity';
-
-  // Vehicle registration help strings
-  static const vehiclePhotoHelpLine1 =
-      'Take the photo in daylight and ensure the whole vehicle is visible';
-  static const vehiclePhotoHelpLine2 =
-      'Avoid glare and ensure the photo is sharp and clear';
-  static const vehicleCertHelpLine1 =
-      'Place the certificate on a flat surface and ensure all details are visible';
-  static const vehicleCertHelpLine2 =
-      'Avoid glare; use natural light if possible';
-  static const vehicleTakeNewPicture = 'Take a New picture';
-
-  // Generic (driver)
-  static const vehicleDetailsSaved = 'Vehicle details saved';
-
-  // ------------------------------
-  // Driver navigation
-  // ------------------------------
-  static const driverTabRequests = 'Requests';
-  static const driverTabOrders = 'My Orders';
-  static const driverTabMaps = 'Maps';
-  static const driverTabChat = 'Chat';
-
-  // ------------------------------
-  // Service details
-  // ------------------------------
-  static const schoolNamesHint = 'School Name(s)';
-  static const dutyTypeHint = 'Duty Type';
-  static const pickupRangeKmHint = 'Pickup Range (km)';
-  static const routeStartPointLabel = 'Route Start Point';
-  // Removed: fareRequired (fare field removed from the app)
-  static const operatingDaysHint = 'Operating Days';
-  static const extraNotesHint = 'Extra Notes (optional)';
-  static const activeStatus = 'Active Status';
-  static const activeStatusSubtitle = 'Mark as available/unavailable';
-  static const requiredFieldsMissing = 'Please complete required fields';
-
-  // ------------------------------
-  // Report
-  // ------------------------------
-  static const reportGuideline1 =
-      'Please describe your issue clearly and provide any relevant details.';
-  static const reportGuideline2 =
-      'Avoid sharing sensitive information. Our team will review and respond promptly.';
-  static const reportHint = 'Describe your issue...';
-  static const reportSent = 'Report sent!';
-
-  // ------------------------------
-  // Validation & helper messages (centralized)
-  // ------------------------------
-  static const errorCnicDigits = 'CNIC must be 13 digits';
-  static const errorCnicNumeric = 'CNIC must be numeric';
-  static const errorExpiryRequired = 'Please enter expiry date';
-  static const errorExpiryFormat = 'Enter date as DD-MM-YYYY';
-  static const errorExpiryMonth = 'Enter valid month';
-  static const errorExpiryDay = 'Enter valid day';
-  static const errorSeatCapacityRequired = 'Please enter seat capacity';
-  static const errorSeatCapacityInvalid = 'Enter a valid capacity';
-  // Prefix used for label and error message where a max value is appended, e.g., "Max allowed seats: 9"
-  static const seatCapacityMaxLabelPrefix = 'Max allowed seats:';
-  static const errorYearRequired = 'Please enter production year';
-  static const errorYearLength = 'Year must be 4 digits';
-  static const errorYearInvalid = 'Enter a valid year';
-  static const errorPlateRequired = 'Please enter number plate';
-
-  // Names input
-  static const fullNameHint = 'Full Name';
-  static const enterFullName = 'Please enter full name';
+  // Validation
+  static const formGlobalError = ValidationStrings.formGlobalError;
+  static const childFormGlobalError = ValidationStrings.childFormGlobalError;
+  static const unableToSubmitForm = ValidationStrings.unableToSubmitForm;
+  static const requiredFieldsMissing = ValidationStrings.requiredFieldsMissing;
+  static const firstNameRequired = ValidationStrings.firstNameRequired;
+  static const errorCnicDigits = ValidationStrings.errorCnicDigits;
+  static const errorCnicNumeric = ValidationStrings.errorCnicNumeric;
+  static const errorExpiryRequired = ValidationStrings.errorExpiryRequired;
+  static const errorExpiryFormat = ValidationStrings.errorExpiryFormat;
+  static const errorExpiryMonth = ValidationStrings.errorExpiryMonth;
+  static const errorExpiryDay = ValidationStrings.errorExpiryDay;
+  static const errorSeatCapacityRequired =
+      ValidationStrings.errorSeatCapacityRequired;
+  static const errorSeatCapacityInvalid =
+      ValidationStrings.errorSeatCapacityInvalid;
+  static const seatCapacityMaxLabelPrefix =
+      ValidationStrings.seatCapacityMaxLabelPrefix;
+  static const errorYearRequired = ValidationStrings.errorYearRequired;
+  static const errorYearLength = ValidationStrings.errorYearLength;
+  static const errorYearInvalid = ValidationStrings.errorYearInvalid;
+  static const errorPlateRequired = ValidationStrings.errorPlateRequired;
+  static const fullNameHint = ValidationStrings.fullNameHint;
+  static const enterFullName = ValidationStrings.enterFullName;
 }

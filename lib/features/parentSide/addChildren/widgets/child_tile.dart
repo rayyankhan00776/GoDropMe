@@ -6,8 +6,11 @@ import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
-import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/common%20widgets/custom_button.dart';
+import 'child_tile_helpers.dart';
+import 'child_tile_avatar.dart';
+import 'child_info_lines.dart';
+import 'child_tile_action_buttons.dart';
+import 'selectable_tile_wrapper.dart';
 
 class ChildTile extends StatefulWidget {
   final Map<String, dynamic> childData;
@@ -51,180 +54,107 @@ class _ChildTileState extends State<ChildTile> {
 
   @override
   Widget build(BuildContext context) {
-    final title = (widget.childData['name']?.toString() ?? '').isNotEmpty
-        ? widget.childData['name'].toString()
-        : 'Child';
-    final initial = title.isNotEmpty ? title[0].toUpperCase() : 'C';
-    final gender = (widget.childData['gender']?.toString() ?? '').trim();
-    final age = (widget.childData['age']?.toString() ?? '').trim();
+    final title = childTitle(widget.childData);
+    final initial = childInitial(title);
+    final gender = childGender(widget.childData);
+    final age = childAge(widget.childData);
 
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        // Ensure inner content respects the rounded corners so the border is visible on corners
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        // Paint the border ABOVE the child so ExpansionTile/Material backgrounds can't cover it
-        foregroundDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.grayLight, width: 1),
-        ),
-        child: Theme(
-          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-          child: ExpansionTile(
-            onExpansionChanged: (v) => setState(() => _expanded = v),
-            tilePadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 2,
-            ),
-            childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-            backgroundColor: Colors.white,
-            collapsedBackgroundColor: Colors.white,
-            iconColor: AppColors.darkGray,
-            collapsedIconColor: AppColors.darkGray,
-            trailing: AnimatedRotation(
-              turns: _expanded ? 0.5 : 0.0,
-              duration: const Duration(milliseconds: 180),
-              child: const Icon(Icons.expand_more, color: AppColors.darkGray),
-            ),
-            title: SizedBox(
-              height: 64,
-              child: Row(
-                children: [
-                  // Leading avatar
-                  Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: AppColors.gradientPink,
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.accent.withValues(alpha: 0.15),
-                          blurRadius: 14,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      initial,
-                      style: AppTypography.optionLineSecondary.copyWith(
-                        color: AppColors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTypography.optionLineSecondary
-                                    .copyWith(
-                                      color: AppColors.black,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 18,
-                                    ),
-                              ),
-                            ),
-                            if (gender.isNotEmpty) const SizedBox(width: 6),
-                            if (gender.isNotEmpty) _Pill(text: gender),
-                            if (age.isNotEmpty) const SizedBox(width: 6),
-                            if (age.isNotEmpty) _Pill(text: '${age}y'),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        _MetaRow(
-                          icon: Icons.school_outlined,
-                          text: widget.childData['school']?.toString() ?? '-',
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+    return SelectableTileWrapper(
+      selected: false,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          // Ensure inner content respects the rounded corners so the border is visible on corners
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-            ),
-            children: [
-              const _ItemDivider(),
-              const SizedBox(height: 8),
-              _IconRow(
-                icon: Icons.place_outlined,
-                label: AppStrings.childPickPointHint,
-                value: widget.childData['pick_point'],
-              ),
-              const _ItemDivider(),
-              _IconRow(
-                icon: Icons.flag_outlined,
-                label: AppStrings.childDropPointHint,
-                value: widget.childData['drop_point'],
-              ),
-              const _ItemDivider(),
-              _IconRow(
-                icon: Icons.family_restroom_outlined,
-                label: AppStrings.childRelationshipHint,
-                value: widget.childData['relationship'],
-              ),
-              const _ItemDivider(),
-              _IconRow(
-                icon: Icons.access_time,
-                label: AppStrings.childPickupTimePref,
-                value:
-                    ((widget.childData['pickup_time']?.toString().isNotEmpty ??
-                        false)
-                    ? widget.childData['pickup_time']
-                    : AppStrings.timeNotSet),
-              ),
-              // Centered 'Find Driver' button (no navigation yet)
-              // TODO: Wire up navigation to find drivers for this child when flow is ready.
-              Center(
-                child: SizedBox(
-                  width: Responsive.wp(context, 70),
-                  child: CustomButton(
-                    text: 'Find Driver',
-                    onTap: () => Get.toNamed(AppRoutes.findDrivers),
-                  ),
-                ),
-              ),
-              SizedBox(height: Responsive.scaleClamped(context, 12, 8, 16)),
-              // Delete action centered beneath the Find Driver button
-              Center(
-                child: TextButton.icon(
-                  onPressed: widget.onDelete == null ? null : _confirmDelete,
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  label: Text(
-                    'Delete',
-                    style: AppTypography.optionTerms.copyWith(
-                      color: Colors.red,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: Responsive.scaleClamped(context, 12, 8, 16)),
             ],
+          ),
+          // Paint the border ABOVE the child so ExpansionTile/Material backgrounds can't cover it
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.grayLight, width: 1),
+          ),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              onExpansionChanged: (v) => setState(() => _expanded = v),
+              tilePadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 2,
+              ),
+              childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              backgroundColor: Colors.white,
+              collapsedBackgroundColor: Colors.white,
+              iconColor: AppColors.darkGray,
+              collapsedIconColor: AppColors.darkGray,
+              trailing: AnimatedRotation(
+                turns: _expanded ? 0.5 : 0.0,
+                duration: const Duration(milliseconds: 180),
+                child: const Icon(Icons.expand_more, color: AppColors.darkGray),
+              ),
+              title: SizedBox(
+                height: 64,
+                child: Row(
+                  children: [
+                    ChildTileAvatar(initial: initial),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ChildInfoLines(
+                        title: title,
+                        gender: gender,
+                        age: age,
+                        school: widget.childData['school']?.toString() ?? '-',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              children: [
+                const _ItemDivider(),
+                const SizedBox(height: 8),
+                _IconRow(
+                  icon: Icons.place_outlined,
+                  label: AppStrings.childPickPointHint,
+                  value: widget.childData['pick_point'],
+                ),
+                const _ItemDivider(),
+                _IconRow(
+                  icon: Icons.flag_outlined,
+                  label: AppStrings.childDropPointHint,
+                  value: widget.childData['drop_point'],
+                ),
+                const _ItemDivider(),
+                _IconRow(
+                  icon: Icons.family_restroom_outlined,
+                  label: AppStrings.childRelationshipHint,
+                  value: widget.childData['relationship'],
+                ),
+                const _ItemDivider(),
+                _IconRow(
+                  icon: Icons.access_time,
+                  label: AppStrings.childPickupTimePref,
+                  value:
+                      ((widget.childData['pickup_time']
+                              ?.toString()
+                              .isNotEmpty ??
+                          false)
+                      ? widget.childData['pickup_time']
+                      : AppStrings.timeNotSet),
+                ),
+                ActionButtonsRow(
+                  onFindDriver: () => Get.toNamed(AppRoutes.findDrivers),
+                  onDelete: widget.onDelete == null ? null : _confirmDelete,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -240,53 +170,6 @@ class _ItemDivider extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Divider(height: 1, thickness: 1, color: AppColors.grayLight),
-    );
-  }
-}
-
-class _Pill extends StatelessWidget {
-  final String text;
-  const _Pill({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        text,
-        style: AppTypography.optionTerms.copyWith(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
-
-class _MetaRow extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  const _MetaRow({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: AppColors.gray),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Text(
-            text.isEmpty ? '-' : text,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTypography.optionTerms.copyWith(color: AppColors.gray),
-          ),
-        ),
-      ],
     );
   }
 }
