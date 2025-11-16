@@ -19,6 +19,15 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
   final Set<Marker> _markers = <Marker>{};
   static const LatLng _peshawar = LatLng(34.0151, 71.5249);
 
+  @override
+  void initState() {
+    super.initState();
+    // Automatically go to current location when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _goToCurrentLocation();
+    });
+  }
+
   void _showMessage(String msg) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -124,7 +133,11 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
               zoomGesturesEnabled: true,
               rotateGesturesEnabled: true,
               tiltGesturesEnabled: true,
-              onMapCreated: (c) => _mapController = c,
+              onMapCreated: (c) {
+                _mapController = c;
+                // Move to current location once map is ready
+                _goToCurrentLocation();
+              },
               markers: _markers,
             ),
             Positioned(

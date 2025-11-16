@@ -66,9 +66,9 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             return IconThemeData(color: selected ? Colors.white : Colors.black);
           }),
           labelTextStyle: MaterialStateProperty.resolveWith((states) {
-            final selected = states.contains(MaterialState.selected);
+            states.contains(MaterialState.selected);
             return TextStyle(
-              color: selected ? Colors.white : Colors.black,
+              color: Colors.black,
               fontWeight: FontWeight.w600,
             );
           }),

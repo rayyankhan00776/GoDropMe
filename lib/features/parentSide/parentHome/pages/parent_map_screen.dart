@@ -8,6 +8,7 @@ import 'package:godropme/routes.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
+import 'package:godropme/features/parentSide/parentHome/controllers/parent_map_controller.dart';
 
 class ParentMapScreen extends StatefulWidget {
   const ParentMapScreen({super.key});
@@ -17,13 +18,25 @@ class ParentMapScreen extends StatefulWidget {
 }
 
 class _ParentMapScreenState extends State<ParentMapScreen> {
-  static const LatLng _target = LatLng(32.462074, 74.529802);
-  // static const CameraPosition _initialCameraPosition = CameraPosition(
-  // target: _target,
-  // zoom: 14.5,
-  // );
-
   GoogleMapController? _controller;
+  final _mapController = Get.put(ParentMapController());
+
+  @override
+  void initState() {
+    super.initState();
+    // Get current location when screen loads
+    _initializeLocation();
+  }
+
+  Future<void> _initializeLocation() async {
+    final position = await _mapController.getCurrentLocation();
+    if (position != null && _controller != null) {
+      final currentLatLng = LatLng(position.latitude, position.longitude);
+      await _controller!.animateCamera(
+        CameraUpdate.newLatLngZoom(currentLatLng, 15),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -46,7 +59,11 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
               zoomControlsEnabled: false,
               myLocationButtonEnabled: false,
               myLocationEnabled: true,
-              onMapCreated: (c) => _controller = c,
+              onMapCreated: (c) {
+                _controller = c;
+                // Move to current location once map is ready
+                _initializeLocation();
+              },
               mapType: MapType.normal,
               // Improve interaction responsiveness inside drawer shell
               gestureRecognizers: {
@@ -58,13 +75,6 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
               zoomGesturesEnabled: true,
               rotateGesturesEnabled: true,
               tiltGesturesEnabled: true,
-              markers: <Marker>{
-                Marker(
-                  markerId: const MarkerId('target'),
-                  position: _target,
-                  infoWindow: const InfoWindow(title: 'Target Location'),
-                ),
-              },
             ),
 
             // Chat button bottom-right
@@ -80,17 +90,27 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
             Positioned(
               left: 16,
               bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
-              child: _RoundFab(
-                icon: Icons.my_location,
-                onTap: () async {
-                  final c = _controller;
-                  if (c != null) {
-                    // (Optional) animate to target for demo; real implementation would use geolocator.
-                    await c.animateCamera(
-                      CameraUpdate.newLatLngZoom(_target, 15),
-                    );
-                  }
-                },
+              child: Obx(
+                () => _RoundFab(
+                  icon: Icons.my_location,
+                  isLoading: _mapController.isLoadingLocation.value,
+                  onTap: () async {
+                    final c = _controller;
+                    if (c != null) {
+                      // Get the actual current location
+                      final position = await _mapController.getCurrentLocation();
+                      if (position != null) {
+                        final currentLatLng = LatLng(
+                          position.latitude,
+                          position.longitude,
+                        );
+                        await c.animateCamera(
+                          CameraUpdate.newLatLngZoom(currentLatLng, 15),
+                        );
+                      }
+                    }
+                  },
+                ),
               ),
             ),
           ],
@@ -103,14 +123,20 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
 class _RoundFab extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  const _RoundFab({required this.icon, required this.onTap});
+  final bool isLoading;
+  
+  const _RoundFab({
+    required this.icon,
+    required this.onTap,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: isLoading ? null : onTap,
         borderRadius: BorderRadius.circular(28),
         child: Container(
           height: 56,
@@ -123,7 +149,18 @@ class _RoundFab extends StatelessWidget {
             ),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: AppColors.white),
+          child: isLoading
+              ? const Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: AppColors.white,
+                      strokeWidth: 2,
+                    ),
+                  ),
+                )
+              : Icon(icon, color: AppColors.white),
         ),
       ),
     );
