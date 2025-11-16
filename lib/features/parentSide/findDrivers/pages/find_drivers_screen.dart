@@ -18,28 +18,72 @@ class FindDriversScreen extends StatelessWidget {
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Leave vertical space below the overlaid drawer button for consistency
-                SizedBox(height: Responsive.scaleClamped(context, 60, 48, 72)),
-
-                // Screen title
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0, bottom: 12),
-                  child: Text(
-                    'Find Drivers',
-                    style: AppTypography.optionHeading,
+            child: DefaultTabController(
+              length: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Leave vertical space below the overlaid drawer button for consistency
+                  SizedBox(
+                    height: Responsive.scaleClamped(context, 60, 48, 72),
                   ),
-                ),
 
-                // One dummy driver card (expandable)
-                DriverListingTile(data: demo),
+                  // Screen title
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, bottom: 8),
+                    child: Text(
+                      'Find Drivers',
+                      style: AppTypography.optionHeading,
+                    ),
+                  ),
 
-                // If more are needed, list them here with spacing
-                // SizedBox(height: 12),
-                // DriverListingTile(data: anotherDemo),
-              ],
+                  // Tabs: Find | Requested
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.grayLight, width: 1),
+                    ),
+                    child: const TabBar(
+                      labelColor: Colors.black,
+                      unselectedLabelColor: Colors.black54,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      tabs: [
+                        Tab(text: 'Find'),
+                        Tab(text: 'Requested'),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Tab content
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        // Find tab: current data with Request action
+                        SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              DriverListingTile(data: demo),
+                              // Add more tiles here if required
+                            ],
+                          ),
+                        ),
+
+                        // Requested tab: same data but button shows "Requested"
+                        SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              DriverListingTile(data: demo, isRequested: true),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
