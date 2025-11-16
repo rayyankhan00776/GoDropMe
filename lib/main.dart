@@ -13,13 +13,7 @@ Future<void> main() async {
   // - iOS: statusBarBrightness (set to dark to get light content)
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.black, // Android status bar background
-      statusBarIconBrightness:
-          Brightness.light, // Android status bar icons (white)
-      statusBarBrightness: Brightness.dark, // iOS status bar content (light)
-      // Optional: make Android navigation bar match (safe, improves contrast)
-      systemNavigationBarColor: Colors.black,
-      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
     ),
   );
   runApp(const GoDropMe());

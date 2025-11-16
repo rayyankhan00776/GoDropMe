@@ -81,7 +81,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     controller: _controller,
                     selectedCode: _selectedCode,
                     validator: pakistanPhoneValidator,
-                    height: Responsive.scaleClamped(context, 56, 44, 66),
+                    height: Responsive.scaleClamped(context, 66, 44, 66),
                     showError: _phoneController.submitted.value,
                   ),
                 ),
@@ -90,6 +90,9 @@ class _PhoneScreenState extends State<PhoneScreen> {
               PhoneActions(
                 onNext: _onNextPressed,
                 height: Responsive.scaleClamped(context, 64, 48, 80),
+              ),
+              SizedBox(
+                height: Responsive.scaleClamped(context, 24, 16, 32),
               ),
             ],
           ),

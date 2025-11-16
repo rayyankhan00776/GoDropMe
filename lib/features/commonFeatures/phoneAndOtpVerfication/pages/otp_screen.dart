@@ -186,6 +186,9 @@ class _OtpScreenState extends State<OtpScreen> {
                   enabled: _otpController.allFilled.value,
                 ),
               ),
+              SizedBox(
+                height: Responsive.scaleClamped(context, 24, 16, 32),
+              ),
             ],
           ),
         ),
