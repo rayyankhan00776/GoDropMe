@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -50,10 +51,22 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
         return;
       }
 
-      Position? pos = await Geolocator.getLastKnownPosition();
-      pos ??= await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      // Prefer a fresh high-accuracy fix first to avoid stale defaults (e.g., Googleplex).
+      Position? pos;
+      try {
+        pos = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 8),
+        );
+      } on TimeoutException {
+        pos = await Geolocator.getLastKnownPosition();
+      } catch (_) {
+        pos = await Geolocator.getLastKnownPosition();
+      }
+      if (pos == null) {
+        _showMessage('Unable to get current location.');
+        return;
+      }
 
       final me = LatLng(pos.latitude, pos.longitude);
       await c.animateCamera(

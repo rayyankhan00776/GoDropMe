@@ -10,7 +10,12 @@ import 'package:godropme/utils/responsive.dart';
 
 class DriverListingTile extends StatefulWidget {
   final DriverListing data;
-  const DriverListingTile({super.key, required this.data});
+  final bool isRequested;
+  const DriverListingTile({
+    super.key,
+    required this.data,
+    this.isRequested = false,
+  });
 
   @override
   State<DriverListingTile> createState() => _DriverListingTileState();
@@ -104,33 +109,76 @@ class _DriverListingTileState extends State<DriverListingTile> {
 
                   SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
-                  // Only Request button (full width)
+                  // Action button (Request / Requested)
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Get.snackbar(
-                          'Request',
-                          'Request sent (demo)',
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.black.withValues(alpha: 0.85),
-                          colorText: Colors.white,
-                          margin: const EdgeInsets.all(12),
-                          borderRadius: 12,
-                          duration: const Duration(seconds: 2),
-                        );
-                      },
+                      onPressed: widget.isRequested
+                          ? null
+                          : () {
+                              Get.snackbar(
+                                'Request',
+                                'Request sent (demo)',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.black.withValues(
+                                  alpha: 0.85,
+                                ),
+                                colorText: Colors.white,
+                                margin: const EdgeInsets.all(12),
+                                borderRadius: 12,
+                                duration: const Duration(seconds: 2),
+                              );
+                            },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
+                        backgroundColor: widget.isRequested
+                            ? AppColors.grayLight
+                            : AppColors.primary,
+                        foregroundColor: widget.isRequested
+                            ? AppColors.darkGray
+                            : Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('Request'),
+                      child: Text(widget.isRequested ? 'Requested' : 'Request'),
                     ),
                   ),
+
+                  if (widget.isRequested) ...[
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Get.snackbar(
+                            'Request',
+                            'Request cancelled (demo)',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.black.withValues(
+                              alpha: 0.85,
+                            ),
+                            colorText: Colors.white,
+                            margin: const EdgeInsets.all(12),
+                            borderRadius: 12,
+                            duration: const Duration(seconds: 2),
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: BorderSide(
+                            color: AppColors.primary,
+                            width: 1.2,
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Cancel Request'),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
