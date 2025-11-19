@@ -69,6 +69,7 @@ class CustonPhoneTextField extends StatelessWidget {
       style: AppTypography.optionLineSecondary.copyWith(
         color: textColor ?? AppColors.black,
         fontWeight: FontWeight.w600, // match the weight used in prefix (+92)
+        height: 1.0, // tight line height for better vertical centering
       ),
       cursorHeight: (AppTypography.optionLineSecondary.fontSize ?? 16) * 1.2,
       cursorWidth: 2,
@@ -79,22 +80,24 @@ class CustonPhoneTextField extends StatelessWidget {
       minLines: 1,
       expands: false,
       maxLines: 1,
-      strutStyle: StrutStyle.fromTextStyle(
-        AppTypography.optionLineSecondary,
+      strutStyle: const StrutStyle(
+        fontSize: 19, // match optionLineSecondary fontSize
+        height: 1.0,
         forceStrutHeight: true,
+        leading: 0,
       ),
       decoration: InputDecoration(
         hintText: hintText,
-        // allow overriding hint color; default to a lighter black and slightly larger size
-        hintStyle: AppTypography.optionTerms.copyWith(
+        // Match hint style exactly with input text style for consistent vertical alignment
+        hintStyle: AppTypography.optionLineSecondary.copyWith(
           color: hintColor ?? AppColors.darkGray,
-          fontSize: (AppTypography.optionTerms.fontSize ?? 12) + 1,
+          fontWeight: FontWeight.w600,
+          height: 1.0,
         ),
         border: InputBorder.none,
         isDense: true,
-        // Add symmetric vertical padding so the text caret remains
-        // vertically centered and does not shift when error state toggles.
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
+        // Zero vertical padding - let the Row handle all vertical centering
+        contentPadding: EdgeInsets.zero,
         isCollapsed: true,
         errorStyle: const TextStyle(
           height: 0,
@@ -119,6 +122,7 @@ class CustonPhoneTextField extends StatelessWidget {
         horizontal: Responsive.scaleClamped(context, 8, 6, 14),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center, // Ensure vertical centering
         children: [
           if (prefix != null) ...[
             // Optionally enforce consistent text styling for the prefix so
@@ -128,6 +132,7 @@ class CustonPhoneTextField extends StatelessWidget {
                 style: AppTypography.optionLineSecondary.copyWith(
                   color: textColor ?? AppColors.black,
                   fontWeight: FontWeight.w600,
+                  height: 1.0,
                 ),
                 child: prefix!,
               )

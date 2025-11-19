@@ -42,7 +42,7 @@ class PhoneInputRow extends StatelessWidget {
           children: [
             CustonPhoneTextField(
               controller: controller,
-              hintText: 'e.g. 3001234567',
+              hintText: '3001234567',
               hintColor: AppColors.black.withValues(alpha: 0.6),
               textColor: AppColors.black,
               inputFormatters: <TextInputFormatter>[
