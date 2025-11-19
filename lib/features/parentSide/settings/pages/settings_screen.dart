@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
+import 'package:get/get.dart';
+import 'package:godropme/routes.dart';
 import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
 import 'package:godropme/features/parentSide/settings/widgets/settings_tile.dart';
 import 'package:godropme/features/parentSide/settings/widgets/settings_section.dart';
@@ -8,6 +10,7 @@ import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/models/parent_profile.dart';
+import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/services/Terms_uri_opener.dart';
 
 class ParentSettingsScreen extends StatefulWidget {
@@ -72,6 +75,13 @@ class _ParentSettingsScreenState extends State<ParentSettingsScreen> {
                       title: 'Phone Number',
                       subtitle: _formatPhone(_phone),
                       showIosChevron: true,
+                      onTap: () => Get.toNamed(
+                        AppRoutes.phoneScreen,
+                        arguments: const {
+                          'mode': 'update-phone',
+                          'role': 'parent',
+                        },
+                      ),
                     ),
                     const SettingsTile(
                       title: 'Languages',
@@ -93,7 +103,14 @@ class _ParentSettingsScreenState extends State<ParentSettingsScreen> {
                       title: AppStrings.drawerTerms,
                       onTap: () async => termsUriOpener(),
                     ),
-                    const SettingsTile(title: AppStrings.drawerLogout),
+                    SettingsTile(
+                      title: AppStrings.drawerLogout,
+                      onTap: () async {
+                        await LocalStorage.clearAllUserData();
+                        Get.offAllNamed(AppRoutes.onboard);
+                      },
+                      isDestructive: true,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 14),

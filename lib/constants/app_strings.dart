@@ -59,6 +59,13 @@ class AppStrings {
   static const otpSubtitle = CommonStrings.otpSubtitle;
   static const otpverify = CommonStrings.otpverify;
   static const changeNumber = CommonStrings.changeNumber;
+  // Update phone flow
+  static const updatePhoneTitle = CommonStrings.updatePhoneTitle;
+  static const updatePhoneSubtitle = CommonStrings.updatePhoneSubtitle;
+  static const updatePhoneButton = CommonStrings.updatePhoneButton;
+  static const updateOtpTitle = CommonStrings.updateOtpTitle;
+  static const updateOtpSubtitle = CommonStrings.updateOtpSubtitle;
+  static const updateOtpVerify = CommonStrings.updateOtpVerify;
   static const reportGuideline1 = CommonStrings.reportGuideline1;
   static const reportGuideline2 = CommonStrings.reportGuideline2;
   static const reportHint = CommonStrings.reportHint;
@@ -72,7 +79,6 @@ class AppStrings {
   static const drawerFindDrivers = ParentStrings.drawerFindDrivers;
   static const drawerSettings = ParentStrings.drawerSettings;
   static const drawerSupport = ParentStrings.drawerSupport;
-  static const drawerHelp = ParentStrings.drawerHelp;
   static const drawerTerms = ParentStrings.drawerTerms;
   static const drawerMapScreen = ParentStrings.drawerMapScreen;
   static const drawerRateUs = ParentStrings.drawerRateUs;

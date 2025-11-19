@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
+import 'package:get/get.dart';
+import 'package:godropme/routes.dart';
 import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
 import 'package:godropme/features/driverSide/settings/widgets/settings_caption.dart';
 import 'package:godropme/features/driverSide/settings/widgets/settings_section.dart';
@@ -27,7 +29,17 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
   }
 
   Future<void> _loadPhone() async {
-    final raw = await LocalStorage.getString(StorageKeys.driverPhone);
+    String? raw = await LocalStorage.getString(StorageKeys.driverPhone);
+    // Fallback: if driver phone not yet stored (pre-role selection flow),
+    // copy parent phone to driver key so settings shows a value.
+    if (raw == null || raw.trim().isEmpty) {
+      final parentRaw = await LocalStorage.getString(StorageKeys.parentPhone);
+      if (parentRaw != null && parentRaw.trim().isNotEmpty) {
+        raw = parentRaw.trim();
+        // Persist for driver for future accesses.
+        await LocalStorage.setString(StorageKeys.driverPhone, raw);
+      }
+    }
     if (!mounted) return;
     setState(() => _phone = raw);
   }
@@ -71,6 +83,13 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
                       title: 'Phone Number',
                       subtitle: _formatPhone(_phone),
                       showIosChevron: true,
+                      onTap: () => Get.toNamed(
+                        AppRoutes.phoneScreen,
+                        arguments: const {
+                          'mode': 'update-phone',
+                          'role': 'driver',
+                        },
+                      ),
                     ),
                     const DriverSettingsTile(
                       title: 'Languages',
@@ -92,7 +111,14 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
                       title: AppStrings.drawerTerms,
                       onTap: () async => termsUriOpener(),
                     ),
-                    const DriverSettingsTile(title: AppStrings.drawerLogout),
+                    DriverSettingsTile(
+                      title: AppStrings.drawerLogout,
+                      onTap: () async {
+                        await LocalStorage.clearAllUserData();
+                        Get.offAllNamed(AppRoutes.onboard);
+                      },
+                      isDestructive: true,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 14),

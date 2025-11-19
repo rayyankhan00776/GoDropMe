@@ -87,12 +87,6 @@ class ParentDrawer extends StatelessWidget {
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
-                          icon: Icons.help_outline_rounded,
-                          title: AppStrings.drawerHelp,
-                          onTap: () {},
-                        ),
-                        const Divider(height: 1),
-                        AppDrawerTile(
                           icon: Icons.star_rate_outlined,
                           title: AppStrings.drawerRateUs,
                           onTap: () {},

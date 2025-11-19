@@ -122,4 +122,20 @@ class LocalStorage {
       await p.remove(k);
     }
   }
+
+  /// Clear all user-related data (both driver and parent) including
+  /// onboarding progress and persisted profile/phone information.
+  static Future<void> clearAllUserData() async {
+    await clearOnboardingData();
+    final p = await _prefs();
+    final extraKeys = [
+      StorageKeys.parentName,
+      StorageKeys.parentPhone,
+      StorageKeys.childrenList,
+      StorageKeys.driverPhone,
+    ];
+    for (final k in extraKeys) {
+      await p.remove(k);
+    }
+  }
 }

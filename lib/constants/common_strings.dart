@@ -61,6 +61,15 @@ class CommonStrings {
   static const otpverify = 'Verify';
   static const changeNumber = 'Change the phone number';
 
+  // Update phone flow (settings re-use of phone & OTP screens)
+  static const updatePhoneTitle = 'Update phone number';
+  static const updatePhoneSubtitle =
+      'Enter a new phone number to update your account';
+  static const updatePhoneButton = 'Update Phone';
+  static const updateOtpTitle = 'Verify New Phone';
+  static const updateOtpSubtitle = 'Enter the code sent to your new number';
+  static const updateOtpVerify = 'Confirm';
+
   // Report (shared)
   static const reportGuideline1 =
       'Please describe your issue clearly and provide any relevant details.';

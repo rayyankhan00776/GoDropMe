@@ -9,7 +9,6 @@ class ParentStrings {
   static const drawerFindDrivers = 'Find Drivers';
   static const drawerSettings = 'Settings';
   static const drawerSupport = 'Support';
-  static const drawerHelp = 'Help';
   static const drawerTerms = 'Terms & Conditions';
   static const drawerMapScreen = 'Home Screen';
   static const drawerRateUs = 'Rate Us';

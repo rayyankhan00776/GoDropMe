@@ -6,15 +6,21 @@ import 'package:godropme/constants/app_strings.dart';
 class PhoneActions extends StatelessWidget {
   final VoidCallback onNext;
   final double height;
+  final String? buttonText;
 
-  const PhoneActions({required this.onNext, this.height = 64, super.key});
+  const PhoneActions({
+    required this.onNext,
+    this.height = 64,
+    this.buttonText,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         CustomButton(
-          text: AppStrings.onboardButton,
+          text: buttonText ?? AppStrings.onboardButton,
           onTap: onNext,
           height: height,
           width: double.infinity,

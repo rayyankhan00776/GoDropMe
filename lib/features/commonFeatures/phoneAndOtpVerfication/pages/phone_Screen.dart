@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
+import 'package:godropme/constants/app_strings.dart';
 // ...existing imports
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/PhoneWidgets/phone_header.dart';
 import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/PhoneWidgets/phone_input_row.dart';
@@ -24,12 +25,22 @@ class _PhoneScreenState extends State<PhoneScreen> {
   final String _selectedCode = '+92';
   final _formKey = GlobalKey<FormState>();
   late final PhoneController _phoneController;
+  late final bool _isUpdateMode;
+  late final String _role; // 'driver' | 'parent' | ''
 
   @override
   void initState() {
     super.initState();
     // Initialize once to avoid re-initialization during rebuilds.
     _phoneController = Get.find<PhoneController>();
+    final args = Get.arguments;
+    if (args is Map) {
+      _isUpdateMode = args['mode'] == 'update-phone';
+      _role = (args['role'] as String?) ?? '';
+    } else {
+      _isUpdateMode = false;
+      _role = '';
+    }
   }
 
   @override
@@ -47,9 +58,22 @@ class _PhoneScreenState extends State<PhoneScreen> {
       // Persist the full phone number for OTP screen display (e.g., +92 3001234567)
       // Store only the user-entered number; UI will render +92 consistently.
       _phoneController.setPhone(_controller.text.trim());
-      // Non-blocking persistence for Settings screen subtitle
-      LocalStorage.setString(StorageKeys.parentPhone, _controller.text.trim());
-      Get.toNamed(AppRoutes.otpScreen);
+      // For onboarding we persist immediately (existing behavior). For update
+      // mode we wait until OTP verification succeeds.
+      if (!_isUpdateMode) {
+        LocalStorage.setString(
+          StorageKeys.parentPhone,
+          _controller.text.trim(),
+        );
+      }
+      // Pass mode/role forward so OTP screen can differentiate navigation.
+      Get.toNamed(
+        AppRoutes.otpScreen,
+        arguments: {
+          if (_isUpdateMode) 'mode': 'update-phone',
+          if (_role.isNotEmpty) 'role': _role,
+        },
+      );
     }
   }
 
@@ -72,7 +96,10 @@ class _PhoneScreenState extends State<PhoneScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PhoneHeader(),
+              PhoneHeader(
+                title: _isUpdateMode ? AppStrings.updatePhoneTitle : null,
+                subtitle: _isUpdateMode ? AppStrings.updatePhoneSubtitle : null,
+              ),
               const SizedBox(height: 24),
               Form(
                 key: _formKey,
@@ -90,10 +117,11 @@ class _PhoneScreenState extends State<PhoneScreen> {
               PhoneActions(
                 onNext: _onNextPressed,
                 height: Responsive.scaleClamped(context, 64, 48, 80),
+                buttonText: _isUpdateMode
+                    ? AppStrings.updatePhoneButton
+                    : AppStrings.onboardButton,
               ),
-              SizedBox(
-                height: Responsive.scaleClamped(context, 24, 16, 32),
-              ),
+              SizedBox(height: Responsive.scaleClamped(context, 24, 16, 32)),
             ],
           ),
         ),

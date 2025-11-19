@@ -7,11 +7,13 @@ class OtpActions extends StatelessWidget {
   final VoidCallback onNext;
   final double height;
   final bool enabled;
+  final String? buttonText;
 
   const OtpActions({
     required this.onNext,
     this.height = 64,
     this.enabled = true,
+    this.buttonText,
     super.key,
   });
 
@@ -24,7 +26,7 @@ class OtpActions extends StatelessWidget {
           child: Opacity(
             opacity: enabled ? 1.0 : 0.55,
             child: CustomButton(
-              text: AppStrings.otpverify,
+              text: buttonText ?? AppStrings.otpverify,
               onTap: enabled ? onNext : onNext,
               height: height,
               width: double.infinity,
