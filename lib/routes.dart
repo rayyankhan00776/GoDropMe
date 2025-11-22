@@ -7,10 +7,10 @@ import 'package:godropme/features/commonFeatures/onboard/binding/onboard_binding
 import 'package:godropme/features/commonFeatures/onboard/pages/onboard_screen.dart';
 import 'package:godropme/features/commonFeatures/registrationOption/binding/option_binding.dart';
 import 'package:godropme/features/commonFeatures/registrationOption/pages/option_screen.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/binding/otp_binding.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/binding/phone_binding.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/pages/otp_screen.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/pages/phone_Screen.dart';
+import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/binding/otp_binding.dart';
+import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/binding/email_binding.dart';
+import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/pages/otp_screen.dart';
+import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/pages/email_Screen.dart';
 
 // Driver side
 import 'package:godropme/features/driverSide/driverRegistration/pages/driver_identification_screen.dart';
@@ -72,7 +72,7 @@ part 'routes/parent_routes.dart';
 class AppRoutes {
   static const String onboard = '/onboard';
   static const String optionScreen = '/option_screen';
-  static const String phoneScreen = '/phone_screen';
+  static const String EmailScreen = '/phone_screen';
   static const String otpScreen = '/otp_screen';
   static const String dopOption = '/dop_option';
   static const String driverName = '/driver_name';

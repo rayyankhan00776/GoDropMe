@@ -12,8 +12,8 @@ final List<GetPage<dynamic>> commonRoutes = [
     binding: OptionBinding(),
   ),
   GetPage(
-    name: AppRoutes.phoneScreen,
-    page: () => const PhoneScreen(),
+    name: AppRoutes.EmailScreen,
+    page: () => const EmailScreen(),
     binding: PhoneBinding(),
   ),
   GetPage(

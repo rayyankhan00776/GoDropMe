@@ -20,7 +20,7 @@ class DriverSettingsScreen extends StatefulWidget {
 }
 
 class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
-  String? _phone;
+  String? _email; // stored in driverPhone key for backward compatibility
 
   @override
   void initState() {
@@ -41,16 +41,10 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
       }
     }
     if (!mounted) return;
-    setState(() => _phone = raw);
+    setState(() => _email = raw);
   }
 
-  String? _formatPhone(String? raw) {
-    if (raw == null || raw.trim().isEmpty) return null;
-    var n = raw.trim();
-    if (n.startsWith('+92')) n = n.substring(3);
-    if (n.startsWith('92')) n = n.substring(2);
-    return '+92 $n';
-  }
+  // Phone formatting removed: now we display raw email value.
 
   @override
   Widget build(BuildContext context) {
@@ -80,11 +74,11 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
                 DriverSettingsSection(
                   children: [
                     DriverSettingsTile(
-                      title: 'Phone Number',
-                      subtitle: _formatPhone(_phone),
+                      title: 'Email',
+                      subtitle: _email?.trim(),
                       showIosChevron: true,
                       onTap: () => Get.toNamed(
-                        AppRoutes.phoneScreen,
+                        AppRoutes.EmailScreen,
                         arguments: const {
                           'mode': 'update-phone',
                           'role': 'driver',

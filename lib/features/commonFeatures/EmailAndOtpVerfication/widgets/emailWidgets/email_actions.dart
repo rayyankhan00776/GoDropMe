@@ -3,12 +3,12 @@ import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/common%20widgets/custom_button.dart';
 import 'package:godropme/constants/app_strings.dart';
 
-class PhoneActions extends StatelessWidget {
+class EmailActions extends StatelessWidget {
   final VoidCallback onNext;
   final double height;
   final String? buttonText;
 
-  const PhoneActions({
+  const EmailActions({
     required this.onNext,
     this.height = 64,
     this.buttonText,

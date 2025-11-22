@@ -3,13 +3,13 @@ import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/otpWidgets/otp_actions.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/otpWidgets/otp_header.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/otpWidgets/otp_text_field.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/widgets/otpWidgets/otp_error_dialog.dart';
+import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/widgets/otpWidgets/otp_actions.dart';
+import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/widgets/otpWidgets/otp_header.dart';
+import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/widgets/otpWidgets/otp_text_field.dart';
+import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/widgets/otpWidgets/otp_error_dialog.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/controllers/otp_controller.dart';
-import 'package:godropme/features/commonFeatures/phoneAndOtpVerfication/controllers/phone_controller.dart';
+import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/controllers/otp_controller.dart';
+import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/controllers/email_controller.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 
@@ -29,7 +29,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   late final OtpController _otpController;
-  late final PhoneController _phoneController;
+  late final EmailController _emailController;
   late final bool _isUpdateMode;
   late final String _role; // 'driver' | 'parent' | ''
 
@@ -38,7 +38,7 @@ class _OtpScreenState extends State<OtpScreen> {
     super.initState();
     // Initialize once to avoid reassigning a late final during rebuilds.
     _otpController = Get.find<OtpController>();
-    _phoneController = Get.find<PhoneController>();
+    _emailController = Get.find<EmailController>();
     final args = Get.arguments;
     if (args is Map) {
       _isUpdateMode = args['mode'] == 'update-phone';
@@ -67,18 +67,18 @@ class _OtpScreenState extends State<OtpScreen> {
     if (_otpController.allFilled.value) {
       if (_isUpdateMode) {
         // Persist updated phone after successful OTP entry
-        final rawNational = _phoneController.phone.value.trim();
+        final rawEmail = _emailController.email.value.trim();
+        // Reuse existing keys for backward compatibility.
         if (_role == 'driver') {
-          LocalStorage.setString(StorageKeys.driverPhone, rawNational);
+          LocalStorage.setString(StorageKeys.driverPhone, rawEmail);
         } else if (_role == 'parent') {
-          LocalStorage.setString(StorageKeys.parentPhone, rawNational);
+          LocalStorage.setString(StorageKeys.parentPhone, rawEmail);
         } else {
-          // Default fallback: parent key (original behavior)
-          LocalStorage.setString(StorageKeys.parentPhone, rawNational);
+          LocalStorage.setString(StorageKeys.parentPhone, rawEmail);
         }
         Get.snackbar(
-          'Phone Updated',
-          'Your phone number has been updated successfully.',
+          'Email Updated',
+          'Your email has been updated successfully.',
           snackPosition: SnackPosition.BOTTOM,
         );
         // Navigate back to appropriate settings screen.
@@ -168,35 +168,22 @@ class _OtpScreenState extends State<OtpScreen> {
                   spacing: 6,
                   children: [
                     Obx(() {
-                      final raw = _phoneController.phone.value;
-                      if (raw.isEmpty) {
-                        return const SizedBox.shrink();
-                      }
-                      // Normalize to exactly one +92 prefix for display
-                      String national = raw;
-                      if (national.startsWith('+92')) {
-                        national = national.substring(3);
-                      } else if (national.startsWith('92')) {
-                        national = national.substring(2);
-                      }
-                      final display = '+92 $national';
+                      final raw = _emailController.email.value;
+                      if (raw.isEmpty) return const SizedBox.shrink();
                       return Text(
-                        display,
+                        raw,
                         style: AppTypography.helperSmall.copyWith(
                           color: AppColors.darkGray,
-                          fontSize: 14, // +2 from helperSmall (12 -> 14)
+                          fontSize: 14,
                         ),
                       );
                     }),
                     TextButton(
                       onPressed: () {
-                        // Reset submission state and go back to phone screen for editing
-                        _phoneController.submitted.value = false;
-                        // Pop back through the stack until the phone screen is on top.
-                        // This avoids issues if an extra OTP was stacked earlier.
+                        _emailController.submitted.value = false;
                         Get.until(
                           (route) =>
-                              route.settings.name == AppRoutes.phoneScreen,
+                              route.settings.name == AppRoutes.EmailScreen,
                         );
                       },
                       style: TextButton.styleFrom(
@@ -205,10 +192,10 @@ class _OtpScreenState extends State<OtpScreen> {
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       child: Text(
-                        AppStrings.changeNumber,
+                        AppStrings.changeEmail,
                         style: AppTypography.helperSmall.copyWith(
                           color: AppColors.primary,
-                          fontSize: 14, // +2 from helperSmall (12 -> 14)
+                          fontSize: 14,
                         ),
                       ),
                     ),

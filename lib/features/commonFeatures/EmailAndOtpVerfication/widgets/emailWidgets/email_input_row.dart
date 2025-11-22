@@ -9,7 +9,7 @@ import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/regix/pakistan_number_formatter.dart';
 import 'package:godropme/utils/app_assets.dart';
 
-class PhoneInputRow extends StatelessWidget {
+class EmailInputRow extends StatelessWidget {
   final TextEditingController controller;
   final String selectedCode;
   final ValueChanged<String>? onCodeChanged;
@@ -17,7 +17,7 @@ class PhoneInputRow extends StatelessWidget {
   final PhoneValidator? validator;
   final bool showError;
 
-  const PhoneInputRow({
+  const EmailInputRow({
     required this.controller,
     required this.selectedCode,
     this.onCodeChanged,

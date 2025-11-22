@@ -31,7 +31,7 @@ class ParentnameInput extends StatelessWidget {
         (v) => v == null || v.trim().isEmpty ? AppStrings.enterFullName : null;
 
     // Compute current validation text from controller value so we can
-    // display a fixed-height error area beneath the input like PhoneInputRow.
+    // display a fixed-height error area beneath the input like EmailInputRow.
     final String? errorText = localValidator.call(controller.text);
     final String? displayError = showError ? errorText : null;
 
@@ -48,7 +48,7 @@ class ParentnameInput extends StatelessWidget {
         SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),
 
         // Fixed-height area for validation messages so showing an error does
-        // not resize surrounding widgets. Matches PhoneInputRow behavior.
+        // not resize surrounding widgets. Matches EmailInputRow behavior.
         SizedBox(
           height: 18,
           child: Align(

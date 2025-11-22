@@ -52,17 +52,16 @@ class AppStrings {
   static const optionPrivacyText = CommonStrings.optionPrivacyText;
   static const dopheading = CommonStrings.dopheading;
   static const dopsubheading = CommonStrings.dopsubheading;
-  static const phoneTitle = CommonStrings.phoneTitle;
-  static const phoneSubtitle = CommonStrings.phoneSubtitle;
-  static const phoneHint = CommonStrings.phoneHint;
+  static const emailTitle = CommonStrings.emailTitle;
+  static const emailSubtitle = CommonStrings.emailSubtitle;
   static const otpTitle = CommonStrings.otpTitle;
   static const otpSubtitle = CommonStrings.otpSubtitle;
   static const otpverify = CommonStrings.otpverify;
-  static const changeNumber = CommonStrings.changeNumber;
+  static const changeEmail = CommonStrings.changeEmail;
   // Update phone flow
-  static const updatePhoneTitle = CommonStrings.updatePhoneTitle;
-  static const updatePhoneSubtitle = CommonStrings.updatePhoneSubtitle;
-  static const updatePhoneButton = CommonStrings.updatePhoneButton;
+  static const updateEmailTitle = CommonStrings.updateEmailTitle;
+  static const updateEmailSubtitle = CommonStrings.updateEmailSubtitle;
+  static const updateEmailButton = CommonStrings.updateEmailButton;
   static const updateOtpTitle = CommonStrings.updateOtpTitle;
   static const updateOtpSubtitle = CommonStrings.updateOtpSubtitle;
   static const updateOtpVerify = CommonStrings.updateOtpVerify;

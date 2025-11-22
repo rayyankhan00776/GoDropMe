@@ -21,7 +21,7 @@ class ParentSettingsScreen extends StatefulWidget {
 }
 
 class _ParentSettingsScreenState extends State<ParentSettingsScreen> {
-  String? _phone;
+  String? _email; // stored under parentPhone key for backward compatibility
 
   @override
   void initState() {
@@ -33,16 +33,10 @@ class _ParentSettingsScreenState extends State<ParentSettingsScreen> {
     final profile = await ParentProfile.loadFromLocal();
     final raw = profile.phone.national;
     if (!mounted) return;
-    setState(() => _phone = raw);
+    setState(() => _email = raw);
   }
 
-  String? _formatPhone(String? raw) {
-    if (raw == null || raw.trim().isEmpty) return null;
-    var n = raw.trim();
-    if (n.startsWith('+92')) n = n.substring(3);
-    if (n.startsWith('92')) n = n.substring(2);
-    return '+92 $n';
-  }
+  // Removed phone formatting; display raw email.
 
   @override
   Widget build(BuildContext context) {
@@ -72,11 +66,11 @@ class _ParentSettingsScreenState extends State<ParentSettingsScreen> {
                 SettingsSection(
                   children: [
                     SettingsTile(
-                      title: 'Phone Number',
-                      subtitle: _formatPhone(_phone),
+                      title: 'Email',
+                      subtitle: _email?.trim(),
                       showIosChevron: true,
                       onTap: () => Get.toNamed(
-                        AppRoutes.phoneScreen,
+                        AppRoutes.EmailScreen,
                         arguments: const {
                           'mode': 'update-phone',
                           'role': 'parent',

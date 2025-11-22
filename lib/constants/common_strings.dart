@@ -42,7 +42,7 @@ class CommonStrings {
   static const optionHeading = 'GoDropMe';
   static const optionLine1 = 'Your App for Fair Deals';
   static const optionLine2 = 'Choose Rides that are Right for You';
-  static const continueWithPhone = 'Continue with Phone';
+  static const continueWithPhone = 'Continue with Email';
   static const continueWithGoogle = 'Continue with Google';
   static const optionTermsPrefix = 'By joining our app you agree with our ';
   static const optionTermsText = 'Terms and Conditions';
@@ -52,22 +52,21 @@ class CommonStrings {
   static const dopheading = 'Are you a Parent or a Driver?';
   static const dopsubheading = 'You can change the mode later';
 
-  // Phone verification strings
-  static const phoneTitle = 'Join us via phone number';
-  static const phoneSubtitle = "We'll text a code to verify your phone";
-  static const phoneHint = 'e.g. 3012345678';
+  // Email verification strings (replacing prior phone flow)
+  static const emailTitle = 'Enter your Email';
+  static const emailSubtitle = 'We will send a verification code to this email';
   static const otpTitle = 'Enter Verification Code';
-  static const otpSubtitle = "we have sent code to your phone number";
+  static const otpSubtitle = "We have sent a code to your email";
   static const otpverify = 'Verify';
-  static const changeNumber = 'Change the phone number';
+  static const changeEmail = 'Change Email';
 
   // Update phone flow (settings re-use of phone & OTP screens)
-  static const updatePhoneTitle = 'Update phone number';
-  static const updatePhoneSubtitle =
-      'Enter a new phone number to update your account';
-  static const updatePhoneButton = 'Update Phone';
-  static const updateOtpTitle = 'Verify New Phone';
-  static const updateOtpSubtitle = 'Enter the code sent to your new number';
+  static const updateEmailTitle = 'Update email address';
+  static const updateEmailSubtitle =
+      'Provide a new email to update your account';
+  static const updateEmailButton = 'Update Email';
+  static const updateOtpTitle = 'Verify New Email';
+  static const updateOtpSubtitle = 'Enter the code sent to your new email';
   static const updateOtpVerify = 'Confirm';
 
   // Report (shared)

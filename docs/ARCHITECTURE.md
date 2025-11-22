@@ -74,7 +74,7 @@ assets/
   - `OptionScreen` composes header, illustration, actions, and terms.
   - `OptionController` centralizes actions (phone flow, TODO: Google sign-in, terms/privacy).
 - Phone & OTP (`features/commonFeatures/phoneAndOtpVerfication`):
-  - `PhoneScreen` uses `CustonPhoneTextField` and validator for Pakistani numbers. Navigates to OTP when valid.
+  - `EmailScreen` uses `CustonPhoneTextField` and validator for Pakistani numbers. Navigates to OTP when valid.
   - Widgets are split into small composables (header, input row, actions).
 - Driver onboarding (`features/driverSide/driverRegistration`):
   - Multi-step flow: driver name, vehicle selection, personal info, licence, identification, vehicle registration.
