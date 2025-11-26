@@ -66,15 +66,15 @@ class _OtpScreenState extends State<OtpScreen> {
     // each field has one character, so this is a safe local bypass.
     if (_otpController.allFilled.value) {
       if (_isUpdateMode) {
-        // Persist updated phone after successful OTP entry
+        // Persist updated email after successful OTP entry
         final rawEmail = _emailController.email.value.trim();
-        // Reuse existing keys for backward compatibility.
         if (_role == 'driver') {
-          LocalStorage.setString(StorageKeys.driverPhone, rawEmail);
+          LocalStorage.setString(StorageKeys.driverEmail, rawEmail);
         } else if (_role == 'parent') {
-          LocalStorage.setString(StorageKeys.parentPhone, rawEmail);
+          LocalStorage.setString(StorageKeys.parentEmail, rawEmail);
         } else {
-          LocalStorage.setString(StorageKeys.parentPhone, rawEmail);
+          // Default to parent email key when role is unknown
+          LocalStorage.setString(StorageKeys.parentEmail, rawEmail);
         }
         Get.snackbar(
           'Email Updated',

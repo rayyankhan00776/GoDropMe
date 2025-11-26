@@ -20,28 +20,18 @@ class DriverSettingsScreen extends StatefulWidget {
 }
 
 class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
-  String? _email; // stored in driverPhone key for backward compatibility
+  String? _email;
 
   @override
   void initState() {
     super.initState();
-    _loadPhone();
+    _loadEmail();
   }
 
-  Future<void> _loadPhone() async {
-    String? raw = await LocalStorage.getString(StorageKeys.driverPhone);
-    // Fallback: if driver phone not yet stored (pre-role selection flow),
-    // copy parent phone to driver key so settings shows a value.
-    if (raw == null || raw.trim().isEmpty) {
-      final parentRaw = await LocalStorage.getString(StorageKeys.parentPhone);
-      if (parentRaw != null && parentRaw.trim().isNotEmpty) {
-        raw = parentRaw.trim();
-        // Persist for driver for future accesses.
-        await LocalStorage.setString(StorageKeys.driverPhone, raw);
-      }
-    }
+  Future<void> _loadEmail() async {
+    final raw = await LocalStorage.getString(StorageKeys.driverEmail);
     if (!mounted) return;
-    setState(() => _email = raw);
+    setState(() => _email = raw?.trim());
   }
 
   // Phone formatting removed: now we display raw email value.

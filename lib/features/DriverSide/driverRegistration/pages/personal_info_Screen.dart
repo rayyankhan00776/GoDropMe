@@ -27,6 +27,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _surNameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   String? _selectedImagePath;
   bool _submitted = false;
   bool _showGlobalError = false;
@@ -37,6 +38,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _surNameController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -53,6 +55,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     _firstNameController.text = '';
     _surNameController.text = '';
     _lastNameController.text = '';
+    _phoneController.text = '';
     _selectedImagePath = null;
   }
 
@@ -154,6 +157,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                       firstNameController: _firstNameController,
                       surNameController: _surNameController,
                       lastNameController: _lastNameController,
+                      phoneController: _phoneController,
                       showSubmittedErrors: _submitted,
                       showGlobalError: _showGlobalError,
                     ),
@@ -192,6 +196,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                   _piController.setFirstName(_firstNameController.text.trim());
                   _piController.setSurName(_surNameController.text.trim());
                   _piController.setLastName(_lastNameController.text.trim());
+                  _piController.setPhone(_phoneController.text.trim());
                   _piController.setImagePath(_selectedImagePath);
                   await _piController.savePersonalInfo();
 

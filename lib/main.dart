@@ -27,7 +27,6 @@ class GoDropMe extends StatelessWidget {
       theme: AppTheme.lightTheme,
       initialRoute: AppRoutes.onboard,
       getPages: AppRoutes.routes,
-      // Provide a smooth fade + slide transition globally
       defaultTransition: Transition.fadeIn,
       transitionDuration: const Duration(milliseconds: 300),
     );

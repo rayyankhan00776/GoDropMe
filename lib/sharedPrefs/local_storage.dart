@@ -23,6 +23,9 @@ class StorageKeys {
   static const parentPhone = 'parent_phone';
   // Driver: phone number (national digits, e.g., 3XXXXXXXXX)
   static const driverPhone = 'driver_phone';
+  // Emails (stored as plain strings)
+  static const parentEmail = 'parent_email';
+  static const driverEmail = 'driver_email';
 }
 
 /// A very small wrapper around SharedPreferences tailored for this app's
@@ -133,6 +136,8 @@ class LocalStorage {
       StorageKeys.parentPhone,
       StorageKeys.childrenList,
       StorageKeys.driverPhone,
+      StorageKeys.parentEmail,
+      StorageKeys.driverEmail,
     ];
     for (final k in extraKeys) {
       await p.remove(k);

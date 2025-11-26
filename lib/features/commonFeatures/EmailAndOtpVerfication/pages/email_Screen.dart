@@ -9,7 +9,6 @@ import 'package:godropme/utils/responsive.dart';
 // a one-off prefix (email icon) and a conditional clear suffix.
 // Requirement: This styling change must remain local to the email screen.
 import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/controllers/email_controller.dart';
-import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 
@@ -62,10 +61,6 @@ class _EmailScreenState extends State<EmailScreen> {
     final valid = _formKey.currentState?.validate() ?? false;
     if (!valid) return;
     _emailController.setEmail(_controller.text.trim());
-    if (!_isUpdateMode) {
-      // Reuse existing storage key to avoid downstream changes.
-      LocalStorage.setString(StorageKeys.parentPhone, _controller.text.trim());
-    }
     Get.toNamed(
       AppRoutes.otpScreen,
       arguments: {
