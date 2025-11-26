@@ -77,7 +77,7 @@ class _EmailScreenState extends State<EmailScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.arrow_back, size: 28),
         ),
       ),

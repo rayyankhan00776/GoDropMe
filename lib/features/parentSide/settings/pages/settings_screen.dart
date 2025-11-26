@@ -68,7 +68,7 @@ class _ParentSettingsScreenState extends State<ParentSettingsScreen> {
                       subtitle: _email?.trim(),
                       showIosChevron: true,
                       onTap: () => Get.toNamed(
-                        AppRoutes.EmailScreen,
+                        AppRoutes.emailScreen,
                         arguments: const {
                           'mode': 'update-phone',
                           'role': 'parent',

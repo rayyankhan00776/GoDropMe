@@ -72,7 +72,7 @@ part 'routes/parent_routes.dart';
 class AppRoutes {
   static const String onboard = '/onboard';
   static const String optionScreen = '/option_screen';
-  static const String EmailScreen = '/phone_screen';
+  static const String emailScreen = '/phone_screen';
   static const String otpScreen = '/otp_screen';
   static const String dopOption = '/dop_option';
   static const String driverName = '/driver_name';
