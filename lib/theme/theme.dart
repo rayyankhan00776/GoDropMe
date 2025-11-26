@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppTheme {
   AppTheme._();
@@ -11,6 +12,11 @@ class AppTheme {
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       iconTheme: IconThemeData(color: Colors.black, size: 24.0),
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.dark, // Android: dark icons
+        statusBarBrightness: Brightness.light, // iOS: dark icons
+        statusBarColor: Colors.transparent,
+      ),
     ),
   );
 }

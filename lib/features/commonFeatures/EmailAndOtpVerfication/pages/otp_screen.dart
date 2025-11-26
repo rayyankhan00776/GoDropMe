@@ -183,7 +183,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         _emailController.submitted.value = false;
                         Get.until(
                           (route) =>
-                              route.settings.name == AppRoutes.EmailScreen,
+                              route.settings.name == AppRoutes.emailScreen,
                         );
                       },
                       style: TextButton.styleFrom(

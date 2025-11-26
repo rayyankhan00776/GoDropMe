@@ -33,7 +33,7 @@ class _ParentConversationScreenState extends State<ParentConversationScreen> {
         title: Text(name, style: const TextStyle(fontWeight: FontWeight.w700)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: Column(

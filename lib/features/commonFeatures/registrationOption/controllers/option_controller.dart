@@ -11,7 +11,7 @@ class OptionController extends GetxController {
   void continueWithPhone() {
     // Prefer named routes (centralized in `routes.dart`). Use named route
     // consistently — bindings provide controller instances for the target.
-    Get.toNamed(AppRoutes.EmailScreen);
+    Get.toNamed(AppRoutes.emailScreen);
     debugPrint(
       'OptionController: continueWithPhone called (navigated via named route)',
     );

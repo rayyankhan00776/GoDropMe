@@ -31,7 +31,7 @@ class _AddChildHelpScreenState extends State<AddChildHelpScreen> {
       await ctrl.addChild(data);
       if (!mounted) return;
       // Pop back to Add Children screen after successful save
-      Get.back();
+      Navigator.of(context).pop();
     }();
   }
 
@@ -60,7 +60,7 @@ class _AddChildHelpScreenState extends State<AddChildHelpScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
-                  onPressed: () => Get.back(),
+                  onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(
                     Icons.arrow_back,
                     size: 28,
