@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/common%20widgets/forms/dynamic_form_builder.dart';
-import 'package:godropme/common%20widgets/forms/form_items.dart';
-import 'package:godropme/common%20widgets/custom_phone_text_field.dart';
+import 'package:godropme/common_widgets/forms/dynamic_form_builder.dart';
+import 'package:godropme/common_widgets/forms/form_items.dart';
+import 'package:godropme/common_widgets/custom_phone_text_field.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/utils/validators_extra.dart';
+import 'package:godropme/utils/validators.dart';
 
 // Date input formatting now provided via ExtraInputFormatters.dateDmy
 
@@ -64,27 +65,7 @@ class DriverLicenceForm extends StatelessWidget {
               ExtraInputFormatters.dateDmy,
               LengthLimitingTextInputFormatter(10),
             ],
-            validator: (v) {
-              final val = v?.trim() ?? '';
-              if (val.isEmpty) return 'Please enter expiry date';
-              if (val.length != 10) return 'Enter date as DD-MM-YYYY';
-              final parts = val.split('-');
-              if (parts.length != 3) return 'Enter date as DD-MM-YYYY';
-              final day = int.tryParse(parts[0]);
-              final month = int.tryParse(parts[1]);
-              final year = int.tryParse(parts[2]);
-              if (day == null || month == null || year == null) {
-                return 'Enter date as DD-MM-YYYY';
-              }
-              if (parts[0].length != 2 ||
-                  parts[1].length != 2 ||
-                  parts[2].length != 4) {
-                return 'Enter date as DD-MM-YYYY';
-              }
-              if (month < 1 || month > 12) return 'Enter valid month';
-              if (day < 1 || day > 31) return 'Enter valid day';
-              return null;
-            },
+            validator: Validators.dateDMYFuture,
           ),
         ),
       ),

@@ -12,6 +12,7 @@ import 'child_pickup_section.dart';
 import 'child_drop_section.dart';
 import 'child_relationship_section.dart';
 import 'child_global_error_line.dart';
+import 'child_photo_picker.dart';
 
 typedef OnSaveChild = void Function(Map<String, dynamic> childData);
 
@@ -33,7 +34,8 @@ class AddChildFormState extends State<AddChildForm> {
   LatLng? _pickLatLng; // kept for re-centering map when reopening picker
   LatLng? _dropLatLng; // kept for re-centering map when reopening picker
   bool _sameAsPick = false;
-  TimeOfDay? _pickupTime;
+  TimeOfDay? _schoolOpenTime;
+  TimeOfDay? _schoolOffTime;
   // Single global error message shown when any required field is missing
   String? _globalError;
 
@@ -42,9 +44,12 @@ class AddChildFormState extends State<AddChildForm> {
   String? _selectedGender;
   String? _selectedSchool;
   String? _selectedRelation;
+  
+  // Child photo path (optional)
+  String? _childPhotoPath;
 
   // Options loaded from asset (via loader)
-  ChildrenFormOptions _options = ChildrenFormOptions.fallback();
+  ChildrenFormOptions _options = ChildrenFormOptions.empty;
 
   @override
   void initState() {
@@ -66,12 +71,26 @@ class AddChildFormState extends State<AddChildForm> {
     super.dispose();
   }
 
-  Future<void> _pickTime() async {
+  Future<void> _pickOpenTime() async {
     final t = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: _schoolOpenTime ?? const TimeOfDay(hour: 7, minute: 30),
     );
-    if (t != null) setState(() => _pickupTime = t);
+    if (t != null) setState(() => _schoolOpenTime = t);
+  }
+
+  Future<void> _pickOffTime() async {
+    final t = await showTimePicker(
+      context: context,
+      initialTime: _schoolOffTime ?? const TimeOfDay(hour: 13, minute: 30),
+    );
+    if (t != null) setState(() => _schoolOffTime = t);
+  }
+
+  /// Parse age from dropdown string (e.g., "5 years") to integer
+  int _parseAge(String ageStr) {
+    final digits = ageStr.replaceAll(RegExp(r'[^0-9]'), '');
+    return int.tryParse(digits) ?? 0;
   }
 
   void _save() {
@@ -81,7 +100,7 @@ class AddChildFormState extends State<AddChildForm> {
     final name = _nameController.text.trim();
     final age = _selectedAge?.trim() ?? '';
     final gender = _selectedGender?.trim() ?? '';
-    final school = _selectedSchool?.trim() ?? '';
+    final schoolName = _selectedSchool?.trim() ?? '';
     final pick = _pickPointController.text.trim();
     final drop = _dropPointController.text.trim();
     final rel = _selectedRelation?.trim() ?? '';
@@ -91,7 +110,7 @@ class AddChildFormState extends State<AddChildForm> {
       name,
       age,
       gender,
-      school,
+      schoolName,
       pick,
       drop,
       rel,
@@ -102,15 +121,32 @@ class AddChildFormState extends State<AddChildForm> {
       return;
     }
 
+    // Get the school object to extract lat/lng
+    final schoolObj = _options.getSchoolByName(schoolName);
+    // Store as [lng, lat] for Appwrite point type
+    final schoolLocation = schoolObj != null 
+        ? [schoolObj.lng, schoolObj.lat] 
+        : null;
+
     final data = {
       'name': name,
-      'age': age,
+      'age': _parseAge(age), // Store as integer
       'gender': gender,
-      'school': school,
-      'pick_point': pick,
-      'drop_point': drop,
-      'relationship': rel,
-      'pickup_time': _pickupTime?.format(context) ?? '',
+      'schoolName': schoolName, // Appwrite: string
+      'schoolLocation': schoolLocation, // Appwrite: point [lng, lat]
+      'pickPoint': pick,
+      'dropPoint': drop,
+      // Store as [lng, lat] for Appwrite point type
+      'pickLocation': _pickLatLng != null 
+          ? [_pickLatLng!.longitude, _pickLatLng!.latitude] 
+          : null,
+      'dropLocation': _dropLatLng != null 
+          ? [_dropLatLng!.longitude, _dropLatLng!.latitude] 
+          : null,
+      'relationshipToChild': rel,
+      'schoolOpenTime': _schoolOpenTime?.format(context) ?? '',
+      'schoolOffTime': _schoolOffTime?.format(context) ?? '',
+      'photoPath': _childPhotoPath, // Local file path for child photo
     };
 
     // Delegate persistence and navigation to parent screen
@@ -158,6 +194,13 @@ class AddChildFormState extends State<AddChildForm> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          // Child photo picker (optional)
+          ChildPhotoPicker(
+            imagePath: _childPhotoPath,
+            onImageSelected: (path) => setState(() => _childPhotoPath = path),
+          ),
+          SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
+          
           ChildBasicInfoFields(
             nameController: _nameController,
             selectedAge: _selectedAge,
@@ -201,7 +244,17 @@ class AddChildFormState extends State<AddChildForm> {
             options: _options,
             onRelationChanged: (sel) => setState(() => _selectedRelation = sel),
           ),
-          TimePickerField(time: _pickupTime, onPick: _pickTime),
+          TimePickerField(
+            label: AppStrings.childSchoolOpenTime,
+            time: _schoolOpenTime,
+            onPick: _pickOpenTime,
+          ),
+          SizedBox(height: Responsive.scaleClamped(context, 8, 6, 12)),
+          TimePickerField(
+            label: AppStrings.childSchoolOffTime,
+            time: _schoolOffTime,
+            onPick: _pickOffTime,
+          ),
           SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
           ChildGlobalErrorLine(visible: _globalError != null),
 

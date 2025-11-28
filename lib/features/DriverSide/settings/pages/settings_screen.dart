@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
-import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
-import 'package:godropme/features/driverSide/settings/widgets/settings_caption.dart';
-import 'package:godropme/features/driverSide/settings/widgets/settings_section.dart';
-import 'package:godropme/features/driverSide/settings/widgets/settings_tile.dart';
+import 'package:godropme/features/DriverSide/common_widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/DriverSide/settings/widgets/settings_caption.dart';
+import 'package:godropme/features/DriverSide/settings/widgets/settings_section.dart';
+import 'package:godropme/features/DriverSide/settings/widgets/settings_tile.dart';
 import 'package:godropme/services/Terms_uri_opener.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
@@ -67,13 +67,7 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
                       title: 'Email',
                       subtitle: _email?.trim(),
                       showIosChevron: true,
-                      onTap: () => Get.toNamed(
-                        AppRoutes.emailScreen,
-                        arguments: const {
-                          'mode': 'update-phone',
-                          'role': 'driver',
-                        },
-                      ),
+                      onTap: () => Get.toNamed(AppRoutes.editDriverEmail),
                     ),
                     const DriverSettingsTile(
                       title: 'Languages',

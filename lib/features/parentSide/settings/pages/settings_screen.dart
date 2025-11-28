@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
-import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
+import 'package:godropme/features/parentSide/common_widgets/parent_drawer_shell.dart';
 import 'package:godropme/features/parentSide/settings/widgets/settings_tile.dart';
 import 'package:godropme/features/parentSide/settings/widgets/settings_section.dart';
 import 'package:godropme/features/parentSide/settings/widgets/settings_caption.dart';
@@ -67,13 +67,7 @@ class _ParentSettingsScreenState extends State<ParentSettingsScreen> {
                       title: 'Email',
                       subtitle: _email?.trim(),
                       showIosChevron: true,
-                      onTap: () => Get.toNamed(
-                        AppRoutes.emailScreen,
-                        arguments: const {
-                          'mode': 'update-phone',
-                          'role': 'parent',
-                        },
-                      ),
+                      onTap: () => Get.toNamed(AppRoutes.editParentEmail),
                     ),
                     const SettingsTile(
                       title: 'Languages',

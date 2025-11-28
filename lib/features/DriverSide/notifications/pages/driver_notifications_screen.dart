@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
-import 'package:godropme/features/driverSide/notifications/controllers/driver_notifications_controller.dart';
-import 'package:godropme/features/driverSide/common widgets/drawer widgets/driver_drawer_card.dart';
+import 'package:godropme/features/DriverSide/common_widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/DriverSide/notifications/controllers/driver_notifications_controller.dart';
+import 'package:godropme/features/DriverSide/common_widgets/drawer widgets/driver_drawer_card.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/theme/colors.dart';

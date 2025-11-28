@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
-import 'package:godropme/features/driverSide/driverRegistration/models/driver_identification.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/models/driver_identification.dart';
 
 class DriverIdentificationController extends GetxController {
   final frontImagePath = RxnString();

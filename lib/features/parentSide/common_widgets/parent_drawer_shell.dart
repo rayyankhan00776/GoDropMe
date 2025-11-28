@@ -4,9 +4,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:godropme/features/parentSide/common widgets/drawer.dart';
-import 'package:godropme/features/parentSide/common widgets/drawer_button.dart';
-import 'package:godropme/features/parentSide/common widgets/notification_button.dart';
+import 'package:godropme/features/parentSide/common_widgets/drawer.dart';
+import 'package:godropme/features/parentSide/common_widgets/drawer_button.dart';
+import 'package:godropme/features/parentSide/common_widgets/notification_button.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/utils/responsive.dart';

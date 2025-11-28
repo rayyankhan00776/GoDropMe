@@ -17,6 +17,7 @@ class ValidationStrings {
   static const errorExpiryFormat = 'Enter date as DD-MM-YYYY';
   static const errorExpiryMonth = 'Enter valid month';
   static const errorExpiryDay = 'Enter valid day';
+  static const errorExpiryPast = 'Date must be in the future';
 
   // Vehicle validations
   static const errorSeatCapacityRequired = 'Please enter seat capacity';

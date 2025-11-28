@@ -74,7 +74,7 @@ class AppStrings {
   static const parentNameTitle = ParentStrings.parentNameTitle;
   static const parentNameSubtitle = ParentStrings.parentNameSubtitle;
   static const parentNameButton = ParentStrings.parentNameButton;
-  static const drawerAddChildren = ParentStrings.drawerAddChildren;
+  static const drawerYourChildren = ParentStrings.drawerYourChildren;
   static const drawerFindDrivers = ParentStrings.drawerFindDrivers;
   static const drawerSettings = ParentStrings.drawerSettings;
   static const drawerSupport = ParentStrings.drawerSupport;
@@ -94,7 +94,8 @@ class AppStrings {
   static const childPickPointHint = ParentStrings.childPickPointHint;
   static const childDropPointHint = ParentStrings.childDropPointHint;
   static const childRelationshipHint = ParentStrings.childRelationshipHint;
-  static const childPickupTimePref = ParentStrings.childPickupTimePref;
+  static const childSchoolOpenTime = ParentStrings.childSchoolOpenTime;
+  static const childSchoolOffTime = ParentStrings.childSchoolOffTime;
   static const addChildSave = ParentStrings.addChildSave;
   static const parentChatHeading = ParentStrings.parentChatHeading;
   static const profileTitle = ParentStrings.profileTitle;
@@ -169,13 +170,11 @@ class AppStrings {
   static const driverTabMaps = DriverStrings.driverTabMaps;
   static const driverTabChat = DriverStrings.driverTabChat;
   static const schoolNamesHint = DriverStrings.schoolNamesHint;
-  static const dutyTypeHint = DriverStrings.dutyTypeHint;
   static const pickupRangeKmHint = DriverStrings.pickupRangeKmHint;
   static const routeStartPointLabel = DriverStrings.routeStartPointLabel;
   static const operatingDaysHint = DriverStrings.operatingDaysHint;
   static const extraNotesHint = DriverStrings.extraNotesHint;
-  static const activeStatus = DriverStrings.activeStatus;
-  static const activeStatusSubtitle = DriverStrings.activeStatusSubtitle;
+    // Removed dutyType and active status toggles
 
   // Validation
   static const formGlobalError = ValidationStrings.formGlobalError;
@@ -189,6 +188,7 @@ class AppStrings {
   static const errorExpiryFormat = ValidationStrings.errorExpiryFormat;
   static const errorExpiryMonth = ValidationStrings.errorExpiryMonth;
   static const errorExpiryDay = ValidationStrings.errorExpiryDay;
+  static const errorExpiryPast = ValidationStrings.errorExpiryPast;
   static const errorSeatCapacityRequired =
       ValidationStrings.errorSeatCapacityRequired;
   static const errorSeatCapacityInvalid =

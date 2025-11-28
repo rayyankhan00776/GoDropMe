@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:godropme/common widgets/app_dropdown.dart';
+import 'package:godropme/common_widgets/app_dropdown.dart';
 
 void main() {
   testWidgets('AppDropdown opens sheet and selects item', (tester) async {

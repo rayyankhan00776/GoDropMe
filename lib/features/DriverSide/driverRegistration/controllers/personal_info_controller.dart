@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
-import 'package:godropme/features/driverSide/driverRegistration/models/personal_info.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/models/personal_info.dart';
 
 class PersonalInfoController extends GetxController {
   final firstName = ''.obs;
@@ -16,6 +16,18 @@ class PersonalInfoController extends GetxController {
   void setImagePath(String? path) => imagePath.value = path;
   void setPhone(String v) => phone.value = v;
 
+  /// Convert phone to E.164 format (+92XXXXXXXXXX) for Appwrite storage
+  /// The PakistanPhoneNumberFormatter already normalizes to 10-digit national format (3XXXXXXXXX)
+  String? get phoneE164 {
+    final p = phone.value.trim();
+    if (p.isEmpty) return null;
+    final digits = p.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.isEmpty) return null;
+    // Formatter outputs 10-digit national number starting with 3
+    // Just prepend +92
+    return '+92$digits';
+  }
+
   Future<void> savePersonalInfo() async {
     // Placeholder: persist locally or call backend later.
     debugPrint(
@@ -26,6 +38,7 @@ class PersonalInfoController extends GetxController {
       firstName: firstName.value,
       surName: surName.value,
       lastName: lastName.value,
+      phone: phone.value, // Store raw for local display
       photoPath: imagePath.value,
     );
     await LocalStorage.setJson(StorageKeys.personalInfo, {
@@ -33,7 +46,8 @@ class PersonalInfoController extends GetxController {
       'surName': model.surName,
       'lastName': model.lastName,
       'imagePath': model.photoPath,
-      'phone': phone.value,
+      'phone': phone.value, // Raw for local
+      'phoneE164': phoneE164, // E.164 format for Appwrite
     });
     // Persist phone under its dedicated key as well for parity with other flows
     if (phone.value.trim().isNotEmpty) {
@@ -64,6 +78,7 @@ class PersonalInfoController extends GetxController {
     firstName: firstName.value,
     surName: surName.value,
     lastName: lastName.value,
+    phone: phone.value,
     photoPath: imagePath.value,
   );
 }

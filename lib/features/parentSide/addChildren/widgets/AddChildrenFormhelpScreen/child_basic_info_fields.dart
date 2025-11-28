@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/common%20widgets/custom_text_field.dart';
-import 'package:godropme/common%20widgets/app_dropdown.dart';
+import 'package:godropme/common_widgets/custom_text_field.dart';
+import 'package:godropme/common_widgets/app_dropdown.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/features/parentSide/addChildren/models/children_form_options.dart';
 import 'package:godropme/theme/colors.dart';
@@ -55,7 +55,7 @@ class ChildBasicInfoFields extends StatelessWidget {
         AppDropdown(
           hint: AppStrings.childSchoolHint,
           value: selectedSchool,
-          items: options.schools,
+          items: options.schoolNames, // Use getter for string names
           onSelect: onSchoolChanged,
         ),
       ],

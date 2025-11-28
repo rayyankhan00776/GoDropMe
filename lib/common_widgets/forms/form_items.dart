@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:godropme/common%20widgets/custom_text_field.dart';
-import 'package:godropme/common%20widgets/app_dropdown.dart';
-import 'package:godropme/common%20widgets/form_error_line.dart';
+import 'package:godropme/common_widgets/custom_text_field.dart';
+import 'package:godropme/common_widgets/app_dropdown.dart';
+import 'package:godropme/common_widgets/form_error_line.dart';
 import 'package:godropme/theme/colors.dart';
 
 abstract class FormItem {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:godropme/common%20widgets/custom_Appbar.dart';
-import 'package:godropme/common%20widgets/custom_button.dart';
-import 'package:godropme/common%20widgets/custom_image_container.dart';
+import 'package:godropme/common_widgets/custom_Appbar.dart';
+import 'package:godropme/common_widgets/custom_button.dart';
+import 'package:godropme/common_widgets/custom_image_container.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';

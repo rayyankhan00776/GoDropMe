@@ -1,16 +1,17 @@
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/driverChat/models/chat_message.dart';
+import 'package:godropme/features/DriverSide/driverChat/models/chat_message.dart';
 
 class DriverConversationController extends GetxController {
-  final String contactId;
+  final String chatRoomId;
+  final String currentDriverId;
   final messages = <DriverChatMessage>[].obs;
 
-  DriverConversationController(this.contactId);
+  DriverConversationController(this.chatRoomId, {this.currentDriverId = 'driver_1'});
 
   @override
   void onInit() {
     super.onInit();
-    messages.assignAll(DriverChatMessage.demoFor(contactId));
+    messages.assignAll(DriverChatMessage.demoFor(chatRoomId));
   }
 
   void send(String text) {
@@ -18,9 +19,10 @@ class DriverConversationController extends GetxController {
     messages.add(
       DriverChatMessage(
         id: DateTime.now().microsecondsSinceEpoch.toString(),
-        contactId: contactId,
+        chatRoomId: chatRoomId,
+        senderId: currentDriverId,
+        senderRole: 'driver',
         text: text.trim(),
-        fromMe: true,
         time: DateTime.now(),
       ),
     );

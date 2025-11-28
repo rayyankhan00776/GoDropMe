@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
+import 'package:godropme/features/parentSide/common_widgets/parent_drawer_shell.dart';
 import 'package:godropme/features/parentSide/notifications/controllers/parent_notifications_controller.dart';
-import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_card.dart';
+import 'package:godropme/features/parentSide/common_widgets/drawer widgets/drawer_card.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/theme/colors.dart';

@@ -69,4 +69,9 @@ final List<GetPage<dynamic>> driverRoutes = [
     page: () => const DriverConversationScreen(),
     binding: DriverConversationBinding(),
   ),
+  // Driver Edit Email
+  GetPage(
+    name: AppRoutes.editDriverEmail,
+    page: () => const driver_edit_email.DriverEditEmailScreen(),
+  ),
 ];

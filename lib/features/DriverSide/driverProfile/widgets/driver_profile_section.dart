@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/features/driverSide/common widgets/drawer widgets/driver_drawer_card.dart';
+import 'package:godropme/features/DriverSide/common_widgets/drawer widgets/driver_drawer_card.dart';
 
 class DriverProfileSection extends StatelessWidget {
   final List<Widget> children;

@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
-import 'package:godropme/features/driverSide/driverRegistration/models/vehicle_registration.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/models/vehicle_registration.dart';
 
 /// Controller for Vehicle Registration step.
 /// Keeps persistence logic centralized without altering the UI layer.

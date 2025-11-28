@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
-import 'package:godropme/features/driverSide/driverHome/controllers/driver_orders_controller.dart';
-import 'package:godropme/features/driverSide/driverHome/widgets/driver_order_tile.dart';
+import 'package:godropme/features/DriverSide/common_widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/DriverSide/driverHome/controllers/driver_orders_controller.dart';
+import 'package:godropme/features/DriverSide/driverHome/widgets/driver_order_tile.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
@@ -51,6 +51,7 @@ class DriverOrdersScreen extends StatelessWidget {
                           },
                           onPicked: () => ctrl.markPicked(ord.id),
                           onDropped: () => ctrl.markDropped(ord.id),
+                          onAbsent: () => ctrl.markAbsent(ord.id),
                         );
                       },
                     );

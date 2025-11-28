@@ -70,10 +70,14 @@ flutter:
     - assets/json/rikshaw_details.json
     # Children form dropdown options JSON
     - assets/json/children_details.json
-    # Driver service details options
+    # Driver service options (service categories)
     - assets/json/driver_details.json
+    # Centralized schools list (used by both parent and driver sides)
+    - assets/json/schools.json
     # nav bar icons
     - assets/icons/navBarIcons/
+    # map marker icons
+    - assets/icons/mapMarkers/
   #---------------------- ./ LOCAL ASSETS END ----------------------#
 
   #---------------------- LOCAL FONTS ----------------------#

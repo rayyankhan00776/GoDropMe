@@ -102,9 +102,12 @@ class _DriverListingTileState extends State<DriverListingTile> {
                     value: d.seatsAvailable.toString(),
                   ),
                   _DetailLine(label: 'Serving', value: d.serving),
-                  _DetailLine(label: 'Pickup Range', value: d.pickupRange),
-                  _DetailLine(label: 'Operating Days', value: d.operatingDays),
-                  _DetailLine(label: 'Duty Type', value: d.dutyType),
+                  _DetailLine(label: 'Service Area', value: d.serviceArea),
+                  _DetailLine(label: 'Service For', value: '${d.serviceCategory} Students'),
+                  _DetailLine(
+                    label: 'Monthly Price',
+                    value: 'Rs. ${d.monthlyPricePkr.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}',
+                  ),
                   _DetailLine(label: 'Extra Notes', value: d.extraNotes),
 
                   SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),

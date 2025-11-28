@@ -77,7 +77,11 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
       if (mounted) setState(() => _hasPermission = true);
       final latLng = await LocationServices.currentPosition();
       if (!mounted) return;
-      setState(() => _selected = latLng);
+      // Reset userChangedSelection so map will animate to the new location
+      setState(() {
+        _selected = latLng;
+        _userChangedSelection = false;
+      });
       _resolveAddress(latLng);
     } catch (_) {
       showLocationSnack('Unable to fetch current location.');
@@ -143,6 +147,7 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
               myLocationEnabled: _hasPermission,
               locating: _locating,
               onLocateMe: _locateMe,
+              userChangedUpstream: _userChangedSelection,
               onPositionChanged: (pos, {bool userGesture = false}) {
                 setState(() {
                   _selected = pos;
@@ -167,6 +172,7 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
               }
             },
           ),
+          SizedBox(height: 12),
         ],
       ),
     );

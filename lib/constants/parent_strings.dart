@@ -5,7 +5,7 @@ class ParentStrings {
   static const parentNameButton = 'Next';
 
   // Drawer
-  static const drawerAddChildren = 'Add Children';
+  static const drawerYourChildren = 'Your Children';
   static const drawerFindDrivers = 'Find Drivers';
   static const drawerSettings = 'Settings';
   static const drawerSupport = 'Support';
@@ -26,7 +26,8 @@ class ParentStrings {
   static const childPickPointHint = 'Pick Point';
   static const childDropPointHint = 'Drop Point';
   static const childRelationshipHint = 'Relationship to Child';
-  static const childPickupTimePref = 'Pickup Time';
+  static const childSchoolOpenTime = 'School Opening Time';
+  static const childSchoolOffTime = 'School Off Time';
   static const addChildSave = 'Save Child';
 
   // Misc parent UI

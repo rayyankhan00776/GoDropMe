@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/common%20widgets/custom_button.dart';
+import 'package:godropme/common_widgets/custom_button.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/constants/button_dimensions.dart';
 

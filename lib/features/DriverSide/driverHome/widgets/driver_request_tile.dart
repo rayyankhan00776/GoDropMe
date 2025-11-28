@@ -1,8 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:godropme/features/driverSide/common widgets/drawer widgets/driver_drawer_card.dart';
-import 'package:godropme/features/driverSide/driverHome/models/driver_request.dart';
+import 'package:godropme/features/DriverSide/common_widgets/drawer widgets/driver_drawer_card.dart';
+import 'package:godropme/features/DriverSide/driverHome/models/driver_request.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/DriverSide/common_widgets/driver_drawer_shell.dart';
 import 'package:godropme/theme/colors.dart';
-import 'package:godropme/common widgets/custom_button.dart';
+import 'package:godropme/common_widgets/custom_button.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_typography.dart';
-import 'package:godropme/features/driverSide/report/controllers/driver_report_controller.dart';
+import 'package:godropme/features/DriverSide/report/controllers/driver_report_controller.dart';
 
 class DriverReportScreen extends StatefulWidget {
   const DriverReportScreen({super.key});

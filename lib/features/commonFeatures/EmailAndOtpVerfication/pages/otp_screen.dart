@@ -30,7 +30,6 @@ class _OtpScreenState extends State<OtpScreen> {
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   late final OtpController _otpController;
   late final EmailController _emailController;
-  late final bool _isUpdateMode;
   late final String _role; // 'driver' | 'parent' | ''
 
   @override
@@ -41,10 +40,8 @@ class _OtpScreenState extends State<OtpScreen> {
     _emailController = Get.find<EmailController>();
     final args = Get.arguments;
     if (args is Map) {
-      _isUpdateMode = args['mode'] == 'update-phone';
       _role = (args['role'] as String?) ?? '';
     } else {
-      _isUpdateMode = false;
       _role = '';
     }
   }
@@ -65,30 +62,18 @@ class _OtpScreenState extends State<OtpScreen> {
     // to the DOP option screen. The button is already enabled only when
     // each field has one character, so this is a safe local bypass.
     if (_otpController.allFilled.value) {
-      if (_isUpdateMode) {
-        // Persist updated email after successful OTP entry
-        final rawEmail = _emailController.email.value.trim();
-        if (_role == 'driver') {
-          LocalStorage.setString(StorageKeys.driverEmail, rawEmail);
-        } else if (_role == 'parent') {
-          LocalStorage.setString(StorageKeys.parentEmail, rawEmail);
-        } else {
-          // Default to parent email key when role is unknown
-          LocalStorage.setString(StorageKeys.parentEmail, rawEmail);
-        }
-        Get.snackbar(
-          'Email Updated',
-          'Your email has been updated successfully.',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        // Navigate back to appropriate settings screen.
-        final targetRoute = _role == 'driver'
-            ? AppRoutes.driverSettings
-            : AppRoutes.parentSettings;
-        Get.offAllNamed(targetRoute);
+      // Persist email after successful OTP entry
+      final rawEmail = _emailController.email.value.trim();
+      if (_role == 'driver') {
+        LocalStorage.setString(StorageKeys.driverEmail, rawEmail);
+      } else if (_role == 'parent') {
+        LocalStorage.setString(StorageKeys.parentEmail, rawEmail);
       } else {
-        Get.toNamed(AppRoutes.dopOption);
+        // Default to parent email key when role is unknown
+        LocalStorage.setString(StorageKeys.parentEmail, rawEmail);
       }
+      // Navigate to driver or parent option screen
+      Get.toNamed(AppRoutes.dopOption);
       return;
     }
 
@@ -121,10 +106,7 @@ class _OtpScreenState extends State<OtpScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              OtpHeader(
-                title: _isUpdateMode ? AppStrings.updateOtpTitle : null,
-                subtitle: _isUpdateMode ? AppStrings.updateOtpSubtitle : null,
-              ),
+              const OtpHeader(),
               const SizedBox(height: 30),
 
               // OTP input row — responsive sizing to avoid overflow on small screens
@@ -208,9 +190,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   onNext: _submitOtp,
                   height: Responsive.scaleClamped(context, 64, 48, 80),
                   enabled: _otpController.allFilled.value,
-                  buttonText: _isUpdateMode
-                      ? AppStrings.updateOtpVerify
-                      : AppStrings.otpverify,
+                  buttonText: AppStrings.otpverify,
                 ),
               ),
               SizedBox(height: Responsive.scaleClamped(context, 24, 16, 32)),

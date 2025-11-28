@@ -25,7 +25,7 @@ lib/
   theme/                        # Colors and ThemeData (Material 3)
   constants/                    # Strings and UI constants (button sizes, etc.)
   utils/                        # App-wide utilities: responsive helpers, assets, typography
-  common widgets/               # Reusable UI widgets (buttons, text fields, etc.)
+  common_widgets/               # Reusable UI widgets (buttons, text fields, etc.)
   config/                       # Environment values (Appwrite project/endpoint)
   services/appwrite/            # Appwrite client singleton
   sharedPrefs/                  # Local storage wrapper around SharedPreferences
@@ -59,7 +59,7 @@ assets/
 - `theme/colors.dart`: central color palette (primary, gradients, neutrals, semantic) used consistently.
 - `utils/app_typography.dart`: shared text styles for common UI elements.
 - `utils/responsive.dart`: helper for responsive sizing and clamped scaling using a 390pt design baseline.
-- `common widgets/`:
+- `common_widgets/`:
   - `custom_button.dart`: gradient button with optional leading and width/height controls.
   - `custom_phone_text_field.dart`: phone input with Pakistan number validator and composable prefix.
   - Additional widgets: `custom_text_field.dart`, `google_button.dart`, etc.

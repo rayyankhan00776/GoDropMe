@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/features/parentSide/common widgets/drawer widgets/drawer_card.dart';
+import 'package:godropme/features/parentSide/common_widgets/drawer widgets/drawer_card.dart';
 
 class ProfileSection extends StatelessWidget {
   final List<Widget> children;

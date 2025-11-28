@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:godropme/services/appwrite/appwrite_client.dart';
 import 'package:godropme/theme/theme.dart';
@@ -19,7 +18,7 @@ class GoDropMe extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: AppRoutes.driverMap,
+      initialRoute: AppRoutes.parentmapScreen,
       getPages: AppRoutes.routes,
       defaultTransition: Transition.cupertino,
       transitionDuration: const Duration(milliseconds: 300),

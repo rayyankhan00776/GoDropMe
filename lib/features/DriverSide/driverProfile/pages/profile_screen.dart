@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/driverSide/common_widgets/driver_drawer_shell.dart';
 import 'package:godropme/features/driverSide/driverProfile/widgets/driver_profile_caption.dart';
 import 'package:godropme/features/driverSide/driverProfile/widgets/driver_profile_section.dart';
 import 'package:godropme/features/driverSide/driverProfile/widgets/driver_profile_tile.dart';
@@ -153,17 +153,6 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                             DriverProfileTile(
                               title: 'School(s)',
                               subtitle: joinSchools(_service?['schoolNames']),
-                              showIosChevron: true,
-                            ),
-                            const Divider(height: 1),
-                            DriverProfileTile(
-                              title: 'Duty Type',
-                              subtitle: (() {
-                                final duty = (_service?['dutyType'] ?? '')
-                                    .toString()
-                                    .trim();
-                                return duty.isEmpty ? 'Not set' : duty;
-                              })(),
                               showIosChevron: true,
                             ),
                           ],

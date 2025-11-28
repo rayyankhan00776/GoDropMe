@@ -2,15 +2,16 @@ import 'package:get/get.dart';
 import 'package:godropme/features/parentSide/parentChat/models/chat_message.dart';
 
 class ParentConversationController extends GetxController {
-  final String contactId;
+  final String chatRoomId;
+  final String currentParentId;
   final messages = <ParentChatMessage>[].obs;
 
-  ParentConversationController(this.contactId);
+  ParentConversationController(this.chatRoomId, {this.currentParentId = 'parent_1'});
 
   @override
   void onInit() {
     super.onInit();
-    messages.assignAll(ParentChatMessage.demoFor(contactId));
+    messages.assignAll(ParentChatMessage.demoFor(chatRoomId));
   }
 
   void send(String text) {
@@ -18,9 +19,10 @@ class ParentConversationController extends GetxController {
     messages.add(
       ParentChatMessage(
         id: DateTime.now().microsecondsSinceEpoch.toString(),
-        contactId: contactId,
+        chatRoomId: chatRoomId,
+        senderId: currentParentId,
+        senderRole: 'parent',
         text: text.trim(),
-        fromMe: true,
         time: DateTime.now(),
       ),
     );

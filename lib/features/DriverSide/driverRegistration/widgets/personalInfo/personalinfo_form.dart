@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 // CustomTextField is used via TextFieldItem in DynamicFormBuilder
-import 'package:godropme/common%20widgets/forms/dynamic_form_builder.dart';
-import 'package:godropme/common%20widgets/forms/form_items.dart';
+import 'package:godropme/common_widgets/forms/dynamic_form_builder.dart';
+import 'package:godropme/common_widgets/forms/form_items.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/common%20widgets/custom_phone_text_field.dart';
+import 'package:godropme/common_widgets/custom_phone_text_field.dart';
 import 'package:flutter/services.dart';
 import 'package:godropme/regix/pakistan_number_formatter.dart';
 

@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // Removed unused UI imports after extracting form items.
 // CustomTextField used via TextFieldItem in DynamicFormBuilder
-import 'package:godropme/common%20widgets/forms/dynamic_form_builder.dart';
-import 'package:godropme/features/driverSide/driverRegistration/utils/driver_service_options_loader.dart';
-import 'package:godropme/features/driverSide/driverRegistration/models/driver_service_options.dart';
-import 'package:godropme/shared/bottom_sheets/location_picker_bottom_sheet.dart';
+import 'package:godropme/common_widgets/forms/dynamic_form_builder.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/utils/driver_service_options_loader.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/models/driver_service_options.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/widgets/serviceDetails/pickup_range_bottom_sheet.dart';
 import 'package:godropme/constants/app_strings.dart';
+import 'package:godropme/models/school.dart';
 // Dropdown, error line replaced by DynamicFormBuilder FormItems
 import 'service_form_items.dart';
 // MapPickField used inside service_form_items.dart
@@ -27,17 +28,19 @@ class ServiceDetailsForm extends StatefulWidget {
 
 class ServiceDetailsFormState extends State<ServiceDetailsForm> {
   DriverServiceOptions? _options;
-  String? _dutyType;
-  String? _operatingDays;
-  List<String> _selectedSchools = [];
+  List<String> _selectedSchoolNames = []; // For UI display
+  List<School> _selectedSchools = []; // Full school objects with lat/lng
+  String? _selectedCategory; // 'Male', 'Female', or 'Both'
 
   // coords
   LatLng? _routeStart;
   String? _routeStartAddress; // human-readable address for display/storage
+  double _pickupRadiusKm = 0.5;
+  List<LatLng> _pickupPolygon = const [];
 
   // fields
   final _notesCtrl = TextEditingController();
-  bool _active = true;
+  final _priceCtrl = TextEditingController();
   bool _showGlobalError = false;
 
   @override
@@ -55,24 +58,45 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
   @override
   void dispose() {
     _notesCtrl.dispose();
+    _priceCtrl.dispose();
     super.dispose();
   }
 
   // Spacing handled by GapItem; legacy helper removed
   Future<void> _pickStart() async {
-    final res = await showAddressLocationPickerBottomSheet(
+    final res = await showPickupRangeBottomSheet(
       context,
       initial: _routeStart,
+      initialRadiusKm: _pickupRadiusKm,
     );
     if (res != null && mounted) {
       setState(() {
-        _routeStart = res.position;
-        _routeStartAddress = res.address;
+        _routeStart = res.center;
+        _pickupRadiusKm = res.radiusKm;
+        _pickupPolygon = res.polygon;
+        _routeStartAddress = res.address; // may be null
       });
     }
   }
 
-  // Removed Route End selection as per requirement
+  /// When school names are selected, find the full School objects
+  void _onSchoolsChanged(List<String> selectedNames) {
+    final options = _options;
+    if (options == null) return;
+    
+    setState(() {
+      _selectedSchoolNames = selectedNames;
+      // Map selected names to full School objects with lat/lng
+      _selectedSchools = selectedNames
+          .map((name) => options.getSchoolByName(name))
+          .whereType<School>()
+          .toList();
+    });
+  }
+
+  void _onCategoryChanged(String? category) {
+    setState(() => _selectedCategory = category);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,19 +126,19 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
         items: buildServiceFormItems(
           context: context,
           options: options,
-          selectedSchools: _selectedSchools,
-          dutyType: _dutyType,
-          operatingDays: _operatingDays,
+          selectedSchools: _selectedSchoolNames,
+          selectedCategory: _selectedCategory,
           notesController: _notesCtrl,
-          active: _active,
+          priceController: _priceCtrl,
           showGlobalError: _showGlobalError,
           onPickStart: _pickStart,
-          routeStartAddress: _routeStartAddress,
+                routeStartAddress: (_routeStartAddress != null &&
+                    _routeStartAddress!.trim().isNotEmpty)
+                  ? '$_routeStartAddress, ${_pickupRadiusKm.toStringAsFixed(1)} km radius'
+                  : '${_pickupRadiusKm.toStringAsFixed(1)} km radius',
           routeStartValue: _routeStart,
-          onSchoolsChanged: (v) => setState(() => _selectedSchools = v),
-          onDutyTypeChanged: (v) => setState(() => _dutyType = v),
-          onOperatingDaysChanged: (v) => setState(() => _operatingDays = v),
-          onActiveChanged: (v) => setState(() => _active = v),
+          onSchoolsChanged: _onSchoolsChanged,
+          onCategoryChanged: _onCategoryChanged,
         ),
       ),
     );
@@ -124,9 +148,8 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
     final valid = widget.formKey.currentState?.validate() ?? false;
     final requiredOk =
         _selectedSchools.isNotEmpty &&
-        _dutyType != null &&
-        _routeStart != null &&
-        _operatingDays != null;
+        _selectedCategory != null &&
+        _routeStart != null;
     setState(() => _showGlobalError = !(valid && requiredOk));
     return valid && requiredOk;
   }
@@ -134,21 +157,21 @@ class ServiceDetailsFormState extends State<ServiceDetailsForm> {
   void submit() {
     if (!_validate()) return;
     widget.onSubmit({
-      'schoolNames': _selectedSchools,
-      'dutyType': _dutyType,
-      'routeStart': _routeStart,
-      'routeStartAddress': _routeStartAddress,
-      'operatingDays': _operatingDays,
+      // Send full school objects with lat/lng for backend storage
+      'schools': _selectedSchools.map((s) => s.toJson()).toList(),
+      'serviceCategory': _selectedCategory,
+      'serviceAreaCenter': _routeStart,
+      'serviceAreaAddress': _routeStartAddress,
+      'serviceAreaRadiusKm': _pickupRadiusKm,
+      'serviceAreaPolygon': _pickupPolygon
+          .map((p) => {'lat': p.latitude, 'lng': p.longitude})
+          .toList(),
+      // Monthly service price in PKR
+      'monthlyPricePkr': int.tryParse(_priceCtrl.text.trim()) ?? 0,
       // Treat extra notes as optional; send null when empty so it never
       // participates in validation logic upstream.
       'notes': _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
-      'active': _active,
     });
   }
 }
 
-// _DropdownField removed in favor of shared AppDropdown widget.
-
-// _MultiDropdownField removed in favor of shared AppMultiSelect widget.
-
-// Map picker widget moved to map_pick_field.dart

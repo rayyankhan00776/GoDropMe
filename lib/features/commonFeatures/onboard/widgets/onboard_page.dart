@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'dart:math' as math;
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/common%20widgets/custom_button.dart';
+import 'package:godropme/common_widgets/custom_button.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/utils/app_typography.dart';
 

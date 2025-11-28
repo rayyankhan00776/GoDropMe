@@ -19,13 +19,19 @@ String maskCnic(String? cnic) {
 
 String joinSchools(dynamic schools) {
   if (schools is List) {
-    final list = schools
-        .whereType<String>()
-        .map((e) => e.trim())
-        .where((e) => e.isNotEmpty)
-        .toList();
-    if (list.isEmpty) return 'Not set';
-    return list.join(', ');
+    final names = <String>[];
+    for (final item in schools) {
+      if (item is String && item.trim().isNotEmpty) {
+        // New format: flat string array (Appwrite compatible)
+        names.add(item.trim());
+      } else if (item is Map<String, dynamic>) {
+        // Legacy format: list of school objects with 'name' key
+        final name = item['name']?.toString().trim() ?? '';
+        if (name.isNotEmpty) names.add(name);
+      }
+    }
+    if (names.isEmpty) return 'Not set';
+    return names.join(', ');
   }
   return 'Not set';
 }

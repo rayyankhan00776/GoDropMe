@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/common%20widgets/form_error_line.dart';
+import 'package:godropme/common_widgets/form_error_line.dart';
 import 'package:godropme/constants/app_strings.dart';
 
 class ChildGlobalErrorLine extends StatelessWidget {

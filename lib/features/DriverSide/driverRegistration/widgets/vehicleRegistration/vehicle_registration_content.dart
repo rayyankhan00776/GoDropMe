@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
-import 'package:godropme/common%20widgets/progress_next_bar.dart';
-import 'package:godropme/features/driverSide/driverRegistration/controllers/vehicle_registration_controller.dart';
+import 'package:godropme/common_widgets/progress_next_bar.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/controllers/vehicle_registration_controller.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_assets.dart';
 import 'package:godropme/utils/app_typography.dart';

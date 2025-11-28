@@ -18,7 +18,7 @@ import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
+import 'package:godropme/features/parentSide/common_widgets/parent_drawer_shell.dart';
 
 class ParentMapScreen extends StatefulWidget {
   const ParentMapScreen({super.key});
@@ -154,7 +154,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:godropme/theme/colors.dart';
-import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/driverSide/common_widgets/driver_drawer_shell.dart';
 
 class DriverMapScreen extends StatefulWidget {
   const DriverMapScreen({super.key});

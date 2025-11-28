@@ -49,6 +49,47 @@ class AddChildrenController extends GetxController {
     children.assignAll(list);
   }
 
+  /// Mark a child at [index] as absent for today.
+  /// This stores the current date in ISO format so we can track today's absence.
+  ///
+  /// Backend integration note:
+  /// When backend is available, this should notify the driver about
+  /// the child's absence via Appwrite messaging/notifications or
+  /// update the trip status to 'absent'.
+  Future<void> markAbsentToday(int index) async {
+    final list = await LocalStorage.getJsonList(StorageKeys.childrenList);
+    if (index < 0 || index >= list.length) return;
+    
+    // Store absent date in ISO format (YYYY-MM-DD)
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    list[index]['absentDate'] = today;
+    
+    await LocalStorage.replaceJsonList(StorageKeys.childrenList, list);
+    children.assignAll(list);
+  }
+  
+  /// Clear the absent status for a child at [index].
+  Future<void> clearAbsent(int index) async {
+    final list = await LocalStorage.getJsonList(StorageKeys.childrenList);
+    if (index < 0 || index >= list.length) return;
+    
+    list[index].remove('absentDate');
+    
+    await LocalStorage.replaceJsonList(StorageKeys.childrenList, list);
+    children.assignAll(list);
+  }
+  
+  /// Check if child at [index] is marked absent for today.
+  bool isAbsentToday(int index) {
+    if (index < 0 || index >= children.length) return false;
+    final child = children[index];
+    final absentDate = child['absentDate']?.toString();
+    if (absentDate == null || absentDate.isEmpty) return false;
+    
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    return absentDate == today;
+  }
+
   // -------- Typed helpers (non-breaking) --------
 
   /// Returns a typed view of the child at [index] without altering storage.

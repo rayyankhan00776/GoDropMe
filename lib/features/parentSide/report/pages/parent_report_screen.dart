@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
+import 'package:godropme/features/parentSide/common_widgets/parent_drawer_shell.dart';
 import 'package:godropme/theme/colors.dart';
-import 'package:godropme/common widgets/custom_button.dart';
+import 'package:godropme/common_widgets/custom_button.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/features/parentSide/report/controllers/parent_report_controller.dart';

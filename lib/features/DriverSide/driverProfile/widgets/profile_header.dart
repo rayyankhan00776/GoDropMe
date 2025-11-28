@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:godropme/features/driverSide/driverProfile/controllers/driver_profile_controller.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
@@ -22,16 +24,27 @@ class ProfileHeader extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: DriverProfileAvatar(
               size: Responsive.scaleClamped(context, 108, 96, 128),
-              imagePath: personalInfo?['imagePath'] as String?,
+              editable: true, // Make avatar editable
             ),
           ),
-          Text(
-            displayName.isEmpty ? 'Driver' : displayName,
-            style: AppTypography.optionLineSecondary.copyWith(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.black,
-            ),
+          // Use controller for reactive name display
+          GetX<DriverProfileController>(
+            init: Get.isRegistered<DriverProfileController>()
+                ? Get.find<DriverProfileController>()
+                : Get.put(DriverProfileController()),
+            builder: (controller) {
+              final name = controller.displayName.value.isNotEmpty 
+                  ? controller.displayName.value 
+                  : displayName;
+              return Text(
+                name.isEmpty ? 'Driver' : name,
+                style: AppTypography.optionLineSecondary.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.black,
+                ),
+              );
+            },
           ),
         ],
       ),

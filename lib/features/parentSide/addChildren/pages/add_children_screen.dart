@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
+import 'package:godropme/features/parentSide/common_widgets/parent_drawer_shell.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_typography.dart';
@@ -89,6 +89,15 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
                                 childData: c,
                                 onDelete: () async {
                                   await _ctrl.deleteChild(index);
+                                },
+                                isAbsentToday: _ctrl.isAbsentToday(index),
+                                onMarkAbsent: () async {
+                                  // Toggle absent status
+                                  if (_ctrl.isAbsentToday(index)) {
+                                    await _ctrl.clearAbsent(index);
+                                  } else {
+                                    await _ctrl.markAbsentToday(index);
+                                  }
                                 },
                               );
                             },

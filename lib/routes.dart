@@ -13,32 +13,32 @@ import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/pages/ot
 import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/pages/email_Screen.dart';
 
 // Driver side
-import 'package:godropme/features/driverSide/driverRegistration/pages/driver_identification_screen.dart';
-import 'package:godropme/features/driverSide/driverRegistration/pages/driver_licence_screen.dart';
-import 'package:godropme/features/driverSide/driverRegistration/pages/driver_name_screen.dart';
-import 'package:godropme/features/driverSide/driverRegistration/binding/driver_name_binding.dart';
-import 'package:godropme/features/driverSide/driverRegistration/binding/driver_licence_binding.dart';
-import 'package:godropme/features/driverSide/driverRegistration/binding/driver_identification_binding.dart';
-import 'package:godropme/features/driverSide/driverRegistration/pages/personal_info_Screen.dart';
-import 'package:godropme/features/driverSide/driverRegistration/binding/personal_info_binding.dart';
-import 'package:godropme/features/driverSide/driverRegistration/pages/vehicle_Selection_screen.dart';
-import 'package:godropme/features/driverSide/driverRegistration/binding/vehicle_selection_binding.dart';
-import 'package:godropme/features/driverSide/driverRegistration/pages/vehicle_registration_Screen.dart';
-import 'package:godropme/features/driverSide/driverRegistration/binding/vehicle_registration_binding.dart';
-import 'package:godropme/features/driverSide/driverRegistration/pages/service_details_screen.dart';
-import 'package:godropme/features/driverSide/driverRegistration/binding/service_details_binding.dart';
-import 'package:godropme/features/driverSide/driverHome/pages/driver_home_screen.dart';
-import 'package:godropme/features/driverSide/driverHome/binding/driver_home_binding.dart';
-import 'package:godropme/features/driverSide/settings/pages/settings_screen.dart'
+import 'package:godropme/features/DriverSide/driverRegistration/pages/driver_identification_screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/driver_licence_screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/driver_name_screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/driver_name_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/driver_licence_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/driver_identification_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/personal_info_Screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/personal_info_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/vehicle_Selection_screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/vehicle_selection_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/vehicle_registration_Screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/vehicle_registration_binding.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/pages/service_details_screen.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/binding/service_details_binding.dart';
+import 'package:godropme/features/DriverSide/driverHome/pages/driver_home_screen.dart';
+import 'package:godropme/features/DriverSide/driverHome/binding/driver_home_binding.dart';
+import 'package:godropme/features/DriverSide/settings/pages/settings_screen.dart'
     as driver_settings;
-import 'package:godropme/features/driverSide/driverProfile/pages/profile_screen.dart'
+import 'package:godropme/features/DriverSide/driverProfile/pages/profile_screen.dart'
     as driver_profile;
-import 'package:godropme/features/driverSide/report/pages/driver_report_screen.dart';
-import 'package:godropme/features/driverSide/report/binding/driver_report_binding.dart';
-import 'package:godropme/features/driverSide/notifications/pages/driver_notifications_screen.dart';
-import 'package:godropme/features/driverSide/notifications/binding/driver_notifications_binding.dart';
-import 'package:godropme/features/driverSide/driverChat/pages/driver_conversation_screen.dart';
-import 'package:godropme/features/driverSide/driverChat/binding/driver_conversation_binding.dart';
+import 'package:godropme/features/DriverSide/report/pages/driver_report_screen.dart';
+import 'package:godropme/features/DriverSide/report/binding/driver_report_binding.dart';
+import 'package:godropme/features/DriverSide/notifications/pages/driver_notifications_screen.dart';
+import 'package:godropme/features/DriverSide/notifications/binding/driver_notifications_binding.dart';
+import 'package:godropme/features/DriverSide/driverChat/pages/driver_conversation_screen.dart';
+import 'package:godropme/features/DriverSide/driverChat/binding/driver_conversation_binding.dart';
 
 // Parent side
 // import 'package:godropme/features/parentSide/parentHome/extra/parent_Home_Screen.dart';
@@ -62,6 +62,11 @@ import 'package:godropme/features/parentSide/notifications/binding/parent_notifi
 import 'package:godropme/features/parentSide/parentChat/binding/parent_chat_binding.dart';
 import 'package:godropme/features/parentSide/parentChat/pages/parent_conversation_screen.dart';
 import 'package:godropme/features/parentSide/parentChat/binding/parent_conversation_binding.dart';
+import 'package:godropme/features/parentSide/parentProfile/pages/edit_name_screen.dart';
+import 'package:godropme/features/parentSide/parentProfile/pages/edit_phone_screen.dart';
+import 'package:godropme/features/parentSide/parentProfile/pages/edit_email_screen.dart';
+import 'package:godropme/features/DriverSide/driverProfile/pages/edit_email_screen.dart'
+    as driver_edit_email;
 
 part 'routes/common_routes.dart';
 part 'routes/driver_routes.dart';
@@ -99,6 +104,10 @@ class AppRoutes {
   static const String driverNotifications = '/driver_notifications';
   static const String parentConversation = '/parent_conversation';
   static const String driverConversation = '/driver_conversation';
+  static const String editParentName = '/edit_parent_name';
+  static const String editParentPhone = '/edit_parent_phone';
+  static const String editParentEmail = '/edit_parent_email';
+  static const String editDriverEmail = '/edit_driver_email';
 
   static final routes = [...commonRoutes, ...driverRoutes, ...parentRoutes];
 }

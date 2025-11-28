@@ -39,11 +39,22 @@ class LatLngLite {
   final double lng;
   const LatLngLite({required this.lat, required this.lng});
 
+  /// Convert to legacy JSON format (for local storage compatibility)
   Map<String, dynamic> toJson() => {'lat': lat, 'lng': lng};
+  
+  /// Convert to Appwrite point format [lng, lat]
+  List<double> toAppwritePoint() => [lng, lat];
 
+  /// Create from legacy JSON format
   factory LatLngLite.fromJson(Map<String, dynamic> json) => LatLngLite(
     lat: (json['lat'] as num).toDouble(),
     lng: (json['lng'] as num).toDouble(),
+  );
+  
+  /// Create from Appwrite point format [lng, lat]
+  factory LatLngLite.fromAppwritePoint(List<dynamic> point) => LatLngLite(
+    lng: (point[0] as num).toDouble(),
+    lat: (point[1] as num).toDouble(),
   );
 }
 

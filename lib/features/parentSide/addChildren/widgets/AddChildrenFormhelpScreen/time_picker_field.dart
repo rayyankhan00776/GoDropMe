@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
 
 class TimePickerField extends StatelessWidget {
+  final String label;
   final TimeOfDay? time;
   final VoidCallback onPick;
-  const TimePickerField({super.key, required this.time, required this.onPick});
+  const TimePickerField({
+    super.key,
+    required this.label,
+    required this.time,
+    required this.onPick,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +28,14 @@ class TimePickerField extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              AppStrings.childPickupTimePref,
+              label,
               style: AppTypography.optionTerms.copyWith(
                 color: AppColors.darkGray,
               ),
             ),
           ),
           Text(
-            time?.format(context) ?? AppStrings.timeNotSet,
+            time?.format(context) ?? 'Not set',
             style: AppTypography.optionTerms.copyWith(
               color: AppColors.darkGray,
             ),

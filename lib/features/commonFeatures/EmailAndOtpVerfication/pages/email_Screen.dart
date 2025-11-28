@@ -23,7 +23,6 @@ class _EmailScreenState extends State<EmailScreen> {
   final _controller = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   late final EmailController _emailController;
-  late final bool _isUpdateMode;
   late final String _role; // 'driver' | 'parent' | ''
 
   @override
@@ -35,10 +34,8 @@ class _EmailScreenState extends State<EmailScreen> {
     _controller.addListener(() => setState(() {}));
     final args = Get.arguments;
     if (args is Map) {
-      _isUpdateMode = args['mode'] == 'update-phone';
       _role = (args['role'] as String?) ?? '';
     } else {
-      _isUpdateMode = false;
       _role = '';
     }
   }
@@ -64,7 +61,6 @@ class _EmailScreenState extends State<EmailScreen> {
     Get.toNamed(
       AppRoutes.otpScreen,
       arguments: {
-        if (_isUpdateMode) 'mode': 'update-phone',
         if (_role.isNotEmpty) 'role': _role,
       },
     );
@@ -91,14 +87,12 @@ class _EmailScreenState extends State<EmailScreen> {
             children: [
               // Simple header (text-only) replacing phone-specific header.
               Text(
-                _isUpdateMode ? 'Update Email' : 'Enter your Email',
+                'Enter your Email',
                 style: AppTypography.titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
-                _isUpdateMode
-                    ? 'Provide a new email to update your account'
-                    : 'We will send a verification code to this email',
+                'We will send a verification code to this email',
                 style: AppTypography.helperSmall.copyWith(
                   color: AppColors.darkGray,
                   fontSize: 14,
@@ -156,7 +150,7 @@ class _EmailScreenState extends State<EmailScreen> {
                     ),
                   ),
                   child: Text(
-                    _isUpdateMode ? 'Update Email' : AppStrings.onboardButton,
+                    AppStrings.onboardButton,
                     style: AppTypography.onboardButton,
                   ),
                 ),

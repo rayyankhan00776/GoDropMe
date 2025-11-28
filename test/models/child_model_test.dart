@@ -12,7 +12,8 @@ void main() {
         pickPoint: 'Home',
         dropPoint: 'School',
         relationshipToChild: 'Father',
-        pickupTime: '07:30 AM',
+        schoolOpenTime: '07:30 AM',
+        schoolOffTime: '02:00 PM',
       );
 
       final json = child.toJson();
@@ -25,7 +26,8 @@ void main() {
       expect(parsed.pickPoint, child.pickPoint);
       expect(parsed.dropPoint, child.dropPoint);
       expect(parsed.relationshipToChild, child.relationshipToChild);
-      expect(parsed.pickupTime, child.pickupTime);
+      expect(parsed.schoolOpenTime, child.schoolOpenTime);
+      expect(parsed.schoolOffTime, child.schoolOffTime);
     });
 
     test('fromJson tolerates loose types', () {

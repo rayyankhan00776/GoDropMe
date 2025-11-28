@@ -26,6 +26,9 @@ class StorageKeys {
   // Emails (stored as plain strings)
   static const parentEmail = 'parent_email';
   static const driverEmail = 'driver_email';
+  // Profile images (local file paths)
+  static const parentProfileImage = 'parent_profile_image';
+  static const driverProfileImage = 'driver_profile_image';
 }
 
 /// A very small wrapper around SharedPreferences tailored for this app's
@@ -138,6 +141,8 @@ class LocalStorage {
       StorageKeys.driverPhone,
       StorageKeys.parentEmail,
       StorageKeys.driverEmail,
+      StorageKeys.parentProfileImage,
+      StorageKeys.driverProfileImage,
     ];
     for (final k in extraKeys) {
       await p.remove(k);

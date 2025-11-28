@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/common%20widgets/custom_button.dart';
+import 'package:godropme/common_widgets/custom_button.dart';
 import 'package:godropme/constants/app_strings.dart';
 
 /// A small reusable alert dialog used by the OTP flow.

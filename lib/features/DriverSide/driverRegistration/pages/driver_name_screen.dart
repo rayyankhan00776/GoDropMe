@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/features/driverSide/driverRegistration/widgets/driverName/driverName_action.dart';
-import 'package:godropme/features/driverSide/driverRegistration/widgets/driverName/driverName_header.dart';
-import 'package:godropme/features/driverSide/driverRegistration/widgets/driverName/driverName_input.dart';
-import 'package:godropme/features/driverSide/driverRegistration/controllers/driver_name_controller.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverName/driverName_action.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverName/driverName_header.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverName/driverName_input.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/controllers/driver_name_controller.dart';
 // binding is provided via route configuration; do not register it here.
 
 class DriverNameScreen extends StatefulWidget {

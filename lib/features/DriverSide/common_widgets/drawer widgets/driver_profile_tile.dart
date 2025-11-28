@@ -14,7 +14,7 @@ class DriverProfileTile extends StatelessWidget {
   const DriverProfileTile({super.key, this.onTap});
 
   Widget _buildAvatar(String? path) {
-    // If we have a local file path (non-asset), show Image.file
+    // First check driverProfileImage, then fallback to personalInfo imagePath
     if (path != null && path.isNotEmpty && !path.startsWith('assets/')) {
       final file = File(path);
       if (file.existsSync()) {
@@ -33,6 +33,34 @@ class DriverProfileTile extends StatelessWidget {
       ),
     );
   }
+  
+  /// Get full name from KYC personal info, fallback to registration name
+  Future<String> _getDisplayName() async {
+    // First try KYC personal info
+    final personalInfo = await LocalStorage.getJson(StorageKeys.personalInfo);
+    if (personalInfo != null) {
+      final f = (personalInfo['firstName'] ?? '').toString().trim();
+      final s = (personalInfo['surName'] ?? '').toString().trim();
+      final l = (personalInfo['lastName'] ?? '').toString().trim();
+      final kycName = [f, s, l].where((e) => e.isNotEmpty).join(' ');
+      if (kycName.isNotEmpty) return kycName;
+    }
+    // Fallback to registration name
+    final regName = await LocalStorage.getString(StorageKeys.driverName);
+    return regName ?? '';
+  }
+  
+  /// Get profile image path - check driverProfileImage first, then personalInfo
+  Future<String?> _getProfileImagePath() async {
+    // First check dedicated profile image
+    final profileImage = await LocalStorage.getString(StorageKeys.driverProfileImage);
+    if (profileImage != null && profileImage.isNotEmpty) {
+      return profileImage;
+    }
+    // Fallback to personalInfo imagePath
+    final personalInfo = await LocalStorage.getJson(StorageKeys.personalInfo);
+    return personalInfo?['imagePath'] as String?;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,20 +69,18 @@ class DriverProfileTile extends StatelessWidget {
       leading: CircleAvatar(
         radius: 26,
         backgroundColor: Colors.white,
-        child: FutureBuilder<Map<String, dynamic>?>(
-          future: LocalStorage.getJson(StorageKeys.personalInfo),
+        child: FutureBuilder<String?>(
+          future: _getProfileImagePath(),
           builder: (context, snapshot) {
-            final imagePath = snapshot.data?['imagePath'] as String?;
-            return _buildAvatar(imagePath);
+            return _buildAvatar(snapshot.data);
           },
         ),
       ),
-      title: FutureBuilder<String?>(
-        future: LocalStorage.getString(StorageKeys.driverName),
+      title: FutureBuilder<String>(
+        future: _getDisplayName(),
         builder: (context, snapshot) {
-          final raw = snapshot.data;
-          final displayName = (raw != null && raw.trim().isNotEmpty)
-              ? raw.trim()
+          final displayName = (snapshot.data != null && snapshot.data!.trim().isNotEmpty)
+              ? snapshot.data!.trim()
               : AppStrings.drawerProfileNamePlaceholder;
           return Text(
             displayName,

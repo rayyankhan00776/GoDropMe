@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
+import 'package:godropme/features/parentSide/common_widgets/parent_drawer_shell.dart';
 import 'package:godropme/features/parentSide/parentProfile/widgets/profile_avatar.dart';
 import 'package:godropme/features/parentSide/parentProfile/widgets/profile_caption.dart';
 import 'package:godropme/features/parentSide/parentProfile/widgets/profile_section.dart';
@@ -64,14 +64,35 @@ class ProfileScreen extends StatelessWidget {
                           title: 'Name',
                           subtitle: name.isEmpty ? 'Not set' : name,
                           showIosChevron: true,
+                          onTap: () => Get.toNamed(AppRoutes.editParentName),
                         );
                       },
                     ),
-                    // Email tile
-                    const ProfileTile(
-                      title: 'Email',
-                      subtitle: 'Add email',
-                      showIosChevron: true,
+                    // Email tile: show stored email
+                    FutureBuilder<ParentProfile>(
+                      future: ParentProfile.loadFromLocal(),
+                      builder: (context, snapshot) {
+                        final email = (snapshot.data?.email ?? '').trim();
+                        return ProfileTile(
+                          title: 'Email',
+                          subtitle: email.isEmpty ? 'Add email' : email,
+                          showIosChevron: true,
+                          onTap: () => Get.toNamed(AppRoutes.editParentEmail),
+                        );
+                      },
+                    ),
+                    // Phone tile: show stored phone (optional field)
+                    FutureBuilder<ParentProfile>(
+                      future: ParentProfile.loadFromLocal(),
+                      builder: (context, snapshot) {
+                        final phone = snapshot.data?.phone.national ?? '';
+                        return ProfileTile(
+                          title: 'Phone',
+                          subtitle: phone.isEmpty ? 'Add phone (optional)' : '+92 $phone',
+                          showIosChevron: true,
+                          onTap: () => Get.toNamed(AppRoutes.editParentPhone),
+                        );
+                      },
                     ),
                     // Children tile: show count and navigate to Add Children screen
                     FutureBuilder<List<Map<String, dynamic>>>(
@@ -87,12 +108,6 @@ class ProfileScreen extends StatelessWidget {
                           onTap: () => Get.toNamed(AppRoutes.addChildren),
                         );
                       },
-                    ),
-                    // City tile
-                    const ProfileTile(
-                      title: 'City',
-                      subtitle: 'Add a city',
-                      showIosChevron: true,
                     ),
                   ],
                 ),

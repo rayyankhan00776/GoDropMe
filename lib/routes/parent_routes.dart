@@ -54,4 +54,19 @@ final List<GetPage<dynamic>> parentRoutes = [
     page: () => const ParentConversationScreen(),
     binding: ParentConversationBinding(),
   ),
+  // Edit Parent Name
+  GetPage(
+    name: AppRoutes.editParentName,
+    page: () => const EditNameScreen(),
+  ),
+  // Edit Parent Phone
+  GetPage(
+    name: AppRoutes.editParentPhone,
+    page: () => const EditPhoneScreen(),
+  ),
+  // Edit Parent Email
+  GetPage(
+    name: AppRoutes.editParentEmail,
+    page: () => const EditEmailScreen(),
+  ),
 ];

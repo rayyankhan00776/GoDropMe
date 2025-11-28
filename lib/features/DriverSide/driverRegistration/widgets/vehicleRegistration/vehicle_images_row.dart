@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/common%20widgets/custom_image_container.dart';
+import 'package:godropme/common_widgets/custom_image_container.dart';
 
 class VehicleImagesRow extends StatelessWidget {
   final String? photoPath;

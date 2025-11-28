@@ -1,8 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:godropme/features/driverSide/common widgets/drawer widgets/driver_drawer_card.dart';
-import 'package:godropme/features/driverSide/driverHome/models/driver_order.dart';
+import 'package:godropme/features/DriverSide/common_widgets/drawer widgets/driver_drawer_card.dart';
+import 'package:godropme/features/DriverSide/driverHome/models/driver_order.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 
@@ -11,6 +11,7 @@ class DriverOrderTile extends StatelessWidget {
   final VoidCallback onChat;
   final VoidCallback onPicked;
   final VoidCallback onDropped;
+  final VoidCallback? onAbsent;
 
   const DriverOrderTile({
     super.key,
@@ -18,12 +19,18 @@ class DriverOrderTile extends StatelessWidget {
     required this.onChat,
     required this.onPicked,
     required this.onDropped,
+    this.onAbsent,
   });
 
   @override
   Widget build(BuildContext context) {
     final picked = data.status == DriverOrderStatus.picked;
     final dropped = data.status == DriverOrderStatus.dropped;
+    final absent = data.status == DriverOrderStatus.absent;
+    final cancelled = data.status == DriverOrderStatus.cancelled;
+    final isFinalized = dropped || absent || cancelled;
+    // Hide "Mark Absent" after picked as well (child is already picked up)
+    final hideAbsent = isFinalized || picked;
 
     return DriverDrawerCard(
       child: Padding(
@@ -66,6 +73,7 @@ class DriverOrderTile extends StatelessWidget {
             const SizedBox(height: 6),
             _LabeledLine(label: 'Drop', value: data.dropPoint),
             const SizedBox(height: 12),
+            // First row: Chat + Picked + Dropped
             Row(
               children: [
                 Expanded(
@@ -86,11 +94,11 @@ class DriverOrderTile extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: dropped ? null : onPicked,
+                    onPressed: isFinalized ? null : onPicked,
                     icon: const Icon(Icons.check_circle_outline, size: 18),
                     label: const Text('Picked'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: picked || dropped
+                      backgroundColor: picked || isFinalized
                           ? AppColors.darkGray
                           : AppColors.primary,
                       foregroundColor: Colors.white,
@@ -105,11 +113,11 @@ class DriverOrderTile extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: dropped ? null : onDropped,
+                    onPressed: isFinalized ? null : onDropped,
                     icon: const Icon(Icons.flag_outlined, size: 18),
                     label: const Text('Dropped'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: dropped
+                      backgroundColor: isFinalized
                           ? AppColors.darkGray
                           : AppColors.primary,
                       foregroundColor: Colors.white,
@@ -123,6 +131,26 @@ class DriverOrderTile extends StatelessWidget {
                 ),
               ],
             ),
+            // Second row: Absent button (only show if callback provided and not finalized/picked)
+            if (onAbsent != null && !hideAbsent) ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: onAbsent,
+                  icon: const Icon(Icons.person_off_outlined, size: 18),
+                  label: const Text('Mark Absent'),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.grey),
+                    foregroundColor: Colors.grey.shade700,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -137,14 +165,24 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = switch (status) {
-      DriverOrderStatus.pendingPickup => 'Pending',
+      DriverOrderStatus.scheduled => 'Scheduled',
+      DriverOrderStatus.driverEnroute => 'En Route',
+      DriverOrderStatus.arrived => 'Arrived',
       DriverOrderStatus.picked => 'Picked',
+      DriverOrderStatus.inTransit => 'In Transit',
       DriverOrderStatus.dropped => 'Dropped',
+      DriverOrderStatus.cancelled => 'Cancelled',
+      DriverOrderStatus.absent => 'Absent',
     };
     final color = switch (status) {
-      DriverOrderStatus.pendingPickup => AppColors.primary,
+      DriverOrderStatus.scheduled => AppColors.primary,
+      DriverOrderStatus.driverEnroute => Colors.blue,
+      DriverOrderStatus.arrived => Colors.teal,
       DriverOrderStatus.picked => Colors.orange,
+      DriverOrderStatus.inTransit => Colors.purple,
       DriverOrderStatus.dropped => Colors.green,
+      DriverOrderStatus.cancelled => Colors.red,
+      DriverOrderStatus.absent => Colors.grey,
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),

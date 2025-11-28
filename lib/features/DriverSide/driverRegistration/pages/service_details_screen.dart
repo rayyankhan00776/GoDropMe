@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/common%20widgets/custom_Appbar.dart';
-import 'package:godropme/common%20widgets/progress_next_bar.dart';
+import 'package:godropme/common_widgets/custom_Appbar.dart';
+import 'package:godropme/common_widgets/progress_next_bar.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/features/driverSide/driverRegistration/controllers/service_details_controller.dart';
-import 'package:godropme/features/driverSide/driverRegistration/widgets/serviceDetails/service_details_form.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/controllers/service_details_controller.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/widgets/serviceDetails/service_details_form.dart';
 import 'package:godropme/routes.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
@@ -79,31 +79,110 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       key: _formWidgetKey,
                       formKey: _formKey,
                       onSubmit: (values) async {
-                        // map values to controller and save
-                        _controller.selectedSchools.assignAll(
-                          (values['schoolNames'] as List).cast<String>(),
-                        );
-                        _controller.dutyType.value =
-                            values['dutyType'] as String?;
-                        final start = values['routeStart'];
-                        if (start != null) {
+                        // Extract schools data - now using flat arrays
+                        final schoolsData = (values['schools'] as List?) ?? [];
+                        final schoolNames = <String>[];
+                        final schoolPoints = <List<double>>[];
+                        
+                        for (final s in schoolsData) {
+                          if (s is Map) {
+                            final name = s['name']?.toString() ?? '';
+                            // Handle both formats:
+                            // 1. New format: 'location': [lng, lat]
+                            // 2. Legacy format: 'lat' and 'lng' separate keys
+                            double lat = 0.0;
+                            double lng = 0.0;
+                            
+                            final location = s['location'];
+                            if (location is List && location.length >= 2) {
+                              // New Appwrite point format: [lng, lat]
+                              lng = (location[0] as num).toDouble();
+                              lat = (location[1] as num).toDouble();
+                            } else {
+                              // Legacy format with separate keys
+                              lat = (s['lat'] as num?)?.toDouble() ?? 0.0;
+                              lng = (s['lng'] as num?)?.toDouble() ?? 0.0;
+                            }
+                            
+                            if (name.isNotEmpty) {
+                              schoolNames.add(name);
+                              schoolPoints.add([lng, lat]); // [lng, lat] for Appwrite point
+                            }
+                          }
+                        }
+                        _controller.selectedSchools.assignAll(schoolNames);
+                        
+                        // Service category (Male/Female/Both)
+                        final serviceCategory = values['serviceCategory'] as String?;
+                        _controller.serviceCategory.value = serviceCategory;
+                        
+                        final center = values['serviceAreaCenter'];
+                        List<double>? centerPoint;
+                        if (center != null) {
                           _controller
-                            ..routeStartLat.value = start.latitude
-                            ..routeStartLng.value = start.longitude;
+                            ..routeStartLat.value = center.latitude
+                            ..routeStartLng.value = center.longitude;
+                          // Store as [lng, lat] for Appwrite point type
+                          centerPoint = [center.longitude, center.latitude];
                         }
                         // address from the bottom sheet (optional)
-                        final startAddress =
-                            values['routeStartAddress'] as String?;
-                        _controller.routeStartAddress.value = startAddress;
-                        _controller.operatingDays.value =
-                            values['operatingDays'] as String?;
+                        final serviceAreaAddress =
+                            values['serviceAreaAddress'] as String?;
+                        _controller.routeStartAddress.value = serviceAreaAddress;
+                        // service area polygon data - convert to Appwrite polygon format
+                        // Appwrite polygon: [[[lng, lat], [lng, lat], ..., [lng, lat]]] (3D array)
+                        // - Outer array holds linear rings
+                        // - First ring is exterior boundary
+                        // - Ring must be closed (first point = last point)
+                        final radiusKm = values['serviceAreaRadiusKm'] as double?;
+                        final rawPolygon = values['serviceAreaPolygon'] as List?;
+                        final ringPoints = rawPolygon
+                                ?.whereType<Map>()
+                                .map((e) {
+                                  final lat = (e['lat'] as num?)?.toDouble();
+                                  final lng = (e['lng'] as num?)?.toDouble();
+                                  if (lat != null && lng != null) {
+                                    return [lng, lat]; // [lng, lat] for Appwrite point
+                                  }
+                                  return null;
+                                })
+                                .whereType<List<double>>()
+                                .toList() ??
+                            <List<double>>[];
+                        
+                        // Ensure polygon ring is closed (first point = last point)
+                        List<List<List<double>>>? polygon;
+                        if (ringPoints.isNotEmpty) {
+                          final ring = List<List<double>>.from(ringPoints);
+                          // Close the ring if not already closed
+                          if (ring.first[0] != ring.last[0] || ring.first[1] != ring.last[1]) {
+                            ring.add(List<double>.from(ring.first));
+                          }
+                          polygon = [ring]; // Wrap in outer array for Appwrite polygon format
+                        }
+                        // Monthly service price in PKR
+                        final monthlyPricePkr = values['monthlyPricePkr'] as int? ?? 0;
+                        _controller.monthlyPricePkr.value = monthlyPricePkr;
                         // Extra notes are optional; use empty string if null.
                         _controller.extraNotes.value =
                             (values['notes'] as String?) ?? '';
-                        _controller.isActive.value =
-                            values['active'] as bool? ?? true;
 
-                        await _controller.saveServiceDetails();
+                        // Save service details using Appwrite-compatible flat types
+                        await LocalStorage.setJson(
+                          StorageKeys.driverServiceDetails,
+                          {
+                            // Parallel arrays: schoolNames (string[]) and schoolPoints (point[])
+                            'schoolNames': schoolNames,
+                            'schoolPoints': schoolPoints, // Each is [lng, lat]
+                            'serviceCategory': serviceCategory, // 'Male', 'Female', or 'Both'
+                            'serviceAreaCenter': centerPoint, // [lng, lat] for Appwrite point
+                            'serviceAreaAddress': _controller.routeStartAddress.value,
+                            'serviceAreaRadiusKm': radiusKm,
+                            'serviceAreaPolygon': polygon, // Array of [lng, lat] for Appwrite polygon
+                            'monthlyPricePkr': monthlyPricePkr,
+                            'extraNotes': _controller.extraNotes.value,
+                          },
+                        );
                         // Fetch and print aggregated onboarding data for debugging.
                         try {
                           final driverName = await LocalStorage.getString(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/common%20widgets/forms/dynamic_form_builder.dart';
+import 'package:godropme/common_widgets/forms/dynamic_form_builder.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'vehicle_catalog_loader.dart';
 import 'vehicle_form_items.dart';

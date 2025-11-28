@@ -4,8 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/features/driverSide/common widgets/drawer widgets/driver_drawer_card.dart';
-import 'package:godropme/features/driverSide/common widgets/drawer widgets/driver_profile_tile.dart';
+import 'package:godropme/features/DriverSide/common_widgets/drawer widgets/driver_drawer_card.dart';
+import 'package:godropme/features/DriverSide/common_widgets/drawer widgets/driver_profile_tile.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/shared/widgets/drawer_button.dart';
 import 'package:godropme/theme/colors.dart';

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/driverRegistration/controllers/service_details_controller.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/controllers/service_details_controller.dart';
 
 class ServiceDetailsBinding extends Bindings {
   @override

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:godropme/common widgets/app_multi_select.dart';
+import 'package:godropme/common_widgets/app_multi_select.dart';
 import 'package:godropme/constants/app_strings.dart';
 
 void main() {

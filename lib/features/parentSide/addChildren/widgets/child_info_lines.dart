@@ -50,7 +50,7 @@ class ChildInfoLines extends StatelessWidget {
             Expanded(
               child: Text(
                 school.isEmpty ? '-' : school,
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: AppTypography.optionTerms.copyWith(
                   color: AppColors.gray,

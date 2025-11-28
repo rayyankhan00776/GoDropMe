@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/theme/colors.dart';
-import 'package:godropme/features/driverSide/driverHome/pages/driver_requests_screen.dart';
-import 'package:godropme/features/driverSide/driverHome/pages/driver_orders_screen.dart';
-import 'package:godropme/features/driverSide/driverHome/pages/driver_map_screen.dart';
-import 'package:godropme/features/driverSide/driverChat/pages/driver_chat_screen.dart';
+import 'package:godropme/features/DriverSide/driverHome/pages/driver_requests_screen.dart';
+import 'package:godropme/features/DriverSide/driverHome/pages/driver_orders_screen.dart';
+import 'package:godropme/features/DriverSide/driverHome/pages/driver_map_screen.dart';
+import 'package:godropme/features/DriverSide/driverChat/pages/driver_chat_screen.dart';
 import 'package:godropme/constants/app_strings.dart';
 
 class DriverHomeScreen extends StatefulWidget {

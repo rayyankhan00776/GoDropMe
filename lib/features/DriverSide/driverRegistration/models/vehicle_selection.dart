@@ -1,21 +1,18 @@
-enum VehicleType { car, rikshaw }
+import 'package:godropme/features/DriverSide/driverRegistration/models/vehicle_registration.dart';
 
-extension VehicleTypeCodec on VehicleType {
-  String get label => this == VehicleType.car ? 'Car' : 'Rikshaw';
-  static VehicleType parse(String s) {
-    final v = s.toLowerCase();
-    if (v.contains('car')) return VehicleType.car;
-    return VehicleType.rikshaw;
-  }
-}
+/// Re-export VehicleType for backwards compatibility
+export 'package:godropme/features/DriverSide/driverRegistration/models/vehicle_registration.dart' show VehicleType, VehicleTypeExt;
 
+/// Simple wrapper for vehicle type selection step.
+/// Uses VehicleType from vehicle_registration.dart.
 class VehicleSelection {
   final VehicleType type;
   const VehicleSelection({required this.type});
 
   Map<String, dynamic> toJson() => {'type': type.name};
+  
   factory VehicleSelection.fromJson(Map<String, dynamic> json) =>
       VehicleSelection(
-        type: VehicleTypeCodec.parse((json['type'] ?? '').toString()),
+        type: VehicleTypeExt.fromString((json['type'] ?? '').toString()),
       );
 }
