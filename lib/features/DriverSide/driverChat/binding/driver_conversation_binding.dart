@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/driverChat/controllers/driver_conversation_controller.dart';
+import 'package:godropme/features/DriverSide/driverChat/controllers/driver_conversation_controller.dart';
 
 class DriverConversationBinding extends Bindings {
   @override

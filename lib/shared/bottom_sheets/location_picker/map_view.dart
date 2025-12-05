@@ -12,6 +12,10 @@ class LocationMapView extends StatefulWidget {
   final Future<void> Function()? onLocateMe;
   final bool myLocationEnabled;
   final bool locating;
+  // Indicates if the user has manually interacted (pan/zoom/tap) upstream.
+  // When true we suppress automatic recenter animations on didUpdateWidget
+  // to avoid the "snap back" zoom behavior.
+  final bool userChangedUpstream;
   const LocationMapView({
     super.key,
     required this.initial,
@@ -19,6 +23,7 @@ class LocationMapView extends StatefulWidget {
     this.onLocateMe,
     this.myLocationEnabled = false,
     this.locating = false,
+    this.userChangedUpstream = false,
   });
 
   @override
@@ -36,6 +41,30 @@ class _LocationMapViewState extends State<LocationMapView> {
     _selected = widget.initial;
   }
 
+  @override
+  void didUpdateWidget(LocationMapView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the parent updated the initial position (e.g., got current location)
+    // animate to the new position. When user clicks locate-me, the parent
+    // updates `initial` which triggers this.
+    if (oldWidget.initial != widget.initial && !widget.userChangedUpstream) {
+      _selected = widget.initial;
+      _userChanged = false; // Reset so marker follows the new location
+      _animateToSelected();
+    }
+  }
+
+  Future<void> _animateToSelected() async {
+    if (_controller.isCompleted) {
+      final c = await _controller.future;
+      await c.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: _selected, zoom: 16),
+        ),
+      );
+    }
+  }
+
   CameraPosition get _initialCamera =>
       CameraPosition(target: _selected, zoom: 14);
 
@@ -49,7 +78,7 @@ class _LocationMapViewState extends State<LocationMapView> {
             _controller.complete(c);
             await c.moveCamera(CameraUpdate.newCameraPosition(_initialCamera));
           },
-          myLocationButtonEnabled: true,
+          myLocationButtonEnabled: false,
           myLocationEnabled: widget.myLocationEnabled,
           onCameraMoveStarted: () {
             if (!_userChanged) setState(() => _userChanged = true);

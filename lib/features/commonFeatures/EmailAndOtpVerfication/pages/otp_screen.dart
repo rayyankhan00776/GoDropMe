@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
-import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/widgets/otpWidgets/otp_actions.dart';
 import 'package:godropme/features/commonFeatures/EmailAndOtpVerfication/widgets/otpWidgets/otp_header.dart';
@@ -30,8 +29,6 @@ class _OtpScreenState extends State<OtpScreen> {
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   late final OtpController _otpController;
   late final EmailController _emailController;
-  late final bool _isUpdateMode;
-  late final String _role; // 'driver' | 'parent' | ''
 
   @override
   void initState() {
@@ -39,14 +36,6 @@ class _OtpScreenState extends State<OtpScreen> {
     // Initialize once to avoid reassigning a late final during rebuilds.
     _otpController = Get.find<OtpController>();
     _emailController = Get.find<EmailController>();
-    final args = Get.arguments;
-    if (args is Map) {
-      _isUpdateMode = args['mode'] == 'update-phone';
-      _role = (args['role'] as String?) ?? '';
-    } else {
-      _isUpdateMode = false;
-      _role = '';
-    }
   }
 
   @override
@@ -60,46 +49,79 @@ class _OtpScreenState extends State<OtpScreen> {
     super.dispose();
   }
 
-  void _submitOtp() {
-    // For now skip backend verification. If all fields are filled, navigate
-    // to the DOP option screen. The button is already enabled only when
-    // each field has one character, so this is a safe local bypass.
-    if (_otpController.allFilled.value) {
-      if (_isUpdateMode) {
-        // Persist updated email after successful OTP entry
-        final rawEmail = _emailController.email.value.trim();
-        if (_role == 'driver') {
-          LocalStorage.setString(StorageKeys.driverEmail, rawEmail);
-        } else if (_role == 'parent') {
-          LocalStorage.setString(StorageKeys.parentEmail, rawEmail);
-        } else {
-          // Default to parent email key when role is unknown
-          LocalStorage.setString(StorageKeys.parentEmail, rawEmail);
-        }
-        Get.snackbar(
-          'Email Updated',
-          'Your email has been updated successfully.',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        // Navigate back to appropriate settings screen.
-        final targetRoute = _role == 'driver'
-            ? AppRoutes.driverSettings
-            : AppRoutes.parentSettings;
-        Get.offAllNamed(targetRoute);
-      } else {
-        Get.toNamed(AppRoutes.dopOption);
-      }
+  void _submitOtp() async {
+    if (!_otpController.allFilled.value) {
+      showDialog(
+        context: context,
+        builder: (_) => const OtpErrorDialog(
+          title: AppStrings.error,
+          message: 'Please enter the 6-digit verification code.',
+          buttonText: AppStrings.ok,
+        ),
+      );
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (_) => const OtpErrorDialog(
-        title: AppStrings.error,
-        message: 'Please enter the 6-digit verification code.',
-        buttonText: AppStrings.ok,
-      ),
-    );
+    // Verify OTP via Appwrite
+    final success = await _otpController.verifyOtp();
+    
+    if (!success && mounted) {
+      // Show error dialog
+      showDialog(
+        context: context,
+        builder: (_) => OtpErrorDialog(
+          title: AppStrings.error,
+          message: _otpController.errorMessage.value.isNotEmpty 
+              ? _otpController.errorMessage.value 
+              : 'Verification failed. Please try again.',
+          buttonText: AppStrings.ok,
+        ),
+      );
+    }
+    // If success, navigation is handled by the controller
+  }
+
+  void _resendOtp() async {
+    final email = _emailController.email.value.trim();
+    if (email.isEmpty) return;
+    
+    // Clear current OTP fields
+    for (final c in _codeControllers) {
+      c.clear();
+    }
+    _focusNodes[0].requestFocus();
+    
+    final success = await _otpController.resendOtp(email);
+    
+    if (success && mounted) {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('OTP sent to $email'),
+      //     backgroundColor: AppColors.primary,
+      //     behavior: SnackBarBehavior.floating,
+      //     margin: const EdgeInsets.all(16),
+      //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      //   ),
+      // );
+      Get.snackbar(
+        'Success',
+        'OTP sent to $email',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+        colorText: AppColors.primaryDark,
+      );
+    } else if (!success && mounted) {
+      showDialog(
+        context: context,
+        builder: (_) => OtpErrorDialog(
+          title: AppStrings.error,
+          message: _otpController.errorMessage.value.isNotEmpty
+              ? _otpController.errorMessage.value
+              : 'Failed to resend OTP. Please try again.',
+          buttonText: AppStrings.ok,
+        ),
+      );
+    }
   }
 
   @override
@@ -121,10 +143,7 @@ class _OtpScreenState extends State<OtpScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              OtpHeader(
-                title: _isUpdateMode ? AppStrings.updateOtpTitle : null,
-                subtitle: _isUpdateMode ? AppStrings.updateOtpSubtitle : null,
-              ),
+              const OtpHeader(),
               const SizedBox(height: 30),
 
               // OTP input row — responsive sizing to avoid overflow on small screens
@@ -159,9 +178,54 @@ class _OtpScreenState extends State<OtpScreen> {
                   );
                 },
               ),
+              
+              const SizedBox(height: 24),
+              
+              // Resend OTP section
+              Center(
+                child: Obx(() {
+                  if (_otpController.canResend.value) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Didn't receive OTP? ",
+                          style: AppTypography.helperSmall.copyWith(
+                            color: AppColors.darkGray,
+                            fontSize: 14,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: _otpController.isResending.value
+                              ? null
+                              : () => _resendOtp(),
+                          child: Text(
+                            _otpController.isResending.value ? 'Sending...' : 'Resend',
+                            style: AppTypography.helperSmall.copyWith(
+                              color: _otpController.isResending.value
+                                  ? AppColors.darkGray
+                                  : AppColors.primary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Text(
+                      'Resend OTP in ${_otpController.resendCountdown.value}s',
+                      style: AppTypography.helperSmall.copyWith(
+                        color: AppColors.darkGray,
+                        fontSize: 14,
+                      ),
+                    );
+                  }
+                }),
+              ),
 
               const Spacer(),
-              // Beneath OTP form: show the number and a change action
+              // Beneath OTP form: show the em and a change action
               Center(
                 child: Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
@@ -205,12 +269,10 @@ class _OtpScreenState extends State<OtpScreen> {
               const SizedBox(height: 8),
               Obx(
                 () => OtpActions(
-                  onNext: _submitOtp,
+                  onNext: _otpController.isLoading.value ? () {} : _submitOtp,
                   height: Responsive.scaleClamped(context, 64, 48, 80),
-                  enabled: _otpController.allFilled.value,
-                  buttonText: _isUpdateMode
-                      ? AppStrings.updateOtpVerify
-                      : AppStrings.otpverify,
+                  enabled: _otpController.allFilled.value && !_otpController.isLoading.value,
+                  buttonText: _otpController.isLoading.value ? 'Verifying...' : AppStrings.otpverify,
                 ),
               ),
               SizedBox(height: Responsive.scaleClamped(context, 24, 16, 32)),

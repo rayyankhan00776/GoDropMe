@@ -85,11 +85,8 @@ class DriverStrings {
 
   // Service details
   static const schoolNamesHint = 'School Name(s)';
-  static const dutyTypeHint = 'Duty Type';
   static const pickupRangeKmHint = 'Pickup Range (km)';
   static const routeStartPointLabel = 'Route Start Point';
   static const operatingDaysHint = 'Operating Days';
   static const extraNotesHint = 'Extra Notes (optional)';
-  static const activeStatus = 'Active Status';
-  static const activeStatusSubtitle = 'Mark as available/unavailable';
 }

@@ -1,20 +1,49 @@
+import 'package:godropme/models/school.dart';
+
+/// Options for driver service registration form.
+/// Data should be loaded via DriverServiceOptionsLoader.
 class DriverServiceOptions {
-  final List<String> schools;
-  final List<String> dutyTypes;
-  final List<String> operatingDays;
-  final List<String> pickupRangeKmOptions;
+  final List<School> schools;
+  /// Service categories: Male, Female, Both
+  final List<String> serviceCategories;
 
   const DriverServiceOptions({
     required this.schools,
-    required this.dutyTypes,
-    required this.operatingDays,
-    required this.pickupRangeKmOptions,
+    required this.serviceCategories,
   });
 
-  factory DriverServiceOptions.fallback() => const DriverServiceOptions(
+  /// Helper to get school names for UI dropdowns
+  List<String> get schoolNames => schools.map((s) => s.name).toList();
+
+  /// Get school by name (for UI selection)
+  School? getSchoolByName(String name) {
+    try {
+      return schools.firstWhere((s) => s.name == name);
+    } catch (_) {
+      return null;
+    }
+  }
+  
+  /// Get school by ID
+  School? getSchoolById(String id) {
+    try {
+      return schools.firstWhere((s) => s.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+  
+  /// Get multiple schools by their IDs
+  List<School> getSchoolsByIds(List<String> ids) {
+    return schools.where((s) => ids.contains(s.id)).toList();
+  }
+
+  /// Empty fallback - should only be used if loading fails
+  static const DriverServiceOptions empty = DriverServiceOptions(
     schools: [],
-    dutyTypes: ['Morning', 'Evening', 'Both'],
-    operatingDays: ['Mon–Fri', 'Mon–Sat'],
-    pickupRangeKmOptions: ['1–3', '3–5', '5–8', '8–10'],
+    serviceCategories: ['Male', 'Female', 'Both'],
   );
+
+  /// Check if options are loaded
+  bool get isLoaded => schools.isNotEmpty;
 }

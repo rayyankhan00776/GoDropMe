@@ -32,4 +32,5 @@ class AppAssets {
   static const defaultPersonSvg = "assets/images/svg/person.svg";
   static const childrenDetailsJson = 'assets/json/children_details.json';
   static const driverDetailsJson = 'assets/json/driver_details.json';
+  static const schoolsJson = 'assets/json/schools.json';
 }

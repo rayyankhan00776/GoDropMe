@@ -6,6 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class StorageKeys {
   StorageKeys._();
 
+  // App state
+  static const hasSeenOnboarding = 'has_seen_onboarding';
+  static const userRole = 'user_role'; // 'driver' | 'parent'
+
   static const driverName = 'driver_name';
   static const vehicleSelection = 'vehicle_selection'; // e.g., Car/Rikshaw
 
@@ -26,6 +30,9 @@ class StorageKeys {
   // Emails (stored as plain strings)
   static const parentEmail = 'parent_email';
   static const driverEmail = 'driver_email';
+  // Profile images (local file paths)
+  static const parentProfileImage = 'parent_profile_image';
+  static const driverProfileImage = 'driver_profile_image';
 }
 
 /// A very small wrapper around SharedPreferences tailored for this app's
@@ -138,6 +145,8 @@ class LocalStorage {
       StorageKeys.driverPhone,
       StorageKeys.parentEmail,
       StorageKeys.driverEmail,
+      StorageKeys.parentProfileImage,
+      StorageKeys.driverProfileImage,
     ];
     for (final k in extraKeys) {
       await p.remove(k);

@@ -82,29 +82,51 @@ class _ParentNameScreenState extends State<ParentNameScreen> {
                       : null;
                   final double gap = errorText != null ? 27.0 : 10.0;
 
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: Responsive.scaleClamped(context, gap, 8, 40),
-                      ),
+                  return Obx(() {
+                    final c = Get.find<ParentNameController>();
+                    
+                    return Column(
+                      children: [
+                        // Show error message from controller if any
+                        if (c.errorMessage.value.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Text(
+                              c.errorMessage.value,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        
+                        SizedBox(
+                          height: Responsive.scaleClamped(context, gap, 8, 40),
+                        ),
 
-                      ParentnameAction(
-                        onNext: () async {
-                          setState(() => _submitted = true);
-                          final valid =
-                              _formKey.currentState?.validate() ?? false;
-                          if (!valid) return;
+                        ParentnameAction(
+                          isLoading: c.isLoading.value,
+                          onNext: () async {
+                            setState(() => _submitted = true);
+                            final valid =
+                                _formKey.currentState?.validate() ?? false;
+                            if (!valid) return;
 
-                          final c = Get.find<ParentNameController>();
-                          c.setName(_textController.text.trim());
-                          await c.saveName();
-                          // For now just go back once saved
-                          Get.toNamed(AppRoutes.parentmapScreen);
-                        },
-                        height: Responsive.scaleClamped(context, 64, 48, 80),
-                      ),
-                    ],
-                  );
+                            c.setName(_textController.text.trim());
+                            
+                            // Register parent with Appwrite backend
+                            final success = await c.registerParent();
+                            
+                            if (success) {
+                              // Navigate to parent home on success
+                              Get.offAllNamed(AppRoutes.parentmapScreen);
+                            }
+                          },
+                          height: Responsive.scaleClamped(context, 64, 48, 80),
+                        ),
+                      ],
+                    );
+                  });
                 },
               ),
             ],

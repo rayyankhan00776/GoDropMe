@@ -39,6 +39,41 @@ class Validators {
     return null;
   }
 
+  /// Validates a date in DD-MM-YYYY format and ensures it's in the future.
+  static String? dateDMYFuture(String? v) {
+    // First validate the format
+    final formatError = dateDMY(v);
+    if (formatError != null) return formatError;
+    
+    // Parse and check if date is in the future
+    final val = v!.trim();
+    final parts = val.split('-');
+    final day = int.parse(parts[0]);
+    final month = int.parse(parts[1]);
+    final year = int.parse(parts[2]);
+    
+    final expiryDate = DateTime(year, month, day);
+    final today = DateTime.now();
+    final todayOnly = DateTime(today.year, today.month, today.day);
+    
+    if (expiryDate.isBefore(todayOnly)) {
+      return AppStrings.errorExpiryPast;
+    }
+    return null;
+  }
+
+  /// Converts DD-MM-YYYY to ISO 8601 format for Appwrite datetime type
+  static String? toIso8601(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return null;
+    final parts = dateStr.trim().split('-');
+    if (parts.length != 3) return null;
+    final day = int.tryParse(parts[0]);
+    final month = int.tryParse(parts[1]);
+    final year = int.tryParse(parts[2]);
+    if (day == null || month == null || year == null) return null;
+    return DateTime(year, month, day).toIso8601String();
+  }
+
   static String? seatCapacity(String? v, {required int max}) {
     final val = v?.trim() ?? '';
     if (val.isEmpty) return AppStrings.errorSeatCapacityRequired;

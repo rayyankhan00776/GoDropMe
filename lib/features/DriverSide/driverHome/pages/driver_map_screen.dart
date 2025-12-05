@@ -2,10 +2,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/DriverSide/common_widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/DriverSide/driverHome/controllers/driver_home_controller.dart';
 
 class DriverMapScreen extends StatefulWidget {
   const DriverMapScreen({super.key});
@@ -16,16 +18,17 @@ class DriverMapScreen extends StatefulWidget {
 
 class _DriverMapScreenState extends State<DriverMapScreen> {
   GoogleMapController? _mapController;
-  final Set<Marker> _markers = <Marker>{};
   static const LatLng _peshawar = LatLng(34.0151, 71.5249);
+  
+  // Use controller for data management
+  late final DriverHomeController _controller;
 
   @override
   void initState() {
     super.initState();
-    // Automatically go to current location when screen loads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _goToCurrentLocation();
-    });
+    // Initialize or find controller
+    _controller = Get.put(DriverHomeController());
+    // Location will be fetched once map is ready in onMapCreated
   }
 
   void _showMessage(String msg) {
@@ -82,20 +85,8 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
         CameraUpdate.newCameraPosition(CameraPosition(target: me, zoom: 16)),
       );
 
-      if (!mounted) return;
-      setState(() {
-        _markers.removeWhere((m) => m.markerId == const MarkerId('me'));
-        _markers.add(
-          Marker(
-            markerId: const MarkerId('me'),
-            position: me,
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueAzure,
-            ),
-            infoWindow: const InfoWindow(title: 'You are here'),
-          ),
-        );
-      });
+      // Update driver location marker via controller
+      _controller.updateDriverLocation(me);
     } catch (e) {
       _showMessage('Unable to get current location.');
     }
@@ -114,7 +105,7 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
         showNotificationButton: true,
         body: Stack(
           children: [
-            GoogleMap(
+            Obx(() => GoogleMap(
               initialCameraPosition: const CameraPosition(
                 target: _peshawar,
                 zoom: 14,
@@ -123,6 +114,7 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
               myLocationButtonEnabled: false,
               padding: const EdgeInsets.only(right: 12, bottom: 80),
               zoomControlsEnabled: false,
+              mapToolbarEnabled: false,
               // Improve gesture responsiveness inside scrollable/drawer shells
               gestureRecognizers: {
                 Factory<OneSequenceGestureRecognizer>(
@@ -138,8 +130,8 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
                 // Move to current location once map is ready
                 _goToCurrentLocation();
               },
-              markers: _markers,
-            ),
+              markers: _controller.markers.value,
+            )),
             Positioned(
               left: 16,
               bottom: 24 + MediaQuery.of(context).viewPadding.bottom,

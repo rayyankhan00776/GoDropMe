@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/features/driverSide/common widgets/driver_drawer_shell.dart';
+import 'package:godropme/features/driverSide/common_widgets/driver_drawer_shell.dart';
 import 'package:godropme/features/driverSide/driverProfile/widgets/driver_profile_caption.dart';
 import 'package:godropme/features/driverSide/driverProfile/widgets/driver_profile_section.dart';
 import 'package:godropme/features/driverSide/driverProfile/widgets/driver_profile_tile.dart';
@@ -13,6 +13,7 @@ import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
+import 'package:godropme/utils/schools_loader.dart';
 
 class DriverProfileScreen extends StatefulWidget {
   const DriverProfileScreen({super.key});
@@ -28,7 +29,9 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
   Map<String, dynamic>? _licence;
   Map<String, dynamic>? _identification;
   Map<String, dynamic>? _vehicle;
+  // ignore: unused_field - kept for future service details display
   Map<String, dynamic>? _service;
+  List<String> _schoolNames = []; // School names looked up from IDs
   bool _loading = true;
 
   // Helpers moved to profile_utils.dart
@@ -44,6 +47,27 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
       LocalStorage.getJson(StorageKeys.driverServiceDetails),
     ]);
     if (!mounted) return;
+    
+    final service = results[6] as Map<String, dynamic>?;
+    
+    // Load school names from IDs
+    List<String> schoolNames = [];
+    if (service != null) {
+      final schoolIds = service['schoolIds'];
+      if (schoolIds is List && schoolIds.isNotEmpty) {
+        try {
+          final schools = await SchoolsLoader.getByIds(
+            schoolIds.map((e) => e.toString()).toList(),
+          );
+          schoolNames = schools.map((s) => s.name).toList();
+        } catch (e) {
+          // If school lookup fails, show IDs count as fallback
+          schoolNames = ['${schoolIds.length} school(s)'];
+        }
+      }
+    }
+    
+    if (!mounted) return;
     setState(() {
       _personalInfo = results[0] as Map<String, dynamic>?;
       _driverName = results[1] as String?;
@@ -51,7 +75,8 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
       _licence = results[3] as Map<String, dynamic>?;
       _identification = results[4] as Map<String, dynamic>?;
       _vehicle = results[5] as Map<String, dynamic>?;
-      _service = results[6] as Map<String, dynamic>?;
+      _service = service;
+      _schoolNames = schoolNames;
       _loading = false;
     });
   }
@@ -152,18 +177,9 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                           children: [
                             DriverProfileTile(
                               title: 'School(s)',
-                              subtitle: joinSchools(_service?['schoolNames']),
-                              showIosChevron: true,
-                            ),
-                            const Divider(height: 1),
-                            DriverProfileTile(
-                              title: 'Duty Type',
-                              subtitle: (() {
-                                final duty = (_service?['dutyType'] ?? '')
-                                    .toString()
-                                    .trim();
-                                return duty.isEmpty ? 'Not set' : duty;
-                              })(),
+                              subtitle: _schoolNames.isNotEmpty 
+                                  ? _schoolNames.join(', ') 
+                                  : 'Not set',
                               showIosChevron: true,
                             ),
                           ],

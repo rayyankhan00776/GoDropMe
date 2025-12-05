@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:godropme/common%20widgets/forms/form_items.dart';
+import 'package:godropme/common_widgets/forms/form_items.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/responsive.dart';

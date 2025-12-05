@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/notifications/models/driver_notification.dart';
+import 'package:godropme/features/DriverSide/notifications/models/driver_notification.dart';
 
 class DriverNotificationsController extends GetxController {
   final notifications = <DriverNotificationItem>[].obs;

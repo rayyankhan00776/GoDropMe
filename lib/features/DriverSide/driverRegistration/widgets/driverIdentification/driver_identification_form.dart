@@ -1,34 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:godropme/common%20widgets/custom_phone_text_field.dart';
+import 'package:godropme/common_widgets/custom_phone_text_field.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/validators.dart';
-
-class DateInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final onlyDigits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-    final limited = onlyDigits.length > 8
-        ? onlyDigits.substring(0, 8)
-        : onlyDigits;
-    final buffer = StringBuffer();
-    for (var i = 0; i < limited.length; i++) {
-      buffer.write(limited[i]);
-      if (i == 1 || i == 3) buffer.write('-');
-    }
-    final formatted = buffer.toString();
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
-    );
-  }
-}
+import 'package:godropme/utils/validators_extra.dart';
 
 /// Formats CNIC as XXXXX-XXXXXXX-X while typing. Accepts up to 13 digits and
 /// inserts hyphens after 5 and 12 digits (digit positions: 5 and 12).
@@ -109,10 +87,10 @@ class DriverIdentificationForm extends StatelessWidget {
                 hintText: AppStrings.driverLicenceExpiryHint,
                 borderColor: AppColors.gray,
                 inputFormatters: [
-                  DateInputFormatter(),
+                  ExtraInputFormatters.dateDmy,
                   LengthLimitingTextInputFormatter(10),
                 ],
-                validator: Validators.dateDMY,
+                validator: Validators.dateDMYFuture,
               ),
             ),
             SizedBox(height: Responsive.scaleClamped(context, 6, 4, 12)),

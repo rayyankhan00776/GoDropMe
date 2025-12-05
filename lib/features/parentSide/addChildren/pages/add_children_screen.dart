@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
+import 'package:godropme/features/parentSide/common_widgets/parent_drawer_shell.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/utils/app_typography.dart';
@@ -53,6 +53,28 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
                 // Content (reactive)
                 Expanded(
                   child: Obx(() {
+                    // Show loading indicator while fetching data
+                    if (_ctrl.isLoading.value) {
+                      return const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              strokeWidth: 3,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'Loading children...',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    
                     if (_ctrl.children.isEmpty) {
                       return AddChildrenEmptyState(onAddChild: _addChild);
                     }
@@ -69,6 +91,44 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
                               ),
                               const SizedBox(width: 8),
                               ChildrenCountChip(count: _ctrl.children.length),
+                              const Spacer(),
+                              // Sync button - shows when there are local drafts
+                              Obx(() {
+                                final hasDrafts = _ctrl.children.any((c) {
+                                  final id = c['id']?.toString() ?? c['\$id']?.toString();
+                                  return id == null || id.isEmpty;
+                                });
+                                if (!hasDrafts) return const SizedBox.shrink();
+                                
+                                return _ctrl.isSyncing.value
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      )
+                                    : IconButton(
+                                        icon: const Icon(Icons.cloud_upload_outlined),
+                                        tooltip: 'Sync to cloud',
+                                        onPressed: () async {
+                                          final success = await _ctrl.syncAllDraftsToBackend();
+                                          if (success) {
+                                            Get.snackbar(
+                                              'Synced',
+                                              'All children synced to cloud',
+                                              snackPosition: SnackPosition.BOTTOM,
+                                            );
+                                          } else {
+                                            Get.snackbar(
+                                              'Sync Failed',
+                                              _ctrl.errorMessage.value.isNotEmpty 
+                                                  ? _ctrl.errorMessage.value 
+                                                  : 'Some children failed to sync',
+                                              snackPosition: SnackPosition.BOTTOM,
+                                            );
+                                          }
+                                        },
+                                      );
+                              }),
                             ],
                           ),
                         ),
@@ -87,8 +147,25 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
                               final c = _ctrl.children[index];
                               return ChildTile(
                                 childData: c,
+                                onEdit: () async {
+                                  // Navigate to edit screen with child data
+                                  await Get.toNamed(
+                                    AppRoutes.addChildHelp,
+                                    arguments: {'childData': c, 'index': index},
+                                  );
+                                  await _ctrl.loadChildren();
+                                },
                                 onDelete: () async {
                                   await _ctrl.deleteChild(index);
+                                },
+                                isAbsentToday: _ctrl.isAbsentToday(index),
+                                onMarkAbsent: () async {
+                                  // Toggle absent status
+                                  if (_ctrl.isAbsentToday(index)) {
+                                    await _ctrl.clearAbsent(index);
+                                  } else {
+                                    await _ctrl.markAbsentToday(index);
+                                  }
                                 },
                               );
                             },

@@ -23,7 +23,6 @@ class _EmailScreenState extends State<EmailScreen> {
   final _controller = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   late final EmailController _emailController;
-  late final bool _isUpdateMode;
   late final String _role; // 'driver' | 'parent' | ''
 
   @override
@@ -35,10 +34,8 @@ class _EmailScreenState extends State<EmailScreen> {
     _controller.addListener(() => setState(() {}));
     final args = Get.arguments;
     if (args is Map) {
-      _isUpdateMode = args['mode'] == 'update-phone';
       _role = (args['role'] as String?) ?? '';
     } else {
-      _isUpdateMode = false;
       _role = '';
     }
   }
@@ -56,18 +53,31 @@ class _EmailScreenState extends State<EmailScreen> {
     return null;
   }
 
-  void _onNextPressed() {
+  void _onNextPressed() async {
     _emailController.markSubmitted();
     final valid = _formKey.currentState?.validate() ?? false;
     if (!valid) return;
     _emailController.setEmail(_controller.text.trim());
-    Get.toNamed(
-      AppRoutes.otpScreen,
-      arguments: {
-        if (_isUpdateMode) 'mode': 'update-phone',
-        if (_role.isNotEmpty) 'role': _role,
-      },
-    );
+    
+    // Send OTP via Appwrite
+    final success = await _emailController.sendOtp();
+    if (success) {
+      Get.toNamed(
+        AppRoutes.otpScreen,
+        arguments: {
+          if (_role.isNotEmpty) 'role': _role,
+        },
+      );
+    } else {
+      // Show error snackbar
+      Get.snackbar(
+        'Error',
+        _emailController.errorMessage.value,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade900,
+      );
+    }
   }
 
   @override
@@ -91,14 +101,12 @@ class _EmailScreenState extends State<EmailScreen> {
             children: [
               // Simple header (text-only) replacing phone-specific header.
               Text(
-                _isUpdateMode ? 'Update Email' : 'Enter your Email',
+                'Enter your Email',
                 style: AppTypography.titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
-                _isUpdateMode
-                    ? 'Provide a new email to update your account'
-                    : 'We will send a verification code to this email',
+                'We will send a verification code to this email',
                 style: AppTypography.helperSmall.copyWith(
                   color: AppColors.darkGray,
                   fontSize: 14,
@@ -147,19 +155,28 @@ class _EmailScreenState extends State<EmailScreen> {
               SizedBox(
                 height: Responsive.scaleClamped(context, 64, 48, 80),
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _onNextPressed,
+                child: Obx(() => ElevatedButton(
+                  onPressed: _emailController.isLoading.value ? null : _onNextPressed,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
-                    _isUpdateMode ? 'Update Email' : AppStrings.onboardButton,
-                    style: AppTypography.onboardButton,
-                  ),
-                ),
+                  child: _emailController.isLoading.value
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          AppStrings.onboardButton,
+                          style: AppTypography.onboardButton,
+                        ),
+                )),
               ),
               SizedBox(height: Responsive.scaleClamped(context, 24, 16, 32)),
             ],

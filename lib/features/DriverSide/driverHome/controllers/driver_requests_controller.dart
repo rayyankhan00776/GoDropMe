@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/driverHome/models/driver_request.dart';
-import 'package:godropme/features/driverSide/driverHome/controllers/driver_orders_controller.dart';
-import 'package:godropme/features/driverSide/driverHome/models/driver_order.dart';
+import 'package:godropme/features/DriverSide/driverHome/models/driver_request.dart';
+import 'package:godropme/features/DriverSide/driverHome/controllers/driver_orders_controller.dart';
+import 'package:godropme/features/DriverSide/driverHome/models/driver_order.dart';
 
 class DriverRequestsController extends GetxController {
   final RxList<DriverRequest> requests = <DriverRequest>[].obs;
@@ -29,7 +29,10 @@ class DriverRequestsController extends GetxController {
           ordersCtrl.addOrder(
             DriverOrder.fromRequest(
               id: 'ord_${r.id}',
+              parentId: r.parentId,
+              childId: r.childId,
               parentName: r.parentName,
+              childName: r.childName,
               avatarUrl: r.avatarUrl,
               schoolName: r.schoolName,
               pickPoint: r.pickPoint,

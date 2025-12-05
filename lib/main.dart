@@ -1,6 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:godropme/firebase_options.dart';
 import 'package:godropme/services/appwrite/appwrite_client.dart';
 import 'package:godropme/theme/theme.dart';
 import 'package:godropme/routes.dart';
@@ -8,6 +9,9 @@ import 'package:godropme/routes.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppwriteClient.instance;
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const GoDropMe());
 }
 
@@ -19,7 +23,7 @@ class GoDropMe extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: AppRoutes.driverMap,
+      initialRoute: AppRoutes.splash,
       getPages: AppRoutes.routes,
       defaultTransition: Transition.cupertino,
       transitionDuration: const Duration(milliseconds: 300),

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/utils/responsive.dart';
-import 'package:godropme/features/driverSide/driverRegistration/widgets/driverName/driverName_action.dart';
-import 'package:godropme/features/driverSide/driverRegistration/widgets/driverName/driverName_header.dart';
-import 'package:godropme/features/driverSide/driverRegistration/widgets/driverName/driverName_input.dart';
-import 'package:godropme/features/driverSide/driverRegistration/controllers/driver_name_controller.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverName/driverName_action.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverName/driverName_header.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/widgets/driverName/driverName_input.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/controllers/driver_name_controller.dart';
 // binding is provided via route configuration; do not register it here.
 
 class DriverNameScreen extends StatefulWidget {
@@ -81,29 +81,52 @@ class _DriverNameScreenState extends State<DriverNameScreen> {
                       : null;
                   final double gap = errorText != null ? 27.0 : 10.0;
 
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: Responsive.scaleClamped(context, gap, 8, 40),
-                      ),
+                  return Obx(() {
+                    final c = Get.find<DriverNameController>();
+                    
+                    return Column(
+                      children: [
+                        // Show error message from controller if any
+                        if (c.errorMessage.value.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Text(
+                              c.errorMessage.value,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        
+                        SizedBox(
+                          height: Responsive.scaleClamped(context, gap, 8, 40),
+                        ),
 
-                      DrivernameAction(
-                        onNext: () async {
-                          setState(() => _submitted = true);
-                          final valid =
-                              _formKey.currentState?.validate() ?? false;
-                          if (!valid) return;
+                        DrivernameAction(
+                          isLoading: c.isLoading.value,
+                          onNext: () async {
+                            setState(() => _submitted = true);
+                            final valid =
+                                _formKey.currentState?.validate() ?? false;
+                            if (!valid) return;
 
-                          final c = Get.find<DriverNameController>();
-                          c.setName(_textController.text.trim());
-                          await c.saveName();
-                          // Move forward; allow back to return here
-                          Get.toNamed(AppRoutes.vehicleSelection);
-                        },
-                        height: Responsive.scaleClamped(context, 64, 48, 80),
-                      ),
-                    ],
-                  );
+                            c.setName(_textController.text.trim());
+                            await c.saveName();
+                            
+                            // Register driver user in users table
+                            final success = await c.registerDriver();
+                            
+                            if (success) {
+                              // Continue to vehicle selection
+                              Get.toNamed(AppRoutes.vehicleSelection);
+                            }
+                          },
+                          height: Responsive.scaleClamped(context, 64, 48, 80),
+                        ),
+                      ],
+                    );
+                  });
                 },
               ),
             ],

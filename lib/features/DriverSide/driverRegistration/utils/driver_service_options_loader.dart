@@ -1,34 +1,37 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:godropme/features/driverSide/driverRegistration/models/driver_service_options.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/models/driver_service_options.dart';
+import 'package:godropme/utils/schools_loader.dart';
 import 'package:godropme/utils/app_assets.dart';
 
+/// Loads driver service options from:
+/// - assets/json/schools.json (schools - via SchoolsLoader)
+/// - assets/json/driver_details.json (serviceCategories)
 class DriverServiceOptionsLoader {
   static Future<DriverServiceOptions> load() async {
     try {
+      // Load schools from centralized schools.json
+      final schools = await SchoolsLoader.load();
+      
+      // Load service categories from driver_details.json
       final jsonStr = await rootBundle.loadString(AppAssets.driverDetailsJson);
       final data = json.decode(jsonStr) as Map<String, dynamic>;
-      final form = (data['serviceOptions'] as Map<String, dynamic>);
-      final schools = (form['schoolNames'] as List)
-          .map((e) => e.toString())
-          .toList();
-      final dutyTypes = (form['dutyTypes'] as List)
-          .map((e) => e.toString())
-          .toList();
-      final operatingDays = (form['operatingDays'] as List)
-          .map((e) => e.toString())
-          .toList();
-      final pickupRanges = (form['pickupRangeKmOptions'] as List)
-          .map((e) => e.toString())
-          .toList();
+      final categories = (data['serviceCategories'] as List?)
+          ?.map((e) => e.toString())
+          .toList() ?? ['Male', 'Female', 'Both'];
+
       return DriverServiceOptions(
         schools: schools,
-        dutyTypes: dutyTypes,
-        operatingDays: operatingDays,
-        pickupRangeKmOptions: pickupRanges,
+        serviceCategories: categories,
       );
-    } catch (_) {
-      return DriverServiceOptions.fallback();
+    } catch (e) {
+      // Log error in debug mode
+      assert(() {
+        // ignore: avoid_print
+        print('DriverServiceOptionsLoader error: $e');
+        return true;
+      }());
+      return DriverServiceOptions.empty;
     }
   }
 }

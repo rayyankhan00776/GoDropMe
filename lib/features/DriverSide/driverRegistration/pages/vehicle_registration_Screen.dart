@@ -1,8 +1,8 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'package:godropme/common%20widgets/custom_Appbar.dart';
-import 'package:godropme/features/driverSide/driverRegistration/widgets/vehicleRegistration/vehicle_registration_content.dart';
+import 'package:godropme/common_widgets/custom_Appbar.dart';
+import 'package:godropme/features/DriverSide/driverRegistration/widgets/vehicleRegistration/vehicle_registration_content.dart';
 
 class VehicleRegistrationScreen extends StatefulWidget {
   const VehicleRegistrationScreen({super.key});

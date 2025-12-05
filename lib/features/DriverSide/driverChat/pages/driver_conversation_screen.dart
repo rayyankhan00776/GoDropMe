@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/driverChat/controllers/driver_conversation_controller.dart';
+import 'package:godropme/features/DriverSide/driverChat/controllers/driver_conversation_controller.dart';
 import 'package:godropme/theme/colors.dart';
 
 class DriverConversationScreen extends StatefulWidget {

@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:godropme/features/parentSide/common widgets/parent_drawer_shell.dart';
+import 'package:godropme/features/parentSide/common_widgets/parent_drawer_shell.dart';
 import 'package:godropme/features/parentSide/parentHome/controllers/parent_map_controller.dart';
 
 class ParentMapScreen extends StatefulWidget {
@@ -24,8 +24,7 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
   @override
   void initState() {
     super.initState();
-    // Get current location when screen loads
-    _initializeLocation();
+    // Location will be fetched once map is ready in onMapCreated
   }
 
   Future<void> _initializeLocation() async {
@@ -51,7 +50,7 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
       body: Scaffold(
         body: Stack(
           children: [
-            GoogleMap(
+            Obx(() => GoogleMap(
               initialCameraPosition: const CameraPosition(
                 target: LatLng(34.0000, 71.57849),
                 zoom: 15,
@@ -59,6 +58,8 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
               zoomControlsEnabled: false,
               myLocationButtonEnabled: false,
               myLocationEnabled: true,
+              mapToolbarEnabled: false,
+              markers: _mapController.markers.value,
               onMapCreated: (c) {
                 _controller = c;
                 // Move to current location once map is ready
@@ -75,7 +76,7 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
               zoomGesturesEnabled: true,
               rotateGesturesEnabled: true,
               tiltGesturesEnabled: true,
-            ),
+            )),
 
             // Chat button bottom-right
             Positioned(
