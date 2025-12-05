@@ -1,13 +1,14 @@
 import 'package:godropme/models/school.dart';
 
 /// Service details using Appwrite-compatible flat data types.
-/// Schools are stored as parallel arrays: schoolNames (string[]) and schoolPoints (point[])
+/// 
+/// Schools are stored as `schoolIds` (string[]) - foreign keys to schools table.
+/// Use SchoolsLoader.getByIds() to get school details including names and locations.
 class ServiceDetails {
-  /// School names as flat string array (Appwrite: string[])
-  final List<String> schoolNames;
-  /// School locations as [lng, lat] pairs (Appwrite: point[] - array of geographic points)
-  /// Each point is [longitude, latitude] to match Appwrite's point type
-  final List<List<double>> schoolPoints;
+  /// School IDs - foreign keys to schools table (Appwrite: string[])
+  /// Use SchoolsLoader.getByIds() to get full school objects
+  final List<String> schoolIds;
+  
   /// Service category: 'Male', 'Female', or 'Both' - indicates gender of students driver serves
   final String? serviceCategory;
   /// Service area center as [lng, lat] (Appwrite: point)
@@ -24,8 +25,7 @@ class ServiceDetails {
   final String? extraNotes;
 
   const ServiceDetails({
-    required this.schoolNames,
-    required this.schoolPoints,
+    required this.schoolIds,
     this.serviceCategory,
     this.serviceAreaCenter,
     this.serviceAreaRadiusKm,
@@ -35,25 +35,8 @@ class ServiceDetails {
     this.extraNotes,
   });
 
-  /// Helper to get School objects from parallel arrays (for local use)
-  List<School> get schools {
-    final result = <School>[];
-    for (int i = 0; i < schoolNames.length && i < schoolPoints.length; i++) {
-      final point = schoolPoints[i];
-      if (point.length >= 2) {
-        result.add(School(
-          name: schoolNames[i],
-          lng: point[0],
-          lat: point[1],
-        ));
-      }
-    }
-    return result;
-  }
-
   Map<String, dynamic> toJson() => {
-    'schoolNames': schoolNames,
-    'schoolPoints': schoolPoints, // Each is [lng, lat] for Appwrite point type
+    'schoolIds': schoolIds,
     'serviceCategory': serviceCategory,
     'serviceAreaCenter': serviceAreaCenter, // [lng, lat] for Appwrite point
     'serviceAreaRadiusKm': serviceAreaRadiusKm,
@@ -64,34 +47,11 @@ class ServiceDetails {
   };
 
   factory ServiceDetails.fromJson(Map<String, dynamic> json) {
-    // Parse school names
-    final namesData = json['schoolNames'];
-    List<String> names = [];
-    if (namesData is List) {
-      names = namesData.map((e) => e.toString()).toList();
-    }
-    
-    // Parse school points [lng, lat]
-    final pointsData = json['schoolPoints'];
-    List<List<double>> points = [];
-    if (pointsData is List) {
-      for (final p in pointsData) {
-        if (p is List && p.length >= 2) {
-          points.add([(p[0] as num).toDouble(), (p[1] as num).toDouble()]);
-        }
-      }
-    }
-    
-    // Legacy support: if old 'schools' array exists, migrate it
-    if (names.isEmpty && json['schools'] is List) {
-      for (final s in json['schools'] as List) {
-        if (s is Map<String, dynamic>) {
-          names.add((s['name'] ?? '').toString());
-          final lat = (s['lat'] as num?)?.toDouble() ?? 0.0;
-          final lng = (s['lng'] as num?)?.toDouble() ?? 0.0;
-          points.add([lng, lat]); // [lng, lat] for Appwrite
-        }
-      }
+    // Parse school IDs (foreign keys to schools table)
+    List<String> ids = [];
+    final idsData = json['schoolIds'];
+    if (idsData is List) {
+      ids = idsData.map((e) => e.toString()).toList();
     }
     
     // Parse center point
@@ -143,8 +103,7 @@ class ServiceDetails {
     }
     
     return ServiceDetails(
-      schoolNames: names,
-      schoolPoints: points,
+      schoolIds: ids,
       serviceCategory: json['serviceCategory']?.toString(),
       serviceAreaCenter: center,
       serviceAreaRadiusKm: json['serviceAreaRadiusKm'] != null 
@@ -156,6 +115,39 @@ class ServiceDetails {
       extraNotes: json['extraNotes']?.toString(),
     );
   }
+  
+  /// Convert to Appwrite document format for driver_services collection.
+  Map<String, dynamic> toAppwriteJson() => {
+    'schoolIds': schoolIds,
+    'serviceCategory': serviceCategory,
+    'serviceAreaCenter': serviceAreaCenter, // [lng, lat] for Appwrite point
+    'serviceAreaRadiusKm': serviceAreaRadiusKm,
+    'serviceAreaPolygon': serviceAreaPolygon, // [[[lng, lat], ...]] for Appwrite polygon
+    if (serviceAreaAddress != null) 'serviceAreaAddress': serviceAreaAddress,
+    'monthlyPricePkr': monthlyPricePkr,
+    if (extraNotes != null) 'extraNotes': extraNotes,
+  };
+  
+  /// Create a copy with updated fields
+  ServiceDetails copyWith({
+    List<String>? schoolIds,
+    String? serviceCategory,
+    List<double>? serviceAreaCenter,
+    double? serviceAreaRadiusKm,
+    List<List<List<double>>>? serviceAreaPolygon,
+    String? serviceAreaAddress,
+    int? monthlyPricePkr,
+    String? extraNotes,
+  }) => ServiceDetails(
+    schoolIds: schoolIds ?? this.schoolIds,
+    serviceCategory: serviceCategory ?? this.serviceCategory,
+    serviceAreaCenter: serviceAreaCenter ?? this.serviceAreaCenter,
+    serviceAreaRadiusKm: serviceAreaRadiusKm ?? this.serviceAreaRadiusKm,
+    serviceAreaPolygon: serviceAreaPolygon ?? this.serviceAreaPolygon,
+    serviceAreaAddress: serviceAreaAddress ?? this.serviceAreaAddress,
+    monthlyPricePkr: monthlyPricePkr ?? this.monthlyPricePkr,
+    extraNotes: extraNotes ?? this.extraNotes,
+  );
   
   /// Create from School objects (convenience factory for form submission)
   factory ServiceDetails.fromSchools({
@@ -180,8 +172,7 @@ class ServiceDetails {
     }
     
     return ServiceDetails(
-      schoolNames: schools.map((s) => s.name).toList(),
-      schoolPoints: schools.map((s) => [s.lng, s.lat]).toList(), // [lng, lat]
+      schoolIds: schools.map((s) => s.id).toList(), // Store IDs only
       serviceCategory: serviceCategory,
       serviceAreaCenter: serviceAreaCenter != null 
           ? [serviceAreaCenter.longitude, serviceAreaCenter.latitude] 

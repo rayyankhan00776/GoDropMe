@@ -15,7 +15,8 @@ class ProfileDocumentsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final number = (licence?['licenceNumber'] ?? '').toString().trim();
-    final expiry = (licence?['expiryDate'] ?? '').toString().trim();
+    // Support both new 'licenseExpiry' and old 'expiryDate' keys
+    final expiry = (licence?['licenseExpiry'] ?? licence?['expiryDate'] ?? '').toString().trim();
     final sub = [
       if (number.isNotEmpty) 'Number: $number',
       if (expiry.isNotEmpty) 'Expiry: $expiry',

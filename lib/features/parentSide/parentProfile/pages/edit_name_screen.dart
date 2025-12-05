@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/features/parentSide/parentProfile/controllers/parent_profile_controller.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
@@ -16,6 +17,7 @@ class _EditNameScreenState extends State<EditNameScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _isValid = false.obs;
+  final _isSyncing = false.obs;
 
   @override
   void initState() {
@@ -40,7 +42,21 @@ class _EditNameScreenState extends State<EditNameScreen> {
   Future<void> _saveName() async {
     if (_formKey.currentState?.validate() ?? false) {
       final name = _nameController.text.trim();
-      await LocalStorage.setString(StorageKeys.parentName, name);
+      
+      _isSyncing.value = true;
+      
+      try {
+        // Use ParentProfileController to update and sync with Appwrite
+        final controller = Get.find<ParentProfileController>();
+        await controller.updateName(name);
+      } catch (e) {
+        debugPrint('⚠️ Error updating name: $e');
+        // Fallback: save locally only
+        // await LocalStorage.setString(StorageKeys.parentName, name);
+      } finally {
+        _isSyncing.value = false;
+      }
+      
       // Hide keyboard before navigating back to avoid overflow
       if (!mounted) return;
       FocusScope.of(context).unfocus();

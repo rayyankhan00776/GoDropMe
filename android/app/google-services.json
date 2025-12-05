@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "407766027052",
+    "project_id": "godropme-f2b6d",
+    "storage_bucket": "godropme-f2b6d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:407766027052:android:c4794a286006d527b77a89",
+        "android_client_info": {
+          "package_name": "com.rayonixsolutions.godropme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvEXfspe5IPwyZmaZUdjmfXnAFDfy75eE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

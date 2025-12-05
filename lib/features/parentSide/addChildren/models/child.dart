@@ -1,5 +1,5 @@
 /// Child model using Appwrite-compatible flat data types.
-/// School is stored as schoolName (string) and schoolLocation (point [lng, lat])
+/// School is stored as schoolId (foreign key to schools table)
 class ChildModel {
   /// Document ID from Appwrite (children.$id)
   final String? id;
@@ -8,10 +8,9 @@ class ChildModel {
   final String name;
   final int age;
   final String gender;
-  /// School name (Appwrite: string)
-  final String schoolName;
-  /// School location as [lng, lat] (Appwrite: point)
-  final List<double>? schoolLocation;
+  /// School ID - foreign key to schools table (Appwrite: string)
+  /// Use SchoolsLoader.getById() to get school details including name and location
+  final String schoolId;
   final String pickPoint;
   final String dropPoint;
   final String relationshipToChild;
@@ -23,8 +22,8 @@ class ChildModel {
   final List<double>? pickLocation;
   /// Drop location as [lng, lat] (Appwrite: point)
   final List<double>? dropLocation;
-  /// Child photo file ID from Appwrite storage (optional)
-  final String? photoFileId;
+  /// Child photo URL from Appwrite storage (optional)
+  final String? photoUrl;
   /// Special notes/instructions for the driver (optional)
   final String? specialNotes;
   /// Whether child is currently active and needs service
@@ -38,8 +37,7 @@ class ChildModel {
     required this.name,
     required this.age,
     required this.gender,
-    required this.schoolName,
-    this.schoolLocation,
+    required this.schoolId,
     required this.pickPoint,
     required this.dropPoint,
     required this.relationshipToChild,
@@ -47,7 +45,7 @@ class ChildModel {
     this.schoolOffTime,
     this.pickLocation,
     this.dropLocation,
-    this.photoFileId,
+    this.photoUrl,
     this.specialNotes,
     this.isActive = true,
     this.assignedDriverId,
@@ -59,8 +57,7 @@ class ChildModel {
     'name': name,
     'age': age,
     'gender': gender,
-    'schoolName': schoolName,
-    'schoolLocation': schoolLocation, // [lng, lat] for Appwrite point type
+    'schoolId': schoolId, // Foreign key to schools table
     'pickPoint': pickPoint,
     'dropPoint': dropPoint,
     'relationshipToChild': relationshipToChild,
@@ -68,16 +65,13 @@ class ChildModel {
     'schoolOffTime': schoolOffTime,
     'pickLocation': pickLocation, // [lng, lat] for Appwrite point type
     'dropLocation': dropLocation, // [lng, lat] for Appwrite point type
-    'photoFileId': photoFileId,
+    'photoUrl': photoUrl,
     'specialNotes': specialNotes,
     'isActive': isActive,
     'assignedDriverId': assignedDriverId,
   };
 
   factory ChildModel.fromJson(Map<String, dynamic> json) {
-    // Parse school location from [lng, lat] array
-    List<double>? schoolLoc = _parsePoint(json['schoolLocation']);
-    
     // Parse pick/drop locations
     List<double>? pickLoc = _parsePoint(json['pickLocation']);
     List<double>? dropLoc = _parsePoint(json['dropLocation']);
@@ -96,21 +90,8 @@ class ChildModel {
       ];
     }
     
-    // Handle both old format (school object) and new format (schoolName + schoolLocation)
-    String name = '';
-    if (json['schoolName'] != null) {
-      name = json['schoolName'].toString();
-    } else if (json['school'] is Map<String, dynamic>) {
-      final schoolData = json['school'] as Map<String, dynamic>;
-      name = (schoolData['name'] ?? '').toString();
-      if (schoolLoc == null) {
-        final lat = (schoolData['lat'] as num?)?.toDouble() ?? 0.0;
-        final lng = (schoolData['lng'] as num?)?.toDouble() ?? 0.0;
-        if (lat != 0.0 || lng != 0.0) {
-          schoolLoc = [lng, lat]; // [lng, lat] for Appwrite
-        }
-      }
-    }
+    // Get schoolId (foreign key to schools table)
+    String schoolId = json['schoolId']?.toString() ?? '';
     
     // Parse age as integer (handle both int and string like "5" or "5 years")
     int parsedAge = 0;
@@ -129,8 +110,7 @@ class ChildModel {
       name: (json['name'] ?? '').toString(),
       age: parsedAge,
       gender: (json['gender'] ?? '').toString(),
-      schoolName: name,
-      schoolLocation: schoolLoc,
+      schoolId: schoolId,
       pickPoint: (json['pickPoint'] ?? json['pick_point'] ?? '').toString(),
       dropPoint: (json['dropPoint'] ?? json['drop_point'] ?? '').toString(),
       relationshipToChild: (json['relationshipToChild'] ?? json['relationship'] ?? '').toString(),
@@ -139,7 +119,7 @@ class ChildModel {
       schoolOffTime: json['schoolOffTime']?.toString(),
       pickLocation: pickLoc,
       dropLocation: dropLoc,
-      photoFileId: json['photoFileId']?.toString(),
+      photoUrl: json['photoUrl']?.toString(),
       specialNotes: json['specialNotes']?.toString(),
       isActive: json['isActive'] == true || json['isActive'] == null, // default true
       assignedDriverId: json['assignedDriverId']?.toString(),
@@ -153,4 +133,43 @@ class ChildModel {
     }
     return null;
   }
+  
+  /// Create a copy with updated fields
+  ChildModel copyWith({
+    String? id,
+    String? parentId,
+    String? name,
+    int? age,
+    String? gender,
+    String? schoolId,
+    String? pickPoint,
+    String? dropPoint,
+    String? relationshipToChild,
+    String? schoolOpenTime,
+    String? schoolOffTime,
+    List<double>? pickLocation,
+    List<double>? dropLocation,
+    String? photoUrl,
+    String? specialNotes,
+    bool? isActive,
+    String? assignedDriverId,
+  }) => ChildModel(
+    id: id ?? this.id,
+    parentId: parentId ?? this.parentId,
+    name: name ?? this.name,
+    age: age ?? this.age,
+    gender: gender ?? this.gender,
+    schoolId: schoolId ?? this.schoolId,
+    pickPoint: pickPoint ?? this.pickPoint,
+    dropPoint: dropPoint ?? this.dropPoint,
+    relationshipToChild: relationshipToChild ?? this.relationshipToChild,
+    schoolOpenTime: schoolOpenTime ?? this.schoolOpenTime,
+    schoolOffTime: schoolOffTime ?? this.schoolOffTime,
+    pickLocation: pickLocation ?? this.pickLocation,
+    dropLocation: dropLocation ?? this.dropLocation,
+    photoUrl: photoUrl ?? this.photoUrl,
+    specialNotes: specialNotes ?? this.specialNotes,
+    isActive: isActive ?? this.isActive,
+    assignedDriverId: assignedDriverId ?? this.assignedDriverId,
+  );
 }

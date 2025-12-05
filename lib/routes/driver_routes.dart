@@ -74,4 +74,19 @@ final List<GetPage<dynamic>> driverRoutes = [
     name: AppRoutes.editDriverEmail,
     page: () => const driver_edit_email.DriverEditEmailScreen(),
   ),
+  // Driver Pending Approval (after registration, before approval)
+  GetPage(
+    name: AppRoutes.driverPendingApproval,
+    page: () => const DriverPendingApprovalScreen(),
+  ),
+  // Driver Suspended (account suspended by admin)
+  GetPage(
+    name: AppRoutes.driverSuspended,
+    page: () => const DriverSuspendedScreen(),
+  ),
+  // Driver Rejected (application rejected by admin)
+  GetPage(
+    name: AppRoutes.driverRejected,
+    page: () => const DriverRejectedScreen(),
+  ),
 ];

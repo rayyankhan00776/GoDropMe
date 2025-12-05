@@ -40,7 +40,7 @@ class ParentDrawer extends StatelessWidget {
                   // Profile tile with polished look
                   DrawerCard(
                     child: ProfileTile(
-                      onTap: () => Get.toNamed(AppRoutes.profile),
+                      onTap: () => _navigateFromDrawer(context, AppRoutes.profile),
                     ),
                   ),
 
@@ -53,37 +53,37 @@ class ParentDrawer extends StatelessWidget {
                         AppDrawerTile(
                           icon: Icons.drive_eta_rounded,
                           title: AppStrings.drawerMapScreen,
-                          onTap: () => Get.toNamed(AppRoutes.parentmapScreen),
+                          onTap: () => _navigateFromDrawer(context, AppRoutes.parentmapScreen),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
                           icon: Icons.child_care_rounded,
                           title: AppStrings.drawerYourChildren,
-                          onTap: () => Get.toNamed(AppRoutes.addChildren),
+                          onTap: () => _navigateFromDrawer(context, AppRoutes.addChildren),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
                           icon: Icons.directions_bus_filled_rounded,
                           title: AppStrings.drawerFindDrivers,
-                          onTap: () => Get.toNamed(AppRoutes.findDrivers),
+                          onTap: () => _navigateFromDrawer(context, AppRoutes.findDrivers),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
                           icon: Icons.directions_bus_filled_rounded,
                           title: AppStrings.parentChatHeading,
-                          onTap: () => Get.toNamed(AppRoutes.parentChat),
+                          onTap: () => _navigateFromDrawer(context, AppRoutes.parentChat),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
                           icon: Icons.settings_rounded,
                           title: AppStrings.drawerSettings,
-                          onTap: () => Get.toNamed(AppRoutes.parentSettings),
+                          onTap: () => _navigateFromDrawer(context, AppRoutes.parentSettings),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
                           icon: Icons.report_gmailerrorred_rounded,
                           title: AppStrings.report,
-                          onTap: () => Get.toNamed(AppRoutes.parentReport),
+                          onTap: () => _navigateFromDrawer(context, AppRoutes.parentReport),
                         ),
                         const Divider(height: 1),
                         AppDrawerTile(
@@ -106,4 +106,21 @@ class ParentDrawer extends StatelessWidget {
   }
 
   // (No local helpers; composition uses DrawerCard, DrawerTile, ProfileTile,
+  void _navigateFromDrawer(BuildContext context, String route) {
+    // // Close the drawer first
+    // if (Navigator.of(context).canPop()) {
+    //   Navigator.of(context).pop();
+    // } else {
+    //   // Fallback for GetX-managed drawers
+    //   Get.back(closeOverlays: true);
+    // }
+
+    // If already on the same route, do nothing further
+    if (Get.currentRoute == route) {
+      return Scaffold.of(context).closeDrawer();
+    }
+
+    // Navigate to the requested route
+    Get.toNamed(route);
+  }
 }

@@ -8,7 +8,7 @@ void main() {
         name: 'Ali',
         age: 8,
         gender: 'Male',
-        schoolName: 'City School',
+        schoolId: 'school123',
         pickPoint: 'Home',
         dropPoint: 'School',
         relationshipToChild: 'Father',
@@ -22,7 +22,7 @@ void main() {
       expect(parsed.name, child.name);
       expect(parsed.age, child.age);
       expect(parsed.gender, child.gender);
-      expect(parsed.schoolName, child.schoolName);
+      expect(parsed.schoolId, child.schoolId);
       expect(parsed.pickPoint, child.pickPoint);
       expect(parsed.dropPoint, child.dropPoint);
       expect(parsed.relationshipToChild, child.relationshipToChild);
@@ -35,7 +35,7 @@ void main() {
         'name': 'Sara',
         'age': '9', // string age should be parsed
         'gender': 'Female',
-        'schoolName': 'Beaconhouse',
+        'schoolId': 'school456',
         'pickPoint': 'Home',
         'dropPoint': 'School',
         'relationshipToChild': 'Mother',
@@ -44,6 +44,7 @@ void main() {
       final child = ChildModel.fromJson(json);
       expect(child.name, 'Sara');
       expect(child.age, 9);
+      expect(child.schoolId, 'school456');
     });
   });
 }

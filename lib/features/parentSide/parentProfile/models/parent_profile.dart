@@ -6,18 +6,18 @@ class ParentProfile {
   final String? id; // parents.$id
   final String? userId; // Reference to auth user $id
   final String fullName;
-  final PhoneNumber phone;
+  final PhoneNumber? phone; // Optional phone number
   final String? email;
-  final String? profilePhotoFileId; // Storage file ID (for Appwrite)
+  final String? profilePhotoUrl; // Storage file URL (for Appwrite)
   final String? profilePhotoPath; // Local file path (before upload)
 
   const ParentProfile({
     this.id,
     this.userId,
     required this.fullName,
-    required this.phone,
+    this.phone, // Now optional
     this.email,
-    this.profilePhotoFileId,
+    this.profilePhotoUrl,
     this.profilePhotoPath,
   });
 
@@ -25,32 +25,37 @@ class ParentProfile {
     'id': id,
     'userId': userId,
     'fullName': fullName,
-    'phone': phone.e164, // Store as E.164 string for Appwrite
+    'phone': phone?.e164, // Store as E.164 string for Appwrite (optional)
     'email': email,
-    'profilePhotoFileId': profilePhotoFileId,
+    'profilePhotoUrl': profilePhotoUrl,
   };
 
   /// Convert to Appwrite document format
   Map<String, dynamic> toAppwriteJson() => {
     'userId': userId,
     'fullName': fullName,
-    'phone': phone.e164,
+    'phone': phone?.e164 ?? '',
     'email': email,
-    'profilePhotoFileId': profilePhotoFileId,
+    'profilePhotoUrl': profilePhotoUrl,
   };
 
   factory ParentProfile.fromJson(Map<String, dynamic> json) {
-    // Parse phone from various formats
-    PhoneNumber parsedPhone;
-    if (json['phone'] is Map<String, dynamic>) {
-      parsedPhone = PhoneNumber.fromJson(json['phone'] as Map<String, dynamic>);
-    } else {
-      final phoneStr = (json['phone'] ?? '').toString();
-      // Strip +92 prefix if present
-      final national = phoneStr.startsWith('+92') 
-          ? phoneStr.substring(3) 
-          : phoneStr;
-      parsedPhone = PhoneNumber(national: national);
+    // Parse phone from various formats (now optional)
+    PhoneNumber? parsedPhone;
+    final phoneValue = json['phone'];
+    if (phoneValue != null && phoneValue.toString().isNotEmpty) {
+      if (phoneValue is Map<String, dynamic>) {
+        parsedPhone = PhoneNumber.fromJson(phoneValue);
+      } else {
+        final phoneStr = phoneValue.toString();
+        // Strip +92 prefix if present
+        final national = phoneStr.startsWith('+92') 
+            ? phoneStr.substring(3) 
+            : phoneStr;
+        if (national.isNotEmpty) {
+          parsedPhone = PhoneNumber(national: national);
+        }
+      }
     }
     
     return ParentProfile(
@@ -59,7 +64,7 @@ class ParentProfile {
       fullName: (json['fullName'] ?? '').toString(),
       phone: parsedPhone,
       email: json['email']?.toString(),
-      profilePhotoFileId: json['profilePhotoFileId']?.toString(),
+      profilePhotoUrl: json['profilePhotoUrl']?.toString(),
       profilePhotoPath: json['profilePhotoPath']?.toString(),
     );
   }
@@ -73,7 +78,7 @@ class ParentProfile {
     final email = await LocalStorage.getString(StorageKeys.parentEmail);
     return ParentProfile(
       fullName: name,
-      phone: PhoneNumber(national: phoneDigits),
+      phone: phoneDigits.isNotEmpty ? PhoneNumber(national: phoneDigits) : null,
       email: email,
     );
   }

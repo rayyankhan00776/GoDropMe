@@ -33,7 +33,6 @@ class LocationServices {
       final placemarks = await gc.placemarkFromCoordinates(
         p.latitude,
         p.longitude,
-        localeIdentifier: 'en',
       );
       if (placemarks.isEmpty) {
         return '${p.latitude.toStringAsFixed(6)}, ${p.longitude.toStringAsFixed(6)}';

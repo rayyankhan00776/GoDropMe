@@ -8,6 +8,7 @@ import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/common_widgets/custom_button.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/sharedPrefs/local_storage.dart';
 
 /// A single onboarding page widget.
 ///
@@ -106,7 +107,9 @@ class OnboardPage extends StatelessWidget {
 
                   return CustomButton(
                     text: AppStrings.onboardButton,
-                    onTap: () {
+                    onTap: () async {
+                      // Mark that user has seen onboarding
+                      await LocalStorage.setString(StorageKeys.hasSeenOnboarding, 'true');
                       Get.offAllNamed(AppRoutes.optionScreen);
                     },
                     height: btnHeight,

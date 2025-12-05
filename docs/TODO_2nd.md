@@ -92,11 +92,10 @@ final session = await account.createSession(
 | Attribute | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `email` | email | ✅ | - | User email (used for OTP auth) |
-| `phone` | string(20) | ❌ | null | Phone number (+92XXXXXXXXXX) |
 | `role` | enum | ✅ | - | Values: `parent`, `driver` |
 | `isProfileComplete` | boolean | ✅ | false | Registration completed |
-| `isApproved` | boolean | ✅ | false | Admin approval (for drivers) |
-| `status` | enum | ✅ | `pending` | Values: `active`, `suspended`, `pending` |
+| `status` | enum | ✅ | `pending` | Values: `active`, `suspended`, `pending`, `rejected` |
+| `statusReason` | string(500) | ❌ | null | Reason for suspension OR rejection |
 | `fcmToken` | string(500) | ❌ | null | Push notification token |
 
 **Indexes**:

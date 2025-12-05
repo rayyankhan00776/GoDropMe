@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:godropme/common_widgets/appwrite_image.dart';
 import 'package:godropme/features/DriverSide/common_widgets/drawer widgets/driver_drawer_card.dart';
 import 'package:godropme/features/DriverSide/driverHome/models/driver_request.dart';
 import 'package:godropme/theme/colors.dart';
@@ -152,12 +153,35 @@ class _Avatar extends StatelessWidget {
               .join()
               .toUpperCase();
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return CircleAvatar(
-        radius: 24,
-        backgroundImage: NetworkImage(imageUrl!),
-        backgroundColor: AppColors.grayLight,
+      return ClipOval(
+        child: AppwriteImage(
+          imageUrl: imageUrl!,
+          width: 48,
+          height: 48,
+          fit: BoxFit.cover,
+          placeholder: Container(
+            width: 48,
+            height: 48,
+            color: AppColors.grayLight,
+            child: const Center(
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+          ),
+          errorWidget: _buildInitials(initials),
+        ),
       );
     }
+    return _buildInitials(initials);
+  }
+
+  Widget _buildInitials(String initials) {
     return CircleAvatar(
       radius: 24,
       backgroundColor: AppColors.primary.withValues(alpha: 0.1),

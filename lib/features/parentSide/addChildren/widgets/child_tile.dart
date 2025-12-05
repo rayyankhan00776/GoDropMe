@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/utils/schools_loader.dart';
 import 'child_tile_helpers.dart';
 import 'child_tile_avatar.dart';
 import 'child_info_lines.dart';
@@ -14,6 +15,7 @@ import 'selectable_tile_wrapper.dart';
 class ChildTile extends StatefulWidget {
   final Map<String, dynamic> childData;
   final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
   final VoidCallback? onMarkAbsent;
   final bool isAbsentToday;
   
@@ -21,6 +23,7 @@ class ChildTile extends StatefulWidget {
     super.key, 
     required this.childData, 
     this.onDelete,
+    this.onEdit,
     this.onMarkAbsent,
     this.isAbsentToday = false,
   });
@@ -31,6 +34,63 @@ class ChildTile extends StatefulWidget {
 
 class _ChildTileState extends State<ChildTile> {
   bool _expanded = false;
+  String? _schoolName; // Looked up from schoolId (null = use pre-populated)
+  
+  @override
+  void initState() {
+    super.initState();
+    // Only load if not pre-populated by controller
+    if (_getPrePopulatedSchoolName() == null) {
+      _loadSchoolName();
+    }
+  }
+  
+  /// Get pre-populated school name from controller (if available)
+  String? _getPrePopulatedSchoolName() {
+    return widget.childData['_schoolName']?.toString();
+  }
+  
+  /// Get the school name to display (pre-populated or async-loaded)
+  String get _displaySchoolName {
+    // First check async-loaded value
+    if (_schoolName != null) return _schoolName!;
+    // Then check pre-populated value from controller
+    final prePop = _getPrePopulatedSchoolName();
+    if (prePop != null && prePop.isNotEmpty) return prePop;
+    // Fallback
+    return '-';
+  }
+  
+  @override
+  void didUpdateWidget(covariant ChildTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reload if schoolId changed and no pre-populated name
+    if (oldWidget.childData['schoolId'] != widget.childData['schoolId']) {
+      _schoolName = null; // Reset async value
+      if (_getPrePopulatedSchoolName() == null) {
+        _loadSchoolName();
+      }
+    }
+  }
+  
+  Future<void> _loadSchoolName() async {
+    final schoolId = widget.childData['schoolId']?.toString();
+    if (schoolId == null || schoolId.isEmpty) {
+      if (mounted) setState(() => _schoolName = '-');
+      return;
+    }
+    
+    try {
+      final school = await SchoolsLoader.getById(schoolId);
+      if (mounted) {
+        setState(() => _schoolName = school?.name ?? '-');
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _schoolName = '-');
+      }
+    }
+  }
 
   Future<void> _confirmDelete() async {
     if (widget.onDelete == null) return;
@@ -41,6 +101,7 @@ class _ChildTileState extends State<ChildTile> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
+          backgroundColor: AppColors.white,
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -195,7 +256,8 @@ class _ChildTileState extends State<ChildTile> {
                       children: [
                         ChildTileAvatar(
                           initial: initial,
-                          photoPath: widget.childData['photoPath']?.toString(),
+                          photoPath: widget.childData['photoUrl']?.toString() 
+                              ?? widget.childData['photoPath']?.toString(),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -203,7 +265,7 @@ class _ChildTileState extends State<ChildTile> {
                             title: title,
                             gender: gender,
                             age: age,
-                            school: widget.childData['schoolName']?.toString() ?? '-',
+                            school: _displaySchoolName,
                           ),
                         ),
                       ],
@@ -288,23 +350,41 @@ class _ChildTileState extends State<ChildTile> {
                       ? widget.childData['schoolOffTime']
                       : 'Not set'),
                 ),
-                // Delete button (only in expanded section)
-                if (widget.onDelete != null) ...[
-                  const SizedBox(height: 12),
-                  Center(
-                    child: TextButton.icon(
-                      onPressed: _confirmDelete,
-                      icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      label: Text(
-                        'Delete',
-                        style: AppTypography.optionTerms.copyWith(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600,
+                // Edit and Delete buttons (only in expanded section)
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Edit button
+                    if (widget.onEdit != null)
+                      TextButton.icon(
+                        onPressed: widget.onEdit,
+                        icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
+                        label: Text(
+                          'Edit',
+                          style: AppTypography.optionTerms.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
+                    if (widget.onEdit != null && widget.onDelete != null)
+                      const SizedBox(width: 16),
+                    // Delete button
+                    if (widget.onDelete != null)
+                      TextButton.icon(
+                        onPressed: _confirmDelete,
+                        icon: const Icon(Icons.delete_outline, color: Colors.red),
+                        label: Text(
+                          'Delete',
+                          style: AppTypography.optionTerms.copyWith(
+                            color: Colors.red,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),

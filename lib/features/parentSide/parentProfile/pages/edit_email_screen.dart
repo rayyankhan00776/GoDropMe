@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/features/parentSide/parentProfile/controllers/parent_profile_controller.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
@@ -16,6 +17,7 @@ class _EditEmailScreenState extends State<EditEmailScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _isValid = false.obs;
+  final _isSyncing = false.obs;
 
   @override
   void initState() {
@@ -40,7 +42,21 @@ class _EditEmailScreenState extends State<EditEmailScreen> {
   Future<void> _saveEmail() async {
     if (_formKey.currentState?.validate() ?? false) {
       final email = _emailController.text.trim();
-      await LocalStorage.setString(StorageKeys.parentEmail, email);
+      
+      _isSyncing.value = true;
+      
+      try {
+        // Use ParentProfileController to update and sync with Appwrite
+        final controller = Get.find<ParentProfileController>();
+        await controller.updateEmail(email);
+      } catch (e) {
+        debugPrint('⚠️ Error updating email: $e');
+        // Fallback: save locally only
+        await LocalStorage.setString(StorageKeys.parentEmail, email);
+      } finally {
+        _isSyncing.value = false;
+      }
+      
       // Hide keyboard before navigating back
       if (!mounted) return;
       FocusScope.of(context).unfocus();

@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:godropme/common_widgets/appwrite_image.dart';
 import 'package:godropme/features/DriverSide/common_widgets/drawer widgets/driver_drawer_card.dart';
 import 'package:godropme/features/DriverSide/driverHome/models/driver_order.dart';
 import 'package:godropme/theme/colors.dart';
@@ -24,13 +25,26 @@ class DriverOrderTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheduled = data.status == DriverOrderStatus.scheduled;
+    final enroute = data.status == DriverOrderStatus.driverEnroute;
+    final arrived = data.status == DriverOrderStatus.arrived;
     final picked = data.status == DriverOrderStatus.picked;
+    final inTransit = data.status == DriverOrderStatus.inTransit;
     final dropped = data.status == DriverOrderStatus.dropped;
     final absent = data.status == DriverOrderStatus.absent;
     final cancelled = data.status == DriverOrderStatus.cancelled;
+    
+    // Trip is finalized (no more actions possible)
     final isFinalized = dropped || absent || cancelled;
-    // Hide "Mark Absent" after picked as well (child is already picked up)
-    final hideAbsent = isFinalized || picked;
+    
+    // Picked button: enabled when trip is scheduled/enroute/arrived (not yet picked)
+    final canPick = scheduled || enroute || arrived;
+    
+    // Dropped button: only enabled AFTER picked (sequential flow)
+    final canDrop = picked || inTransit;
+    
+    // Hide "Mark Absent" after picked (child is already picked up) or if finalized
+    final hideAbsent = isFinalized || picked || inTransit;
 
     return DriverDrawerCard(
       child: Padding(
@@ -92,15 +106,23 @@ class DriverOrderTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
+                // PICKED button: only active before picking
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: isFinalized ? null : onPicked,
-                    icon: const Icon(Icons.check_circle_outline, size: 18),
-                    label: const Text('Picked'),
+                    onPressed: canPick ? onPicked : null,
+                    icon: Icon(
+                      picked || canDrop || isFinalized 
+                          ? Icons.check_circle 
+                          : Icons.check_circle_outline,
+                      size: 18,
+                    ),
+                    label: Text(picked || canDrop ? 'Picked' : 'Pick Up'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: picked || isFinalized
-                          ? AppColors.darkGray
-                          : AppColors.primary,
+                      backgroundColor: picked || canDrop
+                          ? Colors.green  // Show green when picked
+                          : canPick 
+                              ? AppColors.primary 
+                              : AppColors.darkGray,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -111,15 +133,21 @@ class DriverOrderTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
+                // DROPPED button: only active AFTER picked
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: isFinalized ? null : onDropped,
-                    icon: const Icon(Icons.flag_outlined, size: 18),
-                    label: const Text('Dropped'),
+                    onPressed: canDrop ? onDropped : null,
+                    icon: Icon(
+                      dropped ? Icons.flag : Icons.flag_outlined,
+                      size: 18,
+                    ),
+                    label: Text(dropped ? 'Dropped' : 'Drop Off'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isFinalized
-                          ? AppColors.darkGray
-                          : AppColors.primary,
+                      backgroundColor: dropped
+                          ? Colors.green  // Show green when dropped
+                          : canDrop 
+                              ? AppColors.primary 
+                              : AppColors.darkGray,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -250,12 +278,35 @@ class _Avatar extends StatelessWidget {
               .join()
               .toUpperCase();
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return CircleAvatar(
-        radius: 24,
-        backgroundImage: NetworkImage(imageUrl!),
-        backgroundColor: AppColors.grayLight,
+      return ClipOval(
+        child: AppwriteImage(
+          imageUrl: imageUrl!,
+          width: 48,
+          height: 48,
+          fit: BoxFit.cover,
+          placeholder: Container(
+            width: 48,
+            height: 48,
+            color: AppColors.grayLight,
+            child: const Center(
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+          ),
+          errorWidget: _buildInitials(initials),
+        ),
       );
     }
+    return _buildInitials(initials);
+  }
+
+  Widget _buildInitials(String initials) {
     return CircleAvatar(
       radius: 24,
       backgroundColor: AppColors.primary.withValues(alpha: 0.1),

@@ -19,10 +19,10 @@ class VehicleRegistration {
   final String? certificateFrontPath;
   final String? certificateBackPath;
   
-  /// Appwrite Storage file IDs (after upload)
-  final String? vehiclePhotoFileId;
-  final String? registrationFrontFileId;
-  final String? registrationBackFileId;
+  /// Appwrite Storage URLs (after upload)
+  final String? vehiclePhotoUrl;
+  final String? registrationFrontUrl;
+  final String? registrationBackUrl;
   
   /// Whether this vehicle is currently active
   final bool isActive;
@@ -38,9 +38,9 @@ class VehicleRegistration {
     this.vehiclePhotoPath,
     this.certificateFrontPath,
     this.certificateBackPath,
-    this.vehiclePhotoFileId,
-    this.registrationFrontFileId,
-    this.registrationBackFileId,
+    this.vehiclePhotoUrl,
+    this.registrationFrontUrl,
+    this.registrationBackUrl,
     this.isActive = true,
   });
 
@@ -55,9 +55,9 @@ class VehicleRegistration {
     'vehiclePhotoPath': vehiclePhotoPath,
     'certificateFrontPath': certificateFrontPath,
     'certificateBackPath': certificateBackPath,
-    'vehiclePhotoFileId': vehiclePhotoFileId,
-    'registrationFrontFileId': registrationFrontFileId,
-    'registrationBackFileId': registrationBackFileId,
+    'vehiclePhotoUrl': vehiclePhotoUrl,
+    'registrationFrontUrl': registrationFrontUrl,
+    'registrationBackUrl': registrationBackUrl,
     'isActive': isActive,
   };
   
@@ -70,9 +70,9 @@ class VehicleRegistration {
     'productionYear': productionYear,
     'numberPlate': numberPlate,
     'seatCapacity': seatCapacity,
-    'vehiclePhotoFileId': vehiclePhotoFileId,
-    'registrationFrontFileId': registrationFrontFileId,
-    'registrationBackFileId': registrationBackFileId,
+    if (vehiclePhotoUrl != null) 'vehiclePhotoUrl': vehiclePhotoUrl,
+    if (registrationFrontUrl != null) 'registrationFrontUrl': registrationFrontUrl,
+    if (registrationBackUrl != null) 'registrationBackUrl': registrationBackUrl,
     'isActive': isActive,
   };
 
@@ -90,9 +90,43 @@ class VehicleRegistration {
         vehiclePhotoPath: json['vehiclePhotoPath']?.toString(),
         certificateFrontPath: json['certificateFrontPath']?.toString(),
         certificateBackPath: json['certificateBackPath']?.toString(),
-        vehiclePhotoFileId: json['vehiclePhotoFileId']?.toString(),
-        registrationFrontFileId: json['registrationFrontFileId']?.toString(),
-        registrationBackFileId: json['registrationBackFileId']?.toString(),
+        // Support both new Url fields and legacy FileId fields
+        vehiclePhotoUrl: json['vehiclePhotoUrl']?.toString() ?? json['vehiclePhotoFileId']?.toString(),
+        registrationFrontUrl: json['registrationFrontUrl']?.toString() ?? json['registrationFrontFileId']?.toString(),
+        registrationBackUrl: json['registrationBackUrl']?.toString() ?? json['registrationBackFileId']?.toString(),
         isActive: json['isActive'] == true || json['isActive'] == null,
       );
+  
+  /// Create a copy with updated fields
+  VehicleRegistration copyWith({
+    VehicleType? vehicleType,
+    String? brand,
+    String? model,
+    String? color,
+    String? productionYear,
+    String? numberPlate,
+    int? seatCapacity,
+    String? vehiclePhotoPath,
+    String? certificateFrontPath,
+    String? certificateBackPath,
+    String? vehiclePhotoUrl,
+    String? registrationFrontUrl,
+    String? registrationBackUrl,
+    bool? isActive,
+  }) => VehicleRegistration(
+    vehicleType: vehicleType ?? this.vehicleType,
+    brand: brand ?? this.brand,
+    model: model ?? this.model,
+    color: color ?? this.color,
+    productionYear: productionYear ?? this.productionYear,
+    numberPlate: numberPlate ?? this.numberPlate,
+    seatCapacity: seatCapacity ?? this.seatCapacity,
+    vehiclePhotoPath: vehiclePhotoPath ?? this.vehiclePhotoPath,
+    certificateFrontPath: certificateFrontPath ?? this.certificateFrontPath,
+    certificateBackPath: certificateBackPath ?? this.certificateBackPath,
+    vehiclePhotoUrl: vehiclePhotoUrl ?? this.vehiclePhotoUrl,
+    registrationFrontUrl: registrationFrontUrl ?? this.registrationFrontUrl,
+    registrationBackUrl: registrationBackUrl ?? this.registrationBackUrl,
+    isActive: isActive ?? this.isActive,
+  );
 }

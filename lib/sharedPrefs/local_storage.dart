@@ -6,6 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class StorageKeys {
   StorageKeys._();
 
+  // App state
+  static const hasSeenOnboarding = 'has_seen_onboarding';
+  static const userRole = 'user_role'; // 'driver' | 'parent'
+
   static const driverName = 'driver_name';
   static const vehicleSelection = 'vehicle_selection'; // e.g., Car/Rikshaw
 

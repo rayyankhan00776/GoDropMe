@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:godropme/regix/pakistan_number_formatter.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:godropme/features/parentSide/parentProfile/controllers/parent_profile_controller.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
@@ -18,6 +19,7 @@ class _EditPhoneScreenState extends State<EditPhoneScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
   final _isValid = true.obs; // Phone is optional, so valid by default
+  final _isSyncing = false.obs;
 
   @override
   void initState() {
@@ -50,7 +52,21 @@ class _EditPhoneScreenState extends State<EditPhoneScreen> {
   Future<void> _savePhone() async {
     if (_formKey.currentState?.validate() ?? false) {
       final phone = _phoneController.text.trim();
-      await LocalStorage.setString(StorageKeys.parentPhone, phone);
+      
+      _isSyncing.value = true;
+      
+      try {
+        // Use ParentProfileController to update and sync with Appwrite
+        final controller = Get.find<ParentProfileController>();
+        await controller.updatePhone(phone);
+      } catch (e) {
+        debugPrint('⚠️ Error updating phone: $e');
+        // Fallback: save locally only
+        // await LocalStorage.setString(StorageKeys.parentPhone, phone);
+      } finally {
+        _isSyncing.value = false;
+      }
+      
       // Hide keyboard before navigating back to avoid overflow
       if (!mounted) return;
       FocusScope.of(context).unfocus();

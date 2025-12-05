@@ -21,21 +21,36 @@ dependencies:
   get: ^4.6.5
 
   # flutter svg for svg images
-  flutter_svg: ^1.1.6
+  flutter_svg: ^2.2.3
 
   # Add image picker for camera access
   image_picker: ^1.2.0
+  
+  # Image compression for optimized uploads
+  flutter_image_compress: ^2.3.0
 
   # Local storage for simple key-value persistence
   shared_preferences: ^2.5.3
+
+
+  # Path provider for file system paths
+  path_provider: ^2.1.5
+
+  # Cached network images
+  cached_network_image: ^3.4.1
 
   # Maps and permissions
   google_maps_flutter: ^2.13.1
   permission_handler: ^12.0.1
   appwrite: ^20.2.1
-  geolocator: ^10.1.0
+  geolocator: ^14.0.1
   url_launcher: ^6.3.2
-  geocoding: ^2.1.0
+  geocoding: ^4.0.0
+  firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
+  firebase_analytics: ^12.0.4
+  # flutter_local_notifications: ^19.5.0
+  flutter_cache_manager: ^3.4.1
 
   # Product Specific Packages
   # add to be when needed
@@ -44,7 +59,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
@@ -73,7 +88,7 @@ flutter:
     # Driver service options (service categories)
     - assets/json/driver_details.json
     # Centralized schools list (used by both parent and driver sides)
-    - assets/json/schools.json
+    # - assets/json/schools.json
     # nav bar icons
     - assets/icons/navBarIcons/
     # map marker icons

@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:godropme/common_widgets/appwrite_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
@@ -16,10 +17,18 @@ class ChildPhotoPicker extends StatelessWidget {
     required this.onImageSelected,
   });
 
-  bool get _hasImage =>
+  bool get _isNetworkImage =>
       imagePath != null &&
       imagePath!.isNotEmpty &&
+      (imagePath!.startsWith('http://') || imagePath!.startsWith('https://'));
+
+  bool get _hasLocalImage =>
+      imagePath != null &&
+      imagePath!.isNotEmpty &&
+      !_isNetworkImage &&
       File(imagePath!).existsSync();
+
+  bool get _hasImage => _isNetworkImage || _hasLocalImage;
 
   Future<void> _showImagePickerOptions(BuildContext context) async {
     showModalBottomSheet(
@@ -81,7 +90,7 @@ class ChildPhotoPicker extends StatelessWidget {
                   await _pickImage(ImageSource.gallery);
                 },
               ),
-              if (_hasImage)
+              if (_hasLocalImage)
                 ListTile(
                   leading: Container(
                     padding: const EdgeInsets.all(10),
@@ -140,31 +149,7 @@ class ChildPhotoPicker extends StatelessWidget {
         child: Row(
           children: [
             // Avatar/placeholder
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _hasImage ? null : AppColors.grayLight,
-                image: _hasImage
-                    ? DecorationImage(
-                        image: FileImage(File(imagePath!)),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-                border: Border.all(
-                  color: _hasImage ? AppColors.primary : AppColors.gray,
-                  width: 2,
-                ),
-              ),
-              child: _hasImage
-                  ? null
-                  : const Icon(
-                      Icons.person_outline_rounded,
-                      size: 28,
-                      color: AppColors.darkGray,
-                    ),
-            ),
+            _buildPhotoContainer(),
             const SizedBox(width: 16),
             // Text
             Expanded(
@@ -196,6 +181,64 @@ class ChildPhotoPicker extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPhotoContainer() {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: _hasImage ? null : AppColors.grayLight,
+        border: Border.all(
+          color: _hasImage ? AppColors.primary : AppColors.gray,
+          width: 2,
+        ),
+      ),
+      child: ClipOval(
+        child: _hasImage ? _buildImageWidget() : _buildPlaceholder(),
+      ),
+    );
+  }
+
+  Widget _buildImageWidget() {
+    if (_isNetworkImage) {
+      return AppwriteImage(
+        imageUrl: imagePath!,
+        fit: BoxFit.cover,
+        width: 56,
+        height: 56,
+        placeholder: Container(
+          color: AppColors.grayLight,
+          child: const Center(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+        ),
+        errorWidget: _buildPlaceholder(),
+      );
+    } else {
+      return Image.file(
+        File(imagePath!),
+        fit: BoxFit.cover,
+        width: 56,
+        height: 56,
+      );
+    }
+  }
+
+  Widget _buildPlaceholder() {
+    return const Icon(
+      Icons.person_outline_rounded,
+      size: 28,
+      color: AppColors.darkGray,
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/common_widgets/custom_Appbar.dart';
 import 'package:godropme/common_widgets/progress_next_bar.dart';
+import 'package:godropme/services/appwrite/driver_registration_service.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
@@ -79,34 +80,19 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       key: _formWidgetKey,
                       formKey: _formKey,
                       onSubmit: (values) async {
-                        // Extract schools data - now using flat arrays
+                        // Extract schools data - store IDs for database
                         final schoolsData = (values['schools'] as List?) ?? [];
-                        final schoolNames = <String>[];
-                        final schoolPoints = <List<double>>[];
+                        final schoolIds = <String>[];
+                        final schoolNames = <String>[]; // For display/debug only
                         
                         for (final s in schoolsData) {
                           if (s is Map) {
+                            final id = s['id']?.toString() ?? '';
                             final name = s['name']?.toString() ?? '';
-                            // Handle both formats:
-                            // 1. New format: 'location': [lng, lat]
-                            // 2. Legacy format: 'lat' and 'lng' separate keys
-                            double lat = 0.0;
-                            double lng = 0.0;
                             
-                            final location = s['location'];
-                            if (location is List && location.length >= 2) {
-                              // New Appwrite point format: [lng, lat]
-                              lng = (location[0] as num).toDouble();
-                              lat = (location[1] as num).toDouble();
-                            } else {
-                              // Legacy format with separate keys
-                              lat = (s['lat'] as num?)?.toDouble() ?? 0.0;
-                              lng = (s['lng'] as num?)?.toDouble() ?? 0.0;
-                            }
-                            
-                            if (name.isNotEmpty) {
-                              schoolNames.add(name);
-                              schoolPoints.add([lng, lat]); // [lng, lat] for Appwrite point
+                            if (id.isNotEmpty) {
+                              schoolIds.add(id);
+                              schoolNames.add(name); // For controller display
                             }
                           }
                         }
@@ -171,9 +157,8 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                         await LocalStorage.setJson(
                           StorageKeys.driverServiceDetails,
                           {
-                            // Parallel arrays: schoolNames (string[]) and schoolPoints (point[])
-                            'schoolNames': schoolNames,
-                            'schoolPoints': schoolPoints, // Each is [lng, lat]
+                            // School IDs - foreign keys to schools table
+                            'schoolIds': schoolIds,
                             'serviceCategory': serviceCategory, // 'Male', 'Female', or 'Both'
                             'serviceAreaCenter': centerPoint, // [lng, lat] for Appwrite point
                             'serviceAreaAddress': _controller.routeStartAddress.value,
@@ -183,58 +168,57 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             'extraNotes': _controller.extraNotes.value,
                           },
                         );
-                        // Fetch and print aggregated onboarding data for debugging.
+                        
+                        // Submit registration to Appwrite
+                        // Show loading indicator
+                        Get.dialog(
+                          const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          barrierDismissible: false,
+                        );
+                        
                         try {
-                          final driverName = await LocalStorage.getString(
-                            StorageKeys.driverName,
-                          );
-                          final vehicleSelection = await LocalStorage.getString(
-                            StorageKeys.vehicleSelection,
-                          );
-                          final personal = await LocalStorage.getJson(
-                            StorageKeys.personalInfo,
-                          );
-                          final licence = await LocalStorage.getJson(
-                            StorageKeys.driverLicence,
-                          );
-                          final identification = await LocalStorage.getJson(
-                            StorageKeys.driverIdentification,
-                          );
-                          final vehicle = await LocalStorage.getJson(
-                            StorageKeys.vehicleRegistration,
-                          );
-                          final serviceDetails = await LocalStorage.getJson(
-                            StorageKeys.driverServiceDetails,
-                          );
-
-                          // Print in a compact, readable form to the debug console.
-                          // This data will later be sent to the backend.
-                          // ignore: avoid_print
-                          print('--- Onboarding cached data ---');
-                          // ignore: avoid_print
-                          print('driverName: $driverName');
-                          // ignore: avoid_print
-                          print('vehicleSelection: $vehicleSelection');
-                          // ignore: avoid_print
-                          print('personalInfo: ${personal ?? {}}');
-                          // ignore: avoid_print
-                          print('driverLicence: ${licence ?? {}}');
-                          // ignore: avoid_print
-                          print(
-                            'driverIdentification: ${identification ?? {}}',
-                          );
-                          // ignore: avoid_print
-                          print('vehicleRegistration: ${vehicle ?? {}}');
-                          // ignore: avoid_print
-                          print('serviceDetails: ${serviceDetails ?? {}}');
-                          // ignore: avoid_print
-                          print('--- end onboarding data ---');
+                          final result = await DriverRegistrationService.instance.submitRegistration();
+                          
+                          // Close loading dialog
+                          if (Get.isDialogOpen ?? false) {
+                            Get.back();
+                          }
+                          
+                          if (result.success) {
+                            // Clear local data after successful submission
+                            await DriverRegistrationService.instance.clearLocalData();
+                            
+                            // Navigate to pending approval screen
+                            // Driver will wait for admin approval (12-24 hrs)
+                            Get.offAllNamed(AppRoutes.driverPendingApproval);
+                          } else {
+                            // Show error message
+                            Get.snackbar(
+                              'Registration Failed',
+                              result.message ?? 'Please try again',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red.shade100,
+                              colorText: Colors.red.shade900,
+                              duration: const Duration(seconds: 4),
+                            );
+                          }
                         } catch (e) {
-                          // ignore: avoid_print
-                          print('Failed to print onboarding data: $e');
+                          // Close loading dialog
+                          if (Get.isDialogOpen ?? false) {
+                            Get.back();
+                          }
+                          
+                          Get.snackbar(
+                            'Error',
+                            'Something went wrong. Please try again.',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.red.shade100,
+                            colorText: Colors.red.shade900,
+                          );
+                          debugPrint('Registration error: $e');
                         }
-
-                        Get.offAllNamed(AppRoutes.driverMap);
                       },
                     ),
                   ],

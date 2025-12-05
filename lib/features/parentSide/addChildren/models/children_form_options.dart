@@ -18,7 +18,7 @@ class ChildrenFormOptions {
   /// Helper to get school names for UI dropdowns
   List<String> get schoolNames => schools.map((s) => s.name).toList();
 
-  /// Get school by name
+  /// Get school by name (for UI selection)
   School? getSchoolByName(String name) {
     try {
       return schools.firstWhere((s) => s.name == name);
@@ -26,9 +26,22 @@ class ChildrenFormOptions {
       return null;
     }
   }
+  
+  /// Get school by ID
+  School? getSchoolById(String id) {
+    try {
+      return schools.firstWhere((s) => s.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+  
+  /// Get school ID by name (for saving to database)
+  String? getSchoolId(String name) {
+    return getSchoolByName(name)?.id;
+  }
 
-  /// Empty fallback - should only be used if JSON fails to load
-  /// Actual data comes from assets/json/children_details.json
+  /// Empty fallback - should only be used if loading fails
   static const ChildrenFormOptions empty = ChildrenFormOptions(
     ages: [],
     genders: [],

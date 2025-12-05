@@ -18,8 +18,9 @@ typedef OnSaveChild = void Function(Map<String, dynamic> childData);
 
 class AddChildForm extends StatefulWidget {
   final OnSaveChild? onSave;
+  final Map<String, dynamic>? initialData;
 
-  const AddChildForm({this.onSave, super.key});
+  const AddChildForm({this.onSave, this.initialData, super.key});
 
   @override
   State<AddChildForm> createState() => AddChildFormState();
@@ -55,12 +56,101 @@ class AddChildFormState extends State<AddChildForm> {
   void initState() {
     super.initState();
     _loadOptions();
+    _populateFromInitialData();
+  }
+
+  void _populateFromInitialData() {
+    final data = widget.initialData;
+    if (data == null) return;
+    
+    // Populate text fields
+    _nameController.text = data['name']?.toString() ?? '';
+    _pickPointController.text = data['pickPoint']?.toString() ?? '';
+    _dropPointController.text = data['dropPoint']?.toString() ?? '';
+    
+    // Populate dropdowns
+    final age = data['age'];
+    if (age != null) {
+      _selectedAge = '$age years';
+    }
+    _selectedGender = data['gender']?.toString();
+    
+    // For school, try to get from _schoolName (pre-populated by controller)
+    // or resolve from schoolId once options are loaded
+    _selectedSchool = data['_schoolName']?.toString();
+    
+    _selectedRelation = data['relationshipToChild']?.toString();
+    
+    // Populate locations
+    final pickLoc = data['pickLocation'];
+    if (pickLoc is List && pickLoc.length >= 2) {
+      _pickLatLng = LatLng(pickLoc[1].toDouble(), pickLoc[0].toDouble()); // [lng, lat] -> LatLng(lat, lng)
+    }
+    final dropLoc = data['dropLocation'];
+    if (dropLoc is List && dropLoc.length >= 2) {
+      _dropLatLng = LatLng(dropLoc[1].toDouble(), dropLoc[0].toDouble());
+    }
+    
+    // Check if same as pick
+    _sameAsPick = _pickPointController.text == _dropPointController.text && 
+                  _pickPointController.text.isNotEmpty;
+    
+    // Populate times
+    final openTime = data['schoolOpenTime']?.toString();
+    if (openTime != null && openTime.isNotEmpty) {
+      _schoolOpenTime = _parseTimeOfDay(openTime);
+    }
+    final offTime = data['schoolOffTime']?.toString();
+    if (offTime != null && offTime.isNotEmpty) {
+      _schoolOffTime = _parseTimeOfDay(offTime);
+    }
+    
+    // Populate photo
+    _childPhotoPath = data['photoPath']?.toString();
+    // Also check for photoUrl for Appwrite stored images
+    if (_childPhotoPath == null || _childPhotoPath!.isEmpty) {
+      _childPhotoPath = data['photoUrl']?.toString();
+    }
+  }
+  
+  /// Parse time string like "7:30 AM" to TimeOfDay
+  TimeOfDay? _parseTimeOfDay(String timeStr) {
+    try {
+      final parts = timeStr.split(' ');
+      if (parts.length != 2) return null;
+      
+      final timeParts = parts[0].split(':');
+      if (timeParts.length != 2) return null;
+      
+      int hour = int.parse(timeParts[0]);
+      final minute = int.parse(timeParts[1]);
+      final isPM = parts[1].toUpperCase() == 'PM';
+      
+      if (isPM && hour != 12) hour += 12;
+      if (!isPM && hour == 12) hour = 0;
+      
+      return TimeOfDay(hour: hour, minute: minute);
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<void> _loadOptions() async {
     final loaded = await ChildrenFormOptionsLoader.load();
     if (!mounted) return;
-    setState(() => _options = loaded);
+    setState(() {
+      _options = loaded;
+      // If school wasn't pre-populated, resolve it now from schoolId
+      if ((_selectedSchool == null || _selectedSchool!.isEmpty) && widget.initialData != null) {
+        final schoolId = widget.initialData!['schoolId']?.toString();
+        if (schoolId != null && schoolId.isNotEmpty) {
+          final school = _options.getSchoolById(schoolId);
+          if (school != null) {
+            _selectedSchool = school.name;
+          }
+        }
+      }
+    });
   }
 
   @override
@@ -121,19 +211,22 @@ class AddChildFormState extends State<AddChildForm> {
       return;
     }
 
-    // Get the school object to extract lat/lng
+    // Get the school object to extract ID (primary key for database)
     final schoolObj = _options.getSchoolByName(schoolName);
-    // Store as [lng, lat] for Appwrite point type
-    final schoolLocation = schoolObj != null 
-        ? [schoolObj.lng, schoolObj.lat] 
-        : null;
+    final schoolId = schoolObj?.id ?? '';
+    
+    // Validate school was found
+    if (schoolId.isEmpty) {
+      _globalError = 'Please select a valid school';
+      setState(() {});
+      return;
+    }
 
     final data = {
       'name': name,
       'age': _parseAge(age), // Store as integer
       'gender': gender,
-      'schoolName': schoolName, // Appwrite: string
-      'schoolLocation': schoolLocation, // Appwrite: point [lng, lat]
+      'schoolId': schoolId, // Foreign key to schools table
       'pickPoint': pick,
       'dropPoint': drop,
       // Store as [lng, lat] for Appwrite point type

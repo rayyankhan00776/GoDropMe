@@ -2,6 +2,11 @@ part of '../routes.dart';
 
 final List<GetPage<dynamic>> commonRoutes = [
   GetPage(
+    name: AppRoutes.splash,
+    page: () => const SplashScreen(),
+    binding: SplashBinding(),
+  ),
+  GetPage(
     name: AppRoutes.onboard,
     page: () => const OnboardScreen(),
     binding: OnboardBinding(),

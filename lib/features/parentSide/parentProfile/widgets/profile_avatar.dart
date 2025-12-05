@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:godropme/common_widgets/appwrite_image.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/features/parentSide/parentProfile/controllers/parent_profile_controller.dart';
@@ -88,40 +89,11 @@ class ProfileAvatar extends StatelessWidget {
           ? Get.find<ParentProfileController>() 
           : Get.put(ParentProfileController()),
       builder: (controller) {
-        final hasImage = controller.hasProfileImage;
-        final imageFile = controller.profileImageFile;
-        
         return GestureDetector(
           onTap: editable ? () => _showImagePickerOptions(context) : null,
           child: Stack(
             children: [
-              Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey.shade200,
-                  border: Border.all(
-                    color: hasImage ? AppColors.primary : Colors.grey.shade400,
-                    width: 2,
-                  ),
-                  image: hasImage && imageFile != null
-                      ? DecorationImage(
-                          image: FileImage(imageFile),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                ),
-                child: hasImage
-                    ? null
-                    : Center(
-                        child: Icon(
-                          Icons.person_outline_rounded,
-                          size: size * 0.4,
-                          color: AppColors.darkGray.withValues(alpha: 0.5),
-                        ),
-                      ),
-              ),
+              _buildAvatarContainer(controller),
               // Edit badge
               if (editable)
                 Positioned(
@@ -135,9 +107,25 @@ class ProfileAvatar extends StatelessWidget {
                       border: Border.all(color: Colors.white, width: 2),
                     ),
                     child: Icon(
-                      hasImage ? Icons.edit : Icons.add_a_photo_outlined,
+                      controller.hasProfileImage ? Icons.edit : Icons.add_a_photo_outlined,
                       size: size * 0.15,
                       color: Colors.white,
+                    ),
+                  ),
+                ),
+              // Syncing indicator
+              if (controller.isSyncing.value)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black.withValues(alpha: 0.3),
+                    ),
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     ),
                   ),
                 ),
@@ -145,6 +133,66 @@ class ProfileAvatar extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildAvatarContainer(ParentProfileController controller) {
+    final imageUrl = controller.profileImageUrl.value;
+    final imageFile = controller.profileImageFile;
+    
+    // Priority: Network URL > Local file > Placeholder
+    final hasNetworkImage = imageUrl.isNotEmpty;
+    final hasLocalFile = imageFile != null && imageFile.existsSync();
+    final hasImage = hasNetworkImage || hasLocalFile;
+    
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.grey.shade200,
+        border: Border.all(
+          color: hasImage ? AppColors.primary : Colors.grey.shade400,
+          width: 2,
+        ),
+      ),
+      child: ClipOval(
+        child: hasNetworkImage
+            ? AppwriteImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.cover,
+                width: size,
+                height: size,
+                placeholder: Container(
+                  color: Colors.grey.shade200,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+                errorWidget: _buildPlaceholder(),
+              )
+            : hasLocalFile
+                ? Image.file(
+                    imageFile,
+                    fit: BoxFit.cover,
+                    width: size,
+                    height: size,
+                  )
+                : _buildPlaceholder(),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Center(
+      child: Icon(
+        Icons.person_outline_rounded,
+        size: size * 0.4,
+        color: AppColors.darkGray.withValues(alpha: 0.5),
+      ),
     );
   }
 }

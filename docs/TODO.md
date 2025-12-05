@@ -4,12 +4,824 @@
 > **Backend**: Appwrite Cloud (fra.cloud.appwrite.io)  
 > **Project ID**: `68ed397e000f277c6936`  
 > **Created**: November 27, 2025  
-> **Last Updated**: Current Session  
-> **Status**: Pre-Backend Preparation Complete ✅
+> **Last Updated**: December 3, 2025  
+> **Status**: Phase 3 Driver Registration ✅ COMPLETE | Driver Auth Flow ✅ COMPLETE | Status Unification ✅ COMPLETE
 
 ---
 
-## 🎯 Latest Session Changes (Comprehensive Codebase Audit & ID Fixes)
+## 🎯 Latest Session: Status Unification & Schema Cleanup (Dec 3, 2025)
+
+### ✅ Unified Status to Users Table Only
+
+Consolidated all user status management to use only the `users` table instead of having duplicate `verificationStatus` in `drivers` table.
+
+#### Schema Changes
+
+| Table | Column | Action | Notes |
+|-------|--------|--------|-------|
+| `users` | `status` | ✅ KEPT | Single source of truth: `pending`, `active`, `suspended`, `rejected` |
+| `users` | `statusReason` | ✅ CREATED | New column (500 chars) - combines suspension & rejection reasons |
+| `users` | `suspensionReason` | ❌ DELETED | Merged into `statusReason` |
+| `users` | `rejectionReason` | ❌ DELETED | Merged into `statusReason` |
+| `drivers` | `verificationStatus` | ❌ DELETED | Now uses `users.status` instead |
+
+#### Why Consolidate to `statusReason`?
+
+A user can only have ONE status at a time - they're either:
+- `pending` (no reason needed)
+- `active` (no reason needed)
+- `suspended` (needs reason → stored in `statusReason`)
+- `rejected` (needs reason → stored in `statusReason`)
+
+Since suspended and rejected are mutually exclusive, a single `statusReason` column suffices.
+
+#### Updated Constants
+
+```dart
+// lib/services/appwrite/database_constants.dart
+class CollectionEnums {
+  // User status values (used in users table)
+  static const String statusPending = 'pending';
+  static const String statusActive = 'active';
+  static const String statusSuspended = 'suspended';
+  static const String statusRejected = 'rejected';
+}
+```
+
+#### Files Modified
+
+| File | Changes |
+|------|---------|
+| `auth_service.dart` | Reads `status` and `statusReason` from users table only |
+| `driver_service.dart` | Removed `verificationStatus` writes; uses `CollectionEnums.statusPending` |
+| `Driver` model | Removed `verificationStatus` field and `DriverVerificationStatus` enum |
+| `splash_controller.dart` | Uses `CollectionEnums.status*` constants; passes `statusReason` to screens |
+| `otp_controller.dart` | Same routing logic as splash_controller |
+| `database_constants.dart` | Added `statusPending`, `statusActive`, `statusSuspended`, `statusRejected` |
+
+#### Updated Routing Flow
+
+```
+Login/Session Check
+        ↓
+   Check users table
+        ↓
+   Read status field
+        ↓
+┌───────┴───────┬───────────┬───────────┐
+│               │           │           │
+status=active  pending    rejected   suspended
+│               │           │           │
+▼               ▼           ▼           ▼
+Check role   Pending    Rejected    Suspended
+│            Screen     Screen      Screen
+├─► parent → Parent Map          (with statusReason)
+└─► driver → Check hasDriverProfile
+               │
+     ┌─────────┴─────────┐
+     │                   │
+   false               true
+     │                   │
+     ▼                   ▼
+Vehicle Selection    Driver Map
+(resume registration)
+```
+
+#### Key Code Changes
+
+**AuthResult now has single `statusReason`:**
+```dart
+class AuthResult {
+  final String? statusReason; // Used for both suspended and rejected
+  // ...
+}
+```
+
+**Routing uses statusReason for both screens:**
+```dart
+case CollectionEnums.statusSuspended:
+  Get.offAllNamed(AppRoutes.driverSuspended, 
+    arguments: {'reason': result.statusReason ?? 'No reason provided'});
+  
+case CollectionEnums.statusRejected:
+  Get.offAllNamed(AppRoutes.driverRejected,
+    arguments: {'reason': result.statusReason ?? 'No reason provided'});
+```
+
+---
+
+## 🎯 Previous Session: Phase 3 Driver Registration & Auth Flow (Dec 3, 2025)
+
+### ✅ Driver Registration Backend Services Created
+
+Complete backend services for driver registration flow using TablesDB API.
+
+#### Services Created
+
+| Service | File | Purpose | Lines |
+|---------|------|---------|-------|
+| `DriverService` | `lib/services/appwrite/driver_service.dart` | CRUD for `drivers` table | ~870 |
+| `VehicleService` | `lib/services/appwrite/vehicle_service.dart` | CRUD for `vehicles` table | ~539 |
+| `DriverConfigService` | `lib/services/appwrite/driver_config_service.dart` | CRUD for `driver_services` table | ~350 |
+| `DriverRegistrationService` | `lib/services/appwrite/driver_registration_service.dart` | Orchestrates complete registration | ~500 |
+
+#### Key Implementation Details
+
+**Problem Solved: "Missing required attribute cnicNumber"**
+- Appwrite `drivers` table requires ALL fields at creation time
+- Cannot create basic profile then update with documents later
+- Solution: `createDriverComplete()` method uploads ALL photos and provides ALL required fields in single `createRow()` call
+
+**CNIC Sanitization**
+- User input: `17301-4753215-4` (15 chars with dashes)
+- Database storage: `1730147532154` (13 digits only)
+- Added `_sanitizeCnic()` helper to strip non-digit characters
+
+### ✅ Driver User Registration Flow (Like Parent)
+
+Fixed auth flow so driver users are created in `users` table at name entry (like parents).
+
+#### Flow Comparison
+
+| Step | Parent Flow | Driver Flow (Updated) |
+|------|-------------|----------------------|
+| 1. OTP Verification | Account created | Account created |
+| 2. Name Entry | User created in `users` + `parents` table | User created in `users` table only |
+| 3. Registration Complete | ✅ Done | `drivers`, `vehicles`, `driver_services` tables created |
+
+#### Files Modified
+
+| File | Changes |
+|------|---------|
+| `auth_service.dart` | `registerUser()` only creates `users` row for drivers (not `drivers` row) |
+| `driver_name_controller.dart` | Added `registerDriver()` method (calls `AuthService.registerUser`) |
+| `driver_name_screen.dart` | Calls `registerDriver()` on submit, shows loading/error states |
+| `driverName_action.dart` | Added `isLoading` parameter for button state |
+
+### ✅ Incomplete Registration Resume Flow
+
+If driver user exists in `users` table but NOT in `drivers` table → resume at vehicle selection.
+
+#### Auth Result Enhanced
+
+Added `hasDriverProfile` field to track if driver completed registration:
+
+```dart
+class AuthResult {
+  // ... existing fields
+  final bool hasDriverProfile; // True if driver has profile in drivers table
+}
+```
+
+#### Files Modified
+
+| File | Changes |
+|------|---------|
+| `auth_service.dart` | Added `hasDriverProfile` to `_UserCheckResult` and `AuthResult` |
+| `splash_controller.dart` | Routes to `/vehicle_selection` if `!hasDriverProfile` |
+| `otp_controller.dart` | Same routing logic for post-login |
+
+### ✅ Driver Status Routing
+
+Complete status-based routing for drivers using unified `users.status`:
+
+```
+Login/Session Check
+        ↓
+   Check users table (role = driver)
+        ↓
+   Read status field (unified)
+        ↓
+┌───────┴───────┬───────────┬───────────┐
+│               │           │           │
+status=active  pending    rejected   suspended
+│               │           │           │
+▼               ▼           ▼           ▼
+Check           Pending    Rejected    Suspended
+hasDriverProfile Screen    Screen      Screen
+│                          (statusReason) (statusReason)
+├─► false → Vehicle Selection (resume registration)
+└─► true  → Driver Map
+```
+
+**Note**: `verificationStatus` was removed from `drivers` table. All status management now uses `users.status` only.
+
+### ✅ Profile Complete Flag
+
+When driver completes full registration, `users` table is updated:
+
+```dart
+// In driver_registration_service.dart → _markProfileComplete()
+await tablesDB.updateRow(
+  tableId: 'users',
+  rowId: authUserId,
+  data: {'isProfileComplete': true},
+);
+```
+
+### 📝 Registration Data Flow Summary
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                Driver Registration Flow                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. Driver Name Screen                                          │
+│     └─► Creates: users table row (role: driver)                 │
+│                                                                  │
+│  2. Vehicle Selection → Personal Info → CNIC → License →        │
+│     Vehicle Details → Service Details                           │
+│     └─► All data saved to LOCAL STORAGE                         │
+│                                                                  │
+│  3. Service Details → Submit Registration                       │
+│     └─► DriverRegistrationService.submitRegistration()          │
+│         ├─► Upload ALL photos (profile, CNIC×2, license×2)      │
+│         ├─► Create drivers row (with ALL required fields)       │
+│         ├─► Create vehicles row                                 │
+│         ├─► Create driver_services row                          │
+│         ├─► Update users.isProfileComplete = true               │
+│         └─► Clear local storage                                 │
+│                                                                  │
+│  4. Navigate to Pending Approval Screen                         │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🎯 Previous Session: Deprecated Fields Cleanup (Dec 3, 2025)
+
+### ✅ Removed All Deprecated Fields
+
+Removed `schoolName`, `schoolLocation`, `schoolNames`, `schoolPoints` from code and Appwrite tables.
+
+### Appwrite Schema (Final)
+
+#### `children` Table
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `schoolId` | string(36) | FK to schools table ✅ |
+| `schoolName` | ❌ **DELETED** | Column removed from Appwrite |
+| `schoolLocation` | ❌ **DELETED** | Column removed from Appwrite |
+
+#### `driver_services` Table
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `schoolIds` | string[](36) | Array of FKs to schools table ✅ |
+| `schoolNames` | ❌ **DELETED** | Column removed from Appwrite |
+
+### Code Changes
+
+#### Models Cleaned
+
+| Model | Changes |
+|-------|---------|
+| `ChildModel` | Removed `schoolName` field completely |
+| `ServiceDetails` | Removed legacy `schoolNames` fallback |
+| `DriverService` | Removed legacy `schoolNames` fallback |
+
+#### UI Updated
+
+| Component | Change |
+|-----------|--------|
+| `child_tile.dart` | Looks up school name from `schoolId` using `SchoolsLoader.getById()` |
+| `add_child_form.dart` | Only saves `schoolId`, no `schoolName` |
+| `add_children_controller.dart` | Removed `_populateSchoolNames()` method |
+
+### Data Flow (Final)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 Clean School Architecture                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Appwrite `schools` Table (Source of Truth)                     │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ id | name | shortName | location | address | city | ... │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                          ▲                                       │
+│                          │ Lookup by ID                         │
+│         ┌────────────────┴────────────────┐                     │
+│         │                                 │                     │
+│  ┌──────┴──────┐                  ┌──────┴──────┐               │
+│  │  children   │                  │driver_services│             │
+│  │  (schoolId) │                  │ (schoolIds[]) │             │
+│  └─────────────┘                  └───────────────┘             │
+│                                                                  │
+│  Display: SchoolsLoader.getById() → school.name                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🎯 Previous Session: School ID Foreign Keys (Dec 3, 2025)
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ $id (PK)     │ name          │ location [lng,lat]       │    │
+│  ├──────────────┼───────────────┼──────────────────────────┤    │
+│  │ abc123       │ City School   │ [71.518, 34.035]         │    │
+│  │ def456       │ Grammar School│ [71.528, 34.012]         │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                          │                                       │
+│         ┌────────────────┴────────────────┐                     │
+│         ▼                                 ▼                      │
+│  Parent Side                       Driver Side                   │
+│  ┌──────────────────┐              ┌──────────────────┐          │
+│  │ Form: Select     │              │ Form: Select     │          │
+│  │ school by name   │              │ schools by name  │          │
+│  │                  │              │                  │          │
+│  │ Save: schoolId   │              │ Save: schoolIds[]│          │
+│  │ (FK to schools)  │              │ (FK array)       │          │
+│  └──────────────────┘              └──────────────────┘          │
+│           │                                 │                    │
+│           ▼                                 ▼                    │
+│  children table                    driver_services table         │
+│  ┌──────────────────┐              ┌──────────────────┐          │
+│  │ schoolId: abc123 │              │ schoolIds:       │          │
+│  │                  │              │ [abc123, def456] │          │
+│  └──────────────────┘              └──────────────────┘          │
+│           │                                 │                    │
+│           └─────────────┬───────────────────┘                    │
+│                         ▼                                        │
+│              SchoolsLoader.getById(s)                            │
+│              (Lookup names/coords when displaying)               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow Summary
+
+| Operation | Data Saved | How Names Displayed |
+|-----------|------------|---------------------|
+| Add Child | `schoolId` | `SchoolsLoader.getById()` |
+| Driver Service Details | `schoolIds[]` | `SchoolsLoader.getByIds()` |
+| Children List | Read `schoolId` | Controller populates `schoolName` |
+| Driver Profile | Read `schoolIds` | Screen fetches school names |
+
+### Benefits
+
+1. **Data Integrity**: School name changes in one place (schools table)
+2. **Referential Integrity**: IDs are stable, names can change
+3. **Reduced Storage**: One name per school, not duplicated everywhere
+4. **Easier Queries**: Can join/filter by school ID
+
+---
+
+## 🎯 Previous Session: Schools Backend & schoolPoints Resolution (Dec 3, 2025)
+
+### ✅ Schools Table Created in Appwrite
+
+Resolved the `schoolPoints` issue - Appwrite doesn't support `point[]` (array of points). Created a central `schools` table for lookup.
+
+| Table | Columns | Purpose |
+|-------|---------|---------|
+| `schools` | name, location, city, isActive | Central source of truth for school coordinates |
+
+#### Schools Table Schema
+
+| Column | Type | Required | Default | Notes |
+|--------|------|----------|---------|-------|
+| `name` | string (256) | ✅ | - | Unique index |
+| `location` | point | ✅ | - | [lng, lat] format |
+| `city` | string (100) | ❌ | "Peshawar" | Key index |
+| `isActive` | boolean | ❌ | true | Key index |
+
+#### Indexes Created
+
+| Index | Type | Column |
+|-------|------|--------|
+| `idx_name` | unique | name |
+| `idx_city` | key | city |
+| `idx_isActive` | key | isActive |
+
+### ✅ 32 Schools Seeded from JSON
+
+All schools from `assets/json/schools.json` were inserted into Appwrite:
+- Schools 1-16: First batch (Peshawar Grammar, City School, etc.)
+- Schools 17-32: Second batch (various Peshawar schools)
+- All with `city: "Peshawar"`, `isActive: true`
+
+### ✅ SchoolsLoader Updated
+
+Updated `lib/utils/schools_loader.dart` to fetch from Appwrite with JSON fallback:
+
+```dart
+// New flow:
+1. Check cache validity (1 hour)
+2. Try Appwrite: tablesDB.listRows('schools') with Query.equal('isActive', true)
+3. Fallback to assets/json/schools.json if Appwrite fails
+4. Return cached data
+```
+
+### ✅ ServiceDetails Model Updated
+
+Made `schoolPoints` optional since it's not stored in Appwrite:
+
+| Change | Before | After |
+|--------|--------|-------|
+| `schoolPoints` | `required` | `optional (default: [])` |
+| Constructor | `required this.schoolPoints` | `this.schoolPoints = const []` |
+| `toJson()` | Always included | Only if not empty |
+| `toAppwriteJson()` | Excluded | Still excluded |
+
+### ✅ Database Constants Updated
+
+```dart
+// lib/services/appwrite/database_constants.dart
+static const String schools = 'schools'; // Added
+```
+
+### 🔍 Children Table - schoolLocation Decision
+
+**Kept `schoolLocation` in ChildModel** because:
+- Children table has `schoolLocation` as a **single point** (child goes to ONE school)
+- Appwrite **supports** single `point` type
+- Different from driver_services which needs **array of points** (driver serves multiple schools)
+
+| Model | Field | Appwrite Support | Decision |
+|-------|-------|------------------|----------|
+| `ChildModel` | `schoolLocation` | ✅ Single point | **KEEP** |
+| `ServiceDetails` | `schoolPoints` | ❌ Point array | **OPTIONAL (local only)** |
+
+### 🏗️ Architecture: How Schools Work Now
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Schools Architecture                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Appwrite `schools` Table (Source of Truth)                     │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ name          │ location [lng,lat] │ city     │ isActive│    │
+│  ├───────────────┼────────────────────┼──────────┼─────────┤    │
+│  │ City School   │ [71.518, 34.035]   │ Peshawar │ true    │    │
+│  │ Grammar School│ [71.528, 34.012]   │ Peshawar │ true    │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                          │                                       │
+│                          ▼                                       │
+│  SchoolsLoader (lib/utils/schools_loader.dart)                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ 1. Fetch from Appwrite (primary)                        │    │
+│  │ 2. Fallback to assets/json/schools.json                 │    │
+│  │ 3. Cache for 1 hour                                     │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                          │                                       │
+│         ┌────────────────┴────────────────┐                     │
+│         ▼                                 ▼                      │
+│  Parent Side                       Driver Side                   │
+│  (Add Child Form)                  (Service Details Form)        │
+│  ┌──────────────────┐              ┌──────────────────┐          │
+│  │ Select 1 school  │              │ Select N schools │          │
+│  │ Store: schoolName│              │ Store: schoolNames│         │
+│  │ + schoolLocation │              │ (names only!)    │          │
+│  │ (single point ✅)│              │ No schoolPoints  │          │
+│  └──────────────────┘              │ in Appwrite      │          │
+│           │                        └──────────────────┘          │
+│           ▼                                 │                    │
+│  children table                             ▼                    │
+│  (schoolLocation: point)           driver_services table         │
+│                                    (schoolNames: string[])       │
+│                                                                  │
+│  Driver Matching: By school name + serviceAreaPolygon geo-query  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🎯 Previous Session: TablesDB Migration & API Deprecation Fix (Dec 2, 2025)
+
+### ✅ Migrated from Deprecated Databases API to TablesDB API
+
+Appwrite deprecated the `Databases` methods. All service files now use the new `TablesDB` API:
+
+| Old (Deprecated) | New (TablesDB) |
+|------------------|----------------|
+| `databases.createDocument()` | `tablesDB.createRow()` |
+| `databases.getDocument()` | `tablesDB.getRow()` |
+| `databases.listDocuments()` | `tablesDB.listRows()` |
+| `databases.updateDocument()` | `tablesDB.updateRow()` |
+| `databases.deleteDocument()` | `tablesDB.deleteRow()` |
+| `collectionId` parameter | `tableId` parameter |
+| `documentId` parameter | `rowId` parameter |
+| `DocumentList.documents` | `RowList.rows` |
+
+### ✅ Files Updated for TablesDB
+
+| File | Changes |
+|------|---------|
+| **appwrite_client.dart** | Added `tablesDBService()` helper method |
+| **parent_service.dart** | Updated 6 methods to use TablesDB |
+| **auth_service.dart** | Updated 5 method calls to use TablesDB |
+| **child_service.dart** | Updated 7 methods to use TablesDB |
+
+### ✅ AppwriteImage Widget Created
+
+Created a new widget for authenticated image loading from Appwrite storage:
+
+| Feature | Details |
+|---------|---------|
+| **Location** | `lib/common_widgets/appwrite_image.dart` |
+| **Purpose** | Load images from buckets with `read("users")` permission |
+| **Method** | Uses `storage.getFileView()` SDK method for authentication |
+| **Caching** | In-memory cache with URL parsing for bucket/file IDs |
+| **Files Updated** | 7 UI files now use `AppwriteImage` instead of `CachedNetworkImage` |
+
+### ⚠️ Account Update & Delete Flow - IMPORTANT
+
+#### Email Update Issue (UI DISABLED)
+Email update is **disabled in UI** because Appwrite's `account.updateEmail()` requires the user's password:
+```dart
+// This requires password - not feasible without password field
+await account.updateEmail(email: newEmail, password: userPassword);
+```
+
+**Current Update Flow (Name/Phone only):**
+```
+updateParent() syncs to 3 places:
+1. Account.updateName() - Updates account display name ✅
+2. Users table - Updates phone/email in database ✅
+3. Parents table - Updates fullName/phone/email ✅
+
+Email update: DISABLED in UI (requires password)
+```
+
+#### Delete Account Flow - INCOMPLETE ⚠️
+
+**Current Implementation (settings_controller.dart):**
+```dart
+deleteAccount() {
+  1. Delete all children (ChildService.deleteAllChildren) ✅
+  2. Delete parent profile (ParentService.deleteParent) ✅
+  3. Logout (AuthService.logout - only deletes session) ❌
+  4. Clear local data ✅
+}
+```
+
+**What's Missing:**
+| Location | Current Status | Required Action |
+|----------|----------------|-----------------|
+| **Children table** | ✅ Deleted | `deleteAllChildren()` |
+| **Parents table** | ✅ Deleted | `deleteParent()` |
+| **Users table** | ❌ NOT Deleted | Need to add `deleteRow()` |
+| **Account (Auth)** | ❌ NOT Deleted | Client SDK can only block, not delete! |
+
+**Appwrite Account Deletion Limitation:**
+- `account.updateStatus()` can only **block** the account (set status to false)
+- **Full account deletion requires Server SDK** with API key (not available in client app)
+- Options:
+  1. Create an Appwrite Function to delete users (requires API key)
+  2. Just block the account + delete all data from tables
+  3. Admin manually deletes blocked accounts periodically
+
+---
+
+## 🎯 Previous Session: Phone Optional & Driver Review Dialog
+
+### ✅ Phone Number Made Optional (Parents Collection)
+
+Updated the `parents` collection to make phone number optional:
+
+| Change | Details |
+|--------|---------|
+| **Appwrite Table** | `phone` column: `required: false`, `default: ""` |
+| **ParentProfile Model** | `phone` is now `PhoneNumber?` (nullable) |
+| **profile_screen.dart** | Updated null check for optional phone |
+| **TODO.md** | Schema updated to reflect optional phone |
+
+### ✅ Driver Review Dialog (NEW)
+
+Created a themed dialog for parents to rate and review their driver after 1 month of service.
+
+| Feature | Description |
+|---------|-------------|
+| **Location** | `lib/shared/widgets/driver_review_dialog.dart` |
+| **Theme** | Purple gradient header matching app theme |
+| **Rating** | 5-star interactive rating with emoji labels |
+| **Review** | Optional text review field (max 500 chars) |
+| **Photo** | Driver profile photo with fallback avatar |
+| **Badge** | "1 Month of Service 🎉" celebration badge |
+| **Actions** | Submit Review / Maybe Later buttons |
+
+**Usage Example:**
+```dart
+// Show dialog on ParentMap screen after 1 month of service
+await DriverReviewDialog.show(
+  context: context,
+  driverName: 'Muhammad Ali',
+  driverPhotoUrl: 'https://example.com/photo.jpg',
+  onSubmit: (rating, review) {
+    // Save to Appwrite ratings collection
+    await databases.createDocument(
+      databaseId: 'godropme_db',
+      collectionId: 'ratings',
+      documentId: ID.unique(),
+      data: {
+        'driverId': driverId,
+        'parentId': parentId,
+        'tripId': tripId,  // Optional
+        'rating': rating,
+        'review': review,
+        'createdAt': DateTime.now().toIso8601String(),
+      },
+    );
+  },
+  onSkip: () {
+    // Track that user skipped, maybe ask again later
+  },
+);
+```
+
+**Rating Labels:**
+| Rating | Emoji Label |
+|--------|-------------|
+| 1 star | Poor 😞 |
+| 2 stars | Fair 😐 |
+| 3 stars | Good 🙂 |
+| 4 stars | Very Good 😊 |
+| 5 stars | Excellent! 🌟 |
+
+---
+
+## 🎯 Previous Session: Driver Status Screens & Auth Flow
+
+### ✅ Driver Pending Approval Screen (NEW)
+
+Created screen shown to drivers after completing registration while awaiting admin review.
+
+| Feature | Description |
+|---------|-------------|
+| **Location** | `lib/features/DriverSide/driverPendingApproval/pages/driver_pending_approval_screen.dart` |
+| **Route** | `/driver_pending_approval` |
+| **Icon** | Hourglass (purple theme) |
+| **Message** | "Application Under Review - 12-24 hours" |
+| **Info Card** | Notification and email update info |
+| **Action** | "Got it" button → returns to onboard |
+
+### ✅ Driver Suspended Screen (NEW)
+
+Created screen shown when admin suspends a driver account.
+
+| Feature | Description |
+|---------|-------------|
+| **Location** | `lib/features/DriverSide/driverSuspended/pages/driver_suspended_screen.dart` |
+| **Route** | `/driver_suspended` |
+| **Icon** | Block icon (red/accent theme) |
+| **Shows** | Suspension reason (from route arguments) |
+| **Info Card** | Contact support info |
+| **Actions** | "Contact Support" button, "Sign Out" button |
+
+### ✅ Driver Rejected Screen (NEW)
+
+Created screen shown when admin rejects a driver application.
+
+| Feature | Description |
+|---------|-------------|
+| **Location** | `lib/features/DriverSide/driverRejected/pages/driver_rejected_screen.dart` |
+| **Route** | `/driver_rejected` |
+| **Icon** | Cancel icon (red/accent theme) |
+| **Shows** | Rejection reason with styled card |
+| **Info Card** | "What to do next" guidance |
+| **Actions** | "Contact Support", "Apply Again" (restarts registration), "Sign Out" |
+
+### ✅ Updated Routes
+
+Added 3 new routes in `routes.dart` and `driver_routes.dart`:
+
+```dart
+static const String driverPendingApproval = '/driver_pending_approval';
+static const String driverSuspended = '/driver_suspended';
+static const String driverRejected = '/driver_rejected';
+```
+
+### ✅ Updated Driver Registration Flow
+
+Changed `service_details_screen.dart` to navigate to pending approval screen instead of directly to driver map:
+
+```dart
+// Before
+Get.offAllNamed(AppRoutes.driverMap);
+
+// After
+Get.offAllNamed(AppRoutes.driverPendingApproval);
+```
+
+### ✅ Complete Driver Status Flow
+
+```
+Driver Registration Complete
+         ↓
+   Pending Approval (/driver_pending_approval)
+         ↓
+    Admin Reviews (12-24 hrs)
+         ↓
+   ┌─────┴─────┐
+   ▼           ▼
+APPROVED    REJECTED
+   ↓           ↓
+Driver Map  Rejected Screen (/driver_rejected)
+   ↓           ↓
+(Active)    Can Re-apply or Contact Support
+   ↓
+If Suspended Later → Suspended Screen (/driver_suspended)
+```
+
+### ✅ Usage Examples
+
+```dart
+// After registration completion
+Get.offAllNamed(AppRoutes.driverPendingApproval);
+
+// On rejection (with reason)
+Get.offAllNamed(AppRoutes.driverRejected, arguments: {
+  'reason': 'Blurry license photo. Please re-upload with clear images.',
+});
+
+// On suspension (with reason)
+Get.offAllNamed(AppRoutes.driverSuspended, arguments: {
+  'reason': 'Multiple complaints received from parents.',
+});
+
+// On approval
+Get.offAllNamed(AppRoutes.driverMap);
+```
+
+---
+
+## 🎯 Previous Session: Trip Generation Split & Analytics System
+
+### ✅ Trip Generation Split (Improvement)
+
+**Before**: Single `generate-daily-trips` function at 4:30 AM creating both morning and afternoon trips
+
+**After**: Two separate functions for precise timing:
+
+| Function | CRON Schedule | Purpose |
+|----------|---------------|---------|
+| `generate-morning-trips` | **5:00 AM PKT** (`0 5 * * *`) | Creates home→school trips |
+| `generate-afternoon-trips` | **11:00 AM PKT** (`0 11 * * *`) | Creates school→home trips |
+
+**Benefits:**
+- More accurate driver availability tracking
+- Allows same-day changes (e.g., child marked absent before afternoon trips created)
+- Reduced system load by spreading operations
+- Afternoon trips respect morning absence flags
+
+### ✅ Analytics & Trip History Collections (NEW)
+
+Added **2 new collections** for monitoring and reporting:
+
+| Collection | Purpose |
+|------------|---------|
+| `daily_analytics` | Daily aggregated metrics (trips, completion rates, delays, etc.) |
+| `trip_history` | Individual trip records preserved after trips collection cleanup |
+
+### ✅ New Appwrite Functions
+
+| Function | Trigger | Purpose |
+|----------|---------|---------|
+| `generate-daily-analytics` | CRON at 11:59 PM | Create daily analytics summary |
+| `archive-trip-to-history` | Event on trip update | Archive trip when it reaches terminal state |
+
+### ✅ UI Bug Fixes
+
+| Bug | File | Fix |
+|-----|------|-----|
+| Parent profile email not loading | `lib/models/parent_profile.dart` | Added email loading in `loadFromLocal()` |
+| "My Location" button not working | `lib/shared/bottom_sheets/location_picker/location_picker_sheet.dart` | Reset `_userChangedSelection = false` in `_locateMe()` |
+
+### ✅ Driver Order Tile UX Improvements
+
+**Key Insight**: Morning and Afternoon are **separate trip documents** — no button reset needed!
+
+| Improvement | Description |
+|-------------|-------------|
+| **Sequential Button Flow** | Pick Up → then Drop Off becomes active (logical order) |
+| **Window Filtering** | Controller filters trips by current time window (morning/afternoon) |
+| **Direction Indicator** | Visual badge showing "Home → School" or "School → Home" |
+| **Window Header** | Screen header shows current active window |
+| **Button States** | Green checkmark when action completed, gray when disabled |
+
+**Button Logic:**
+```
+Scheduled/Enroute/Arrived → [Pick Up ✓] [Drop Off ✗] [Absent ✓]
+Picked/InTransit         → [Picked ✓]  [Drop Off ✓] [Absent hidden]
+Dropped/Absent/Cancelled → All buttons disabled (finalized)
+```
+
+**Files Updated:**
+- `driver_order_tile.dart` — Sequential button logic, direction indicator
+- `driver_orders_controller.dart` — Window filtering, demo data for both windows
+- `driver_orders_screen.dart` — Window header indicator
+
+### ✅ Updated Schema Summary
+
+- **Total Collections**: 17 (was 14, added `daily_analytics` + `trip_history` + `ratings`)
+- **Total Functions**: 10 (was 7, added 3 new functions)
+- **Codebase Analysis**: `flutter analyze` shows 12 minor info issues (no errors)
+
+---
+
+## 🎯 Previous Session: Comprehensive Codebase Audit & ID Fixes
 
 ### ✅ Full Codebase Audit Against Appwrite Schema
 
@@ -252,22 +1064,60 @@ GoDropMe connects **Parents** seeking safe school transportation with **Drivers*
 
 Based on [Appwrite Email OTP Documentation](https://appwrite.io/docs/products/auth/email-otp):
 
-### Flow:
+### Registration Flow (New Users):
 ```
-1. User enters email → account.createEmailToken(userId, email)
+1. User on Onboard Screen → taps "Get Started"
    ↓
-2. User receives 6-digit OTP via email
+2. Option Screen → User sees registration options
    ↓
-3. User enters OTP → account.createSession(userId, secret)
+3. Email Screen → User enters email
    ↓
-4. Session created → User authenticated
+4. account.createEmailToken(userId: ID.unique(), email) → OTP sent
+   ↓
+5. OTP Screen → User enters 6-digit code
+   ↓
+6. account.createSession(userId, secret) → Session created
+   ↓
+7. DOP Option Screen → Choose Parent or Driver role
+   ↓
+8. Role-specific registration flow begins
+```
+
+### Login Flow (Already Registered Users):
+```
+1. User on Onboard Screen → taps "Already have an account?" / "Sign In"
+   ↓
+2. Option Screen → User sees login options
+   ↓
+3. Email Screen → User enters their registered email
+   ↓
+4. account.createEmailToken(userId: existingUserId, email) → OTP sent
+   ↓
+5. OTP Screen → User enters 6-digit code
+   ↓
+6. account.createSession(userId, secret) → Session created
+   ↓
+7. CHECK USER STATUS in 'users' collection:
+   │
+   ├─► status == 'active' && role == 'parent' → Parent Map (/map_screen)
+   │
+   ├─► status == 'active' && role == 'driver' && hasDriverProfile → Driver Map (/driver_map)
+   │
+   ├─► status == 'active' && role == 'driver' && !hasDriverProfile → Vehicle Selection (resume)
+   │
+   ├─► status == 'pending' → Pending Approval (/driver_pending_approval)
+   │
+   ├─► status == 'rejected' → Rejected Screen (/driver_rejected) with statusReason
+   │
+   └─► status == 'suspended' → Suspended Screen (/driver_suspended) with statusReason
 ```
 
 ### Key Methods:
 ```dart
-// Step 1: Send OTP
+// Step 1: Send OTP (works for both new and existing users)
 final token = await account.createEmailToken(
-  userId: ID.unique(),
+  userId: ID.unique(), // For new users
+  // OR: userId: existingUserId, // For existing users (looked up by email)
   email: 'user@example.com',
 );
 final userId = token.userId;
@@ -276,6 +1126,397 @@ final userId = token.userId;
 final session = await account.createSession(
   userId: userId,
   secret: '123456', // 6-digit OTP from email
+);
+
+// Step 3: Check status and redirect (for existing users)
+Future<void> handlePostLogin(String userId) async {
+  try {
+    final userDoc = await tablesDB.getRow(
+      databaseId: 'godropme_db',
+      tableId: 'users',
+      rowId: userId,
+    );
+    
+    final role = userDoc.data['role'];
+    final status = userDoc.data['status'];
+    final statusReason = userDoc.data['statusReason'];
+    
+    // Use CollectionEnums constants for type-safe comparison
+    switch (status) {
+      case CollectionEnums.statusActive:
+        if (role == 'parent') {
+          Get.offAllNamed(AppRoutes.parentmapScreen);
+        } else if (role == 'driver') {
+          // Check if driver has profile
+          final hasProfile = await _checkDriverProfile(userId);
+          if (hasProfile) {
+            Get.offAllNamed(AppRoutes.driverMap);
+          } else {
+            Get.offAllNamed(AppRoutes.vehicleSelection); // Resume registration
+          }
+        }
+        break;
+        
+      case CollectionEnums.statusPending:
+        Get.offAllNamed(AppRoutes.driverPendingApproval);
+        break;
+        
+      case CollectionEnums.statusRejected:
+        Get.offAllNamed(AppRoutes.driverRejected,
+          arguments: {'reason': statusReason ?? 'No reason provided'});
+        break;
+        
+      case CollectionEnums.statusSuspended:
+        Get.offAllNamed(AppRoutes.driverSuspended,
+          arguments: {'reason': statusReason ?? 'No reason provided'});
+        break;
+    }
+  } catch (e) {
+    // User document not found - new user, go to DOP Option
+    Get.offAllNamed(AppRoutes.dopOption);
+  }
+}
+```
+
+### Visual Login Flow:
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    EXISTING USER LOGIN                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐  │
+│  │ Onboard  │───►│  Option  │───►│  Email   │───►│   OTP    │  │
+│  │ Screen   │    │  Screen  │    │  Screen  │    │  Screen  │  │
+│  └──────────┘    └──────────┘    └──────────┘    └────┬─────┘  │
+│                                                        │        │
+│                                                        ▼        │
+│                                              ┌─────────────────┐│
+│                                              │ Check User Role ││
+│                                              │ in 'users' DB   ││
+│                                              └────────┬────────┘│
+│                                                       │         │
+│                         ┌─────────────────────────────┼─────────┤
+│                         │                             │         │
+│                         ▼                             ▼         │
+│              ┌────────────────────┐       ┌────────────────────┐│
+│              │   role == 'parent' │       │  role == 'driver'  ││
+│              └─────────┬──────────┘       └─────────┬──────────┘│
+│                        │                            │           │
+│                        ▼                            ▼           │
+│              ┌────────────────────┐      ┌─────────────────────┐│
+│              │   Parent Map       │      │  Check Driver       ││
+│              │   (/map_screen)    │      │  Status             ││
+│              └────────────────────┘      └──────────┬──────────┘│
+│                                                     │           │
+│                    ┌────────────────────────────────┼───────────┤
+│                    │              │                 │           │
+│                    ▼              ▼                 ▼           │
+│           ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│           │   Active    │ │  Pending    │ │ Rejected/   │       │
+│           │   Driver    │ │  Approval   │ │ Suspended   │       │
+│           └──────┬──────┘ └──────┬──────┘ └──────┬──────┘       │
+│                  │               │               │              │
+│                  ▼               ▼               ▼              │
+│           ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│           │ Driver Map  │ │ Pending     │ │ Status      │       │
+│           │(/driver_map)│ │ Screen      │ │ Screen      │       │
+│           └─────────────┘ └─────────────┘ └─────────────┘       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Complete App Flow (Registration to Active User)
+
+### User Journey Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           APP LAUNCH                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌───────────┐ │
+│   │  Onboard    │ ──► │   Option    │ ──► │   Email     │ ──► │    OTP    │ │
+│   │  Screen     │     │   Screen    │     │   Screen    │     │   Screen  │ │
+│   └─────────────┘     └─────────────┘     └─────────────┘     └─────┬─────┘ │
+│                                                                      │       │
+│                                                                      ▼       │
+│                                                           ┌─────────────────┐│
+│                                                           │  DOP Option     ││
+│                                                           │ (Parent/Driver) ││
+│                                                           └────────┬────────┘│
+│                                                                    │         │
+│                          ┌─────────────────────────────────────────┼─────────┤
+│                          │                                         │         │
+│                          ▼                                         ▼         │
+│               ┌─────────────────────┐               ┌────────────────────────┤
+│               │    PARENT FLOW      │               │     DRIVER FLOW        │
+│               ├─────────────────────┤               ├────────────────────────┤
+│               │                     │               │                        │
+│               │  ┌───────────────┐  │               │  ┌──────────────────┐  │
+│               │  │  Parent Name  │  │               │  │   Driver Name    │  │
+│               │  │    Screen     │  │               │  │     Screen       │  │
+│               │  └───────┬───────┘  │               │  └────────┬─────────┘  │
+│               │          │          │               │           │            │
+│               │          ▼          │               │           ▼            │
+│               │  ┌───────────────┐  │               │  ┌──────────────────┐  │
+│               │  │  Parent Map   │  │               │  │ Vehicle Selection│  │
+│               │  │   (Home)      │  │               │  │   (Car/Rikshaw)  │  │
+│               │  └───────────────┘  │               │  └────────┬─────────┘  │
+│               │                     │               │           │            │
+│               │  ✅ REGISTRATION    │               │           ▼            │
+│               │     COMPLETE!       │               │  ┌──────────────────┐  │
+│               │                     │               │  │  Personal Info   │  │
+│               │  Parent can now:    │               │  │  (Name, DOB,     │  │
+│               │  • Add children     │               │  │   CNIC, Photo)   │  │
+│               │  • Find drivers     │               │  └────────┬─────────┘  │
+│               │  • Chat             │               │           │            │
+│               │  • Track trips      │               │           ▼            │
+│               └─────────────────────┘               │  ┌──────────────────┐  │
+│                                                     │  │ Driver Licence   │  │
+│                                                     │  │ (License photos) │  │
+│                                                     │  └────────┬─────────┘  │
+│                                                     │           │            │
+│                                                     │           ▼            │
+│                                                     │  ┌──────────────────┐  │
+│                                                     │  │   Identification │  │
+│                                                     │  │  (CNIC photos)   │  │
+│                                                     │  └────────┬─────────┘  │
+│                                                     │           │            │
+│                                                     │           ▼            │
+│                                                     │  ┌──────────────────┐  │
+│                                                     │  │ Vehicle Reg      │  │
+│                                                     │  │ (Vehicle photos, │  │
+│                                                     │  │  registration)   │  │
+│                                                     │  └────────┬─────────┘  │
+│                                                     │           │            │
+│                                                     │           ▼            │
+│                                                     │  ┌──────────────────┐  │
+│                                                     │  │ Service Details  │  │
+│                                                     │  │ (Schools, Area,  │  │
+│                                                     │  │  Pricing)        │  │
+│                                                     │  └────────┬─────────┘  │
+│                                                     │           │            │
+│                                                     │           ▼            │
+│                                                     │  ┌──────────────────┐  │
+│                                                     │  │ PENDING APPROVAL │  │
+│                                                     │  │                  │  │
+│                                                     │  │ "Application     │  │
+│                                                     │  │  Under Review"   │  │
+│                                                     │  │                  │  │
+│                                                     │  │ (12-24 hours)    │  │
+│                                                     │  └────────┬─────────┘  │
+│                                                     │           │            │
+│                                                     │    ┌──────┴──────┐     │
+│                                                     │    │   ADMIN     │     │
+│                                                     │    │   REVIEW    │     │
+│                                                     │    └──────┬──────┘     │
+│                                                     │           │            │
+│                                                     │     ┌─────┴─────┐      │
+│                                                     │     ▼           ▼      │
+│                                                     │ ┌────────┐ ┌────────┐  │
+│                                                     │ │APPROVED│ │REJECTED│  │
+│                                                     │ └───┬────┘ └───┬────┘  │
+│                                                     │     │          │       │
+│                                                     │     ▼          ▼       │
+│                                                     │ ┌────────┐ ┌────────┐  │
+│                                                     │ │ Driver │ │ Email/ │  │
+│                                                     │ │  Map   │ │ Notif  │  │
+│                                                     │ │ (Home) │ │ Reason │  │
+│                                                     │ └────────┘ └────────┘  │
+│                                                     │     After approval     │
+│                                                     │  Driver can now:       │
+│                                                     │  • View orders         │
+│                                                     │  • Start trips         │
+│                                                     │  • Chat with parents   │
+│                                                     │  • Track earnings      │
+│                                                     └────────────────────────┘
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Screen Routes Reference
+
+| Screen | Route | Description |
+|--------|-------|-------------|
+| Onboard | `/onboard` | Initial app introduction carousel |
+| Option | `/option_screen` | "Get Started" / "Sign In" options |
+| Email | `/phone_screen` | Email input for OTP |
+| OTP | `/otp_screen` | 6-digit verification code |
+| DOP Option | `/dop_option` | Choose Parent or Driver |
+| **Parent Flow** | | |
+| Parent Name | `/parent_name` | Enter parent's name |
+| Parent Map | `/map_screen` | Parent home screen (map) |
+| **Driver Flow** | | |
+| Driver Name | `/driver_name` | Enter driver's name |
+| Vehicle Selection | `/vehicle_selection` | Choose Car or Rickshaw |
+| Personal Info | `/personal_info` | Name, DOB, CNIC, photo |
+| Driver Licence | `/driver_licence` | Licence front/back photos |
+| Driver Identification | `/driver_identification` | CNIC front/back photos |
+| Vehicle Registration | `/vehicle_registration` | Vehicle details & photos |
+| Service Details | `/driver_service_details` | Schools, area, pricing |
+| Pending Approval | `/driver_pending_approval` | "Under Review" screen (12-24 hrs) |
+| **Driver Status Screens** | | |
+| Driver Map | `/driver_map` | Driver home screen (after approval) |
+| Driver Rejected | `/driver_rejected` | Application rejected with reason |
+| Driver Suspended | `/driver_suspended` | Account suspended with reason |
+
+### Backend Status Handling
+
+```dart
+// User status enum in Appwrite (users.status field)
+// Use CollectionEnums constants for type-safe comparison
+class CollectionEnums {
+  static const String statusPending = 'pending';    // Just registered, awaiting approval (drivers)
+  static const String statusActive = 'active';      // Approved and can use app
+  static const String statusSuspended = 'suspended'; // Temporarily disabled (with statusReason)
+  static const String statusRejected = 'rejected';   // Application rejected (with statusReason)
+}
+
+// Check user status on app launch
+Future<void> checkUserStatus() async {
+  final user = await getCurrentUser();
+  if (user == null) {
+    // Not logged in → optionScreen
+    Get.offAllNamed(AppRoutes.optionScreen);
+    return;
+  }
+  
+  final userDoc = await tablesDB.getRow(
+    databaseId: 'godropme_db',
+    tableId: 'users',
+    rowId: user.$id,
+  );
+  
+  final role = userDoc.data['role'];
+  final status = userDoc.data['status'];
+  final statusReason = userDoc.data['statusReason']; // Single field for both suspension/rejection
+  
+  if (role == 'parent') {
+    // Parents don't need approval - go directly to dashboard
+    Get.offAllNamed(AppRoutes.parentmapScreen);
+  } else if (role == 'driver') {
+    switch (status) {
+      case CollectionEnums.statusPending:
+        // Still waiting for admin approval
+        Get.offAllNamed(AppRoutes.driverPendingApproval);
+        break;
+        
+      case CollectionEnums.statusActive:
+        // Check if driver completed registration (has profile in drivers table)
+        final hasDriverProfile = await _checkDriverProfile(user.$id);
+        if (hasDriverProfile) {
+          Get.offAllNamed(AppRoutes.driverMap);
+        } else {
+          Get.offAllNamed(AppRoutes.vehicleSelection); // Resume registration
+        }
+        break;
+        
+      case CollectionEnums.statusRejected:
+        // Application rejected - show reason and allow re-apply
+        Get.offAllNamed(
+          AppRoutes.driverRejected,
+          arguments: {'reason': statusReason ?? 'No reason provided'},
+        );
+        break;
+        
+      case CollectionEnums.statusSuspended:
+        // Account suspended - show reason and support contact
+        Get.offAllNamed(
+          AppRoutes.driverSuspended,
+          arguments: {'reason': statusReason ?? 'No reason provided'},
+        );
+        break;
+    }
+  }
+}
+```
+
+### Admin Approval Workflow
+
+**When driver completes registration:**
+1. All registration data saved to Appwrite collections
+2. `users.status` = `pending`
+3. Driver sees "Pending Approval" screen
+
+**Admin reviews application:**
+1. Admin dashboard shows pending drivers
+2. Admin can view all uploaded documents
+3. Admin clicks "Approve" or "Reject"
+
+**On Approval:**
+```dart
+// Update user status using TablesDB API
+await tablesDB.updateRow(
+  databaseId: 'godropme_db',
+  tableId: 'users',
+  rowId: driverId,
+  data: {
+    'status': CollectionEnums.statusActive, // 'active'
+    'statusReason': null, // Clear any previous reason
+  },
+);
+
+// Send push notification
+await sendPushNotification(
+  userId: driverId,
+  title: 'Application Approved! 🎉',
+  body: 'Congratulations! You can now start accepting ride requests.',
+);
+
+// Send email notification
+await sendEmail(
+  to: driverEmail,
+  subject: 'GoDropMe - Application Approved',
+  body: 'Your driver application has been approved...',
+);
+```
+
+**On Rejection:**
+```dart
+// Update user status with statusReason
+await tablesDB.updateRow(
+  databaseId: 'godropme_db',
+  tableId: 'users',
+  rowId: driverId,
+  data: {
+    'status': CollectionEnums.statusRejected, // 'rejected'
+    'statusReason': 'Blurry license photo. Please re-upload with clear images.',
+  },
+);
+
+// Send notification with reason
+await sendPushNotification(
+  userId: driverId,
+  title: 'Application Update',
+  body: 'We need more information. Please check your email.',
+);
+
+await sendEmail(
+  to: driverEmail,
+  subject: 'GoDropMe - Application Needs Attention',
+  body: 'Reason: Blurry license photo. Please re-upload...',
+);
+```
+
+**On Suspension (for active drivers):**
+```dart
+// Update user status with statusReason
+await tablesDB.updateRow(
+  databaseId: 'godropme_db',
+  tableId: 'users',
+  rowId: driverId,
+  data: {
+    'status': CollectionEnums.statusSuspended, // 'suspended'
+    'statusReason': 'Multiple complaints received from parents.',
+  },
+);
+
+// Send notification
+await sendPushNotification(
+  userId: driverId,
+  title: 'Account Suspended',
+  body: 'Your account has been temporarily suspended. Contact support for more info.',
 );
 ```
 
@@ -341,18 +1582,128 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 
 ---
 
+### 📸 Storage URL Pattern
+
+When uploading files to Appwrite Storage, store the **full URL** in the database (not just the file ID). This simplifies image loading in the app.
+
+**Upload Flow:**
+```dart
+// 1. Upload file to Storage bucket
+final file = await storage.createFile(
+  bucketId: 'profile_photos',  // or 'documents', 'vehicle_photos', etc.
+  fileId: ID.unique(),
+  file: InputFile.fromPath(path: localFilePath),
+);
+
+// 2. Generate the public view URL
+final fileUrl = 'https://fra.cloud.appwrite.io/v1/storage/buckets/${bucketId}/files/${file.$id}/view?project=68ed397e000f277c6936';
+
+// 3. Save URL to collection document
+await databases.updateDocument(
+  databaseId: 'godropme_db',
+  collectionId: 'drivers',
+  documentId: driverId,
+  data: {
+    'profilePhotoUrl': fileUrl,
+  },
+);
+```
+
+**Storage Buckets:**
+| Bucket ID | Purpose | File Types |
+|-----------|---------|------------|
+| `profile_photos` | Parent & driver profile pictures | jpg, png |
+| `child_photos` | Children's photos | jpg, png |
+| `documents` | CNIC, license, registration | jpg, png, pdf |
+| `vehicle_photos` | Vehicle images | jpg, png |
+| `chat_images` | Chat message attachments | jpg, png |
+| `report_attachments` | Report evidence files | jpg, png, pdf |
+
+**URL Format:**
+```
+https://fra.cloud.appwrite.io/v1/storage/buckets/{bucketId}/files/{fileId}/view?project=68ed397e000f277c6936
+```
+
+---
+
+### 🔗 Relationship Attributes (Created in Appwrite)
+
+All collections are linked with proper relationship columns for data integrity and easy querying.
+
+| From Collection | Relationship Key | Type | To Collection | Two-Way Key | On Delete |
+|-----------------|------------------|------|---------------|-------------|-----------|
+| `parents` | `user` | One-to-One | `users` | `parentProfile` | cascade |
+| `drivers` | `user` | One-to-One | `users` | `driverProfile` | cascade |
+| `children` | `parent` | Many-to-One | `parents` | `children` | cascade |
+| `children` | `assignedDriver` | Many-to-One | `drivers` | `assignedChildren` | setNull |
+| `vehicles` | `driver` | Many-to-One | `drivers` | `vehicle` | cascade |
+| `driver_services` | `driver` | One-to-One | `drivers` | `service` | cascade |
+| `service_requests` | `parentRef` | Many-to-One | `parents` | `serviceRequests` | cascade |
+| `service_requests` | `driverRef` | Many-to-One | `drivers` | `receivedRequests` | cascade |
+| `service_requests` | `childRef` | Many-to-One | `children` | `serviceRequests` | cascade |
+| `active_services` | `parentRef` | Many-to-One | `parents` | `activeServices` | cascade |
+| `active_services` | `driverRef` | Many-to-One | `drivers` | `activeServices` | cascade |
+| `active_services` | `childRef` | Many-to-One | `children` | `activeService` | cascade |
+| `trips` | `activeService` | Many-to-One | `active_services` | `trips` | cascade |
+| `trips` | `driverRef` | Many-to-One | `drivers` | `trips` | cascade |
+| `trips` | `childRef` | Many-to-One | `children` | `trips` | cascade |
+| `trips` | `parentRef` | Many-to-One | `parents` | `trips` | cascade |
+| `chat_rooms` | `parentRef` | Many-to-One | `parents` | `chatRooms` | cascade |
+| `chat_rooms` | `driverRef` | Many-to-One | `drivers` | `chatRooms` | cascade |
+| `messages` | `chatRoom` | Many-to-One | `chat_rooms` | `messages` | cascade |
+| `notifications` | `userRef` | Many-to-One | `users` | `notifications` | cascade |
+| `geofence_events` | `tripRef` | Many-to-One | `trips` | `geofenceEvents` | cascade |
+| `geofence_events` | `driverRef` | Many-to-One | `drivers` | `geofenceEvents` | cascade |
+| `trip_history` | `originalTrip` | One-to-One | `trips` | `historyRecord` | setNull |
+| `ratings` | `driver` | Many-to-One | `drivers` | `ratings` | setNull |
+| `ratings` | `parent` | Many-to-One | `parents` | `ratings` | setNull |
+| `ratings` | `trip` | Many-to-One | `trips` | `rating` | setNull |
+
+**Relationship Benefits:**
+- **Cascade Delete**: When a parent is deleted, all their children, service requests, etc. are automatically deleted
+- **SetNull**: When a driver is unassigned from a child, the `assignedDriverId` becomes null (child record preserved)
+- **Two-Way Access**: Can query from either direction (e.g., get all children for a parent, or get parent for a child)
+
+**Usage Example:**
+```dart
+// Get parent with all their children in one query
+final parentDoc = await databases.getDocument(
+  databaseId: 'godropme_db',
+  collectionId: 'parents',
+  documentId: parentId,
+);
+// parentDoc.data['children'] contains array of child documents
+
+// Get driver with all their active services
+final driverDoc = await databases.getDocument(
+  databaseId: 'godropme_db',
+  collectionId: 'drivers',
+  documentId: driverId,
+);
+// driverDoc.data['activeServices'] contains array of service documents
+```
+
+---
+
 ### 📁 Collection 1: `users`
 > Core user authentication and role management
 
 | Attribute | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `email` | email | ✅ | - | User email (used for OTP auth) |
-| `phone` | string(20) | ❌ | null | Phone number (+92XXXXXXXXXX) |
 | `role` | enum | ✅ | - | Values: `parent`, `driver` |
 | `isProfileComplete` | boolean | ✅ | false | Registration completed |
-| `isApproved` | boolean | ✅ | false | Admin approval (for drivers) |
-| `status` | enum | ✅ | `pending` | Values: `active`, `suspended`, `pending` |
+| `status` | enum | ✅ | `pending` | Values: `active`, `suspended`, `pending`, `rejected` |
+| `statusReason` | string(500) | ❌ | null | Reason for suspension OR rejection (single field) |
 | `fcmToken` | string(500) | ❌ | null | Push notification token |
+
+**Removed Columns** (Dec 3, 2025):
+- ~~`suspensionReason`~~ — Merged into `statusReason`
+- ~~`rejectionReason`~~ — Merged into `statusReason`
+- ~~`phone`~~ — Redundant (phone stored in parents/drivers tables)
+- ~~`isApproved`~~ — Redundant (use `status` field instead)
+
+**Note**: `statusReason` is used for both suspension and rejection reasons since a user can only have one status at a time.
 
 **Indexes**:
 - `email` (Unique)
@@ -368,9 +1719,9 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 |-----------|------|----------|---------|-------------|
 | `userId` | string(36) | ✅ | - | Reference to auth user $id |
 | `fullName` | string(128) | ✅ | - | Parent's full name |
-| `phone` | string(20) | ✅ | - | Phone with country code |
+| `phone` | string(20) | ❌ | "" | Phone with country code (optional) |
 | `email` | email | ✅ | - | Parent's email |
-| `profilePhotoFileId` | string(36) | ❌ | null | Storage file ID |
+| `profilePhotoUrl` | url | ❌ | null | Profile photo URL from Storage |
 
 **Indexes**:
 - `userId` (Unique)
@@ -381,7 +1732,40 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 
 ---
 
-### 📁 Collection 3: `children`
+### 📁 Collection 3: `schools` ⭐ NEW
+> Central source of truth for school data (Dec 3, 2025)
+
+| Attribute | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `name` | string(256) | ✅ | - | School name (unique) |
+| `shortName` | string(50) | ❌ | null | Abbreviated name |
+| `location` | point | ✅ | - | School coordinates `[lng, lat]` |
+| `address` | string(500) | ❌ | null | Full street address |
+| `city` | string(100) | ❌ | "Peshawar" | City name |
+| `isActive` | boolean | ❌ | true | School is active |
+
+**Indexes**:
+- `name` (Unique) - Primary lookup
+- `city` (Key) - Filter by city
+- `isActive` (Key) - Filter active schools
+- `location` (Key) - For geo queries
+
+**Usage Pattern**:
+```dart
+// SchoolsLoader caches all schools for 1 hour
+// O(1) lookups by ID or name
+SchoolsLoader.getById(schoolId)     // → School
+SchoolsLoader.getByIds(schoolIds)   // → List<School>
+SchoolsLoader.getByName(name)       // → School?
+```
+
+**Relationships**:
+- Referenced by `children.schoolId` (FK)
+- Referenced by `driver_services.schoolIds[]` (FK array)
+
+---
+
+### 📁 Collection 4: `children`
 > Children registered by parents
 
 | Attribute | Type | Required | Default | Description |
@@ -390,19 +1774,22 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 | `name` | string(128) | ✅ | - | Child's name |
 | `age` | integer | ✅ | - | Age (4-25) - **stored as integer** |
 | `gender` | enum | ✅ | - | Values: `Male`, `Female` |
-| `schoolName` | string(256) | ✅ | - | School name |
-| `schoolLocation` | point | ❌ | null | School coordinates [lng, lat] |
-| `pickPoint` | string(500) | ✅ | - | Pickup location address |
+| `schoolId` | string(36) | ✅ | - | **FK to `schools` table** - School $id |
+| `pickPoint` | string(1500) | ✅ | - | Pickup location address |
 | `pickLocation` | point | ✅ | - | Pickup coordinates [lng, lat] |
-| `dropPoint` | string(500) | ✅ | - | Drop-off location address |
+| `dropPoint` | string(1500) | ✅ | - | Drop-off location address |
 | `dropLocation` | point | ✅ | - | Drop-off coordinates [lng, lat] |
 | `relationshipToChild` | string(50) | ✅ | - | Father, Mother, Guardian, etc. |
 | `schoolOpenTime` | string(10) | ❌ | null | School opening time (e.g., "7:30 AM") |
 | `schoolOffTime` | string(10) | ❌ | null | School closing time (e.g., "1:30 PM") |
-| `photoFileId` | string(36) | ❌ | null | Storage file ID |
+| `photoUrl` | url | ❌ | null | Child photo URL from Storage |
 | `specialNotes` | string(1000) | ❌ | null | Special instructions |
 | `isActive` | boolean | ✅ | true | Currently needs service |
 | `assignedDriverId` | string(36) | ❌ | null | Reference to drivers.$id |
+
+**Removed Fields** (Dec 3, 2025 cleanup):
+- ~~`schoolName`~~ — Now looked up via `SchoolsLoader.getById(schoolId)`
+- ~~`schoolLocation`~~ — Now looked up via `SchoolsLoader.getById(schoolId).location`
 
 **Field Mapping from Flutter Model:**
 ```dart
@@ -411,21 +1798,21 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
   'name': 'Ali',
   'age': 8,                              // integer (was string, now parsed)
   'gender': 'Male',
-  'schoolName': 'City School',           // string (not nested object)
-  'schoolLocation': [71.518, 34.035],    // point [lng, lat]
+  'schoolId': 'abc123xyz...',            // FK to schools table
   'pickPoint': 'House 123, Street 5...',
   'pickLocation': [71.588, 34.021],      // point [lng, lat]
   'dropPoint': 'City School Gate...',
   'dropLocation': [71.518, 34.035],      // point [lng, lat]
   'relationshipToChild': 'Father',
   'schoolOpenTime': '7:30 AM',           // renamed from pickupTime
-  'schoolOffTime': '1:30 PM',            // NEW field
+  'schoolOffTime': '1:30 PM',            // school closing time
 }
+// Display: Use SchoolsLoader.getById(schoolId).name
 ```
 
 **Indexes**:
 - `parentId` (Key)
-- `schoolName` (Key)
+- `schoolId` (Key) - For filtering by school
 - `assignedDriverId` (Key)
 - `isActive` (Key)
 - `pickLocation` (Key) - For geo queries
@@ -433,7 +1820,7 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 
 ---
 
-### 📁 Collection 4: `drivers`
+### 📁 Collection 5: `drivers`
 > Driver profile and verification details
 
 | Attribute | Type | Required | Default | Description |
@@ -445,16 +1832,15 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 | `lastName` | string(50) | ✅ | - | Last name |
 | `phone` | string(20) | ✅ | - | Phone with country code |
 | `email` | email | ✅ | - | Driver's email |
-| `profilePhotoFileId` | string(36) | ✅ | - | Storage file ID |
+| `profilePhotoUrl` | url | ✅ | - | Profile photo URL from Storage |
 | `cnicNumber` | string(13) | ✅ | - | 13-digit CNIC (no dashes) |
 | `cnicExpiry` | datetime | ❌ | null | CNIC expiry date |
-| `cnicFrontFileId` | string(36) | ✅ | - | Storage file ID |
-| `cnicBackFileId` | string(36) | ✅ | - | Storage file ID |
+| `cnicFrontUrl` | url | ✅ | - | CNIC front photo URL from Storage |
+| `cnicBackUrl` | url | ✅ | - | CNIC back photo URL from Storage |
 | `licenseNumber` | string(50) | ✅ | - | Driving license number |
 | `licenseExpiry` | datetime | ✅ | - | License expiry date |
-| `licensePhotoFileId` | string(36) | ✅ | - | Storage file ID |
-| `selfieWithLicenseFileId` | string(36) | ✅ | - | Storage file ID |
-| `verificationStatus` | enum | ✅ | `pending` | Values: `pending`, `verified`, `rejected` |
+| `licensePhotoUrl` | url | ✅ | - | License photo URL from Storage |
+| `selfieWithLicenseUrl` | url | ✅ | - | Selfie with license URL from Storage |
 | `rating` | float | ❌ | 0.0 | Average rating (1-5) |
 | `totalTrips` | integer | ❌ | 0 | Total completed trips |
 | `totalRatings` | integer | ❌ | 0 | Number of ratings received |
@@ -462,18 +1848,22 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 | `currentLocation` | point | ❌ | null | Real-time location [lng, lat] |
 | `lastLocationUpdate` | datetime | ❌ | null | Timestamp of last location update |
 
+**Removed Columns** (Dec 3, 2025):
+- ~~`verificationStatus`~~ — Status is now managed in `users.status` table only
+
+**Note**: Driver verification/approval status is now unified in the `users` table (`status` field). This eliminates redundancy and ensures a single source of truth.
+
 **Indexes**:
 - `userId` (Unique)
 - `email` (Unique)
 - `cnicNumber` (Unique)
 - `licenseNumber` (Unique)
-- `verificationStatus` (Key)
 - `isOnline` (Key)
 - `currentLocation` (Key) - For geo queries & geofencing
 
 ---
 
-### 📁 Collection 5: `vehicles`
+### 📁 Collection 6: `vehicles`
 > Driver's vehicle information
 
 | Attribute | Type | Required | Default | Description |
@@ -486,9 +1876,9 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 | `productionYear` | string(4) | ✅ | - | Year of manufacture |
 | `numberPlate` | string(20) | ✅ | - | License plate number |
 | `seatCapacity` | integer | ✅ | - | Number of seats available |
-| `vehiclePhotoFileId` | string(36) | ✅ | - | Storage file ID |
-| `registrationFrontFileId` | string(36) | ✅ | - | Storage file ID |
-| `registrationBackFileId` | string(36) | ✅ | - | Storage file ID |
+| `vehiclePhotoUrl` | url | ✅ | - | Vehicle photo URL from Storage |
+| `registrationFrontUrl` | url | ✅ | - | Registration front URL from Storage |
+| `registrationBackUrl` | url | ✅ | - | Registration back URL from Storage |
 | `isActive` | boolean | ✅ | true | Currently in use |
 
 **Indexes**:
@@ -498,7 +1888,7 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 
 ---
 
-### 📁 Collection 6: `driver_services`
+### 📁 Collection 7: `driver_services`
 > Driver's service configuration
 
 > **Note**: Service windows are **system-managed** (Morning: 5-9 AM → home_to_school, Afternoon: 11 AM-3 PM → school_to_home). Drivers don't select windows — trips are auto-generated for both.
@@ -506,13 +1896,12 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 | Attribute | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `driverId` | relationship | ✅ | - | One-to-One → `drivers` |
-| `schoolNames` | string[] | ✅ | - | Array of school names driver serves |
-| `schoolPoints` | point[] | ✅ | - | Array of school locations, each `[lng, lat]` |
+| `schoolIds` | string[](36) | ✅ | - | **FK array to `schools` table** - School $ids driver serves |
 | `serviceCategory` | enum | ✅ | - | Gender category: 'Male', 'Female', or 'Both' |
 | `serviceAreaCenter` | point | ✅ | - | Center of service area `[lng, lat]` |
 | `serviceAreaRadiusKm` | float | ✅ | - | Radius of service area (0.2 - 2 km, colony-level) |
 | `serviceAreaPolygon` | polygon | ✅ | - | Service area boundary `[[[lng, lat], ...]]` (3D array, closed ring) |
-| `serviceAreaAddress` | string(500) | ❌ | null | Human-readable address of center |
+| `serviceAreaAddress` | string(1500) | ❌ | null | Human-readable address of center |
 | `monthlyPricePkr` | integer | ✅ | - | Monthly service price in PKR |
 | `extraNotes` | string(1000) | ❌ | null | Additional notes |
 
@@ -524,6 +1913,8 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
   - Each ring must be **closed** (first point = last point)
 
 **Removed Fields** (from previous version):
+- ~~`schoolNames`~~ — **DELETED Dec 3, 2025** - Now looked up via `SchoolsLoader.getByIds(schoolIds)`
+- ~~`schoolPoints`~~ — **DELETED Dec 3, 2025** - Now looked up via `SchoolsLoader.getByIds(schoolIds)[].location`
 - ~~`serviceWindow`~~ — System generates trips for both morning & afternoon automatically
 - ~~`pickupRangeKm` (enum)~~ — Replaced by `serviceAreaRadiusKm` (float) + `serviceAreaPolygon`
 - ~~`isActive`~~ — Removed from UI; drivers are active if they have a valid service doc
@@ -541,7 +1932,7 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 
 ---
 
-### 📁 Collection 7: `service_requests`
+### 📁 Collection 8: `service_requests`
 > Parent requests for driver service
 
 | Attribute | Type | Required | Default | Description |
@@ -564,7 +1955,7 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 
 ---
 
-### 📁 Collection 8: `active_services`
+### 📁 Collection 9: `active_services`
 > Ongoing parent-driver service contracts
 
 | Attribute | Type | Required | Default | Description |
@@ -586,7 +1977,7 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 
 ---
 
-### 📁 Collection 9: `trips`
+### 📁 Collection 10: `trips`
 > Daily trip records for tracking
 
 | Attribute | Type | Required | Default | Description |
@@ -633,7 +2024,7 @@ factory Model.fromJson(Map<String, dynamic> json) => Model(
 
 ---
 
-### 📁 Collection 10: `chat_rooms`
+### 📁 Collection 11: `chat_rooms`
 > Chat rooms between parents and drivers (Realtime enabled)
 
 | Attribute | Type | Required | Default | Description |
@@ -658,7 +2049,7 @@ client.subscribe('databases.godropme_db.collections.chat_rooms.documents');
 
 ---
 
-### 📁 Collection 11: `messages`
+### 📁 Collection 12: `messages`
 > Chat messages (Realtime enabled)
 
 | Attribute | Type | Required | Default | Description |
@@ -668,7 +2059,7 @@ client.subscribe('databases.godropme_db.collections.chat_rooms.documents');
 | `senderRole` | enum | ✅ | - | Values: `parent`, `driver` |
 | `messageType` | enum | ✅ | `text` | Values: `text`, `image`, `location` |
 | `text` | string(2000) | ❌ | null | Message content |
-| `imageFileId` | string(36) | ❌ | null | Storage file ID |
+| `imageUrl` | url | ❌ | null | Image URL from Storage |
 | `location` | point | ❌ | null | Shared location [lng, lat] |
 | `isRead` | boolean | ✅ | false | Message read status |
 
@@ -684,7 +2075,7 @@ client.subscribe('databases.godropme_db.collections.messages.documents.$chatRoom
 
 ---
 
-### 📁 Collection 12: `notifications`
+### 📁 Collection 13: `notifications`
 > Push notification records
 
 | Attribute | Type | Required | Default | Description |
@@ -705,7 +2096,7 @@ client.subscribe('databases.godropme_db.collections.messages.documents.$chatRoom
 
 ---
 
-### 📁 Collection 13: `reports`
+### 📁 Collection 14: `reports`
 > User reports and complaints
 
 | Attribute | Type | Required | Default | Description |
@@ -717,7 +2108,7 @@ client.subscribe('databases.godropme_db.collections.messages.documents.$chatRoom
 | `reportType` | enum | ✅ | - | Values: `safety`, `behavior`, `service`, `app_issue`, `other` |
 | `title` | string(200) | ✅ | - | Report title |
 | `description` | string(2000) | ✅ | - | Detailed description |
-| `attachmentFileIds` | string(500) | ❌ | null | JSON array of file IDs |
+| `attachmentUrls` | string(2000) | ❌ | null | JSON array of attachment URLs |
 | `status` | enum | ✅ | `pending` | Values: `pending`, `investigating`, `resolved`, `dismissed` |
 | `adminNotes` | string(1000) | ❌ | null | Admin response |
 | `resolvedAt` | datetime | ❌ | null | Resolution timestamp |
@@ -730,7 +2121,7 @@ client.subscribe('databases.godropme_db.collections.messages.documents.$chatRoom
 
 ---
 
-### 📁 Collection 14: `geofence_events`
+### 📁 Collection 15: `geofence_events`
 > Geofencing event logs for arrival notifications
 
 | Attribute | Type | Required | Default | Description |
@@ -747,6 +2138,101 @@ client.subscribe('databases.godropme_db.collections.messages.documents.$chatRoom
 - `tripId` (Key)
 - `driverId` (Key)
 - `eventType` (Key)
+
+---
+
+### 📁 Collection 16: `daily_analytics`
+> Daily trip analytics and statistics for monitoring and reports
+
+| Attribute | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `date` | datetime | ✅ | - | Date of analytics (start of day) |
+| `totalActiveServices` | integer | ✅ | 0 | Total active services on this date |
+| `totalMorningTrips` | integer | ✅ | 0 | Morning trips scheduled |
+| `totalAfternoonTrips` | integer | ✅ | 0 | Afternoon trips scheduled |
+| `completedMorningTrips` | integer | ✅ | 0 | Morning trips successfully completed |
+| `completedAfternoonTrips` | integer | ✅ | 0 | Afternoon trips successfully completed |
+| `cancelledTrips` | integer | ✅ | 0 | Trips cancelled |
+| `absentChildren` | integer | ✅ | 0 | Children marked absent |
+| `noShowTrips` | integer | ✅ | 0 | Trips where driver arrived but child not ready |
+| `avgPickupDelayMins` | float | ❌ | null | Avg delay between scheduled & actual pickup |
+| `avgTripDurationMins` | float | ❌ | null | Avg duration from pickup to drop |
+| `activeDrivers` | integer | ✅ | 0 | Drivers who had at least one trip |
+| `newServiceRequests` | integer | ✅ | 0 | New service requests created |
+| `acceptedRequests` | integer | ✅ | 0 | Service requests accepted by drivers |
+| `rejectedRequests` | integer | ✅ | 0 | Service requests rejected |
+| `totalNotificationsSent` | integer | ✅ | 0 | Notifications sent |
+| `geofenceEventsCount` | integer | ✅ | 0 | Geofence events logged |
+| `avgDriverRating` | float | ❌ | null | Average driver rating for trips on this day |
+| `issuesReported` | integer | ✅ | 0 | Reports/complaints filed |
+
+**Indexes**:
+- `date` (Unique) — One document per day
+- `$createdAt` (Key) — For ordering
+
+> **Note**: Analytics are generated daily at **11:59 PM PKT** by the `generate-daily-analytics` function, summarizing the day's activity.
+
+---
+
+### 📁 Collection 17: `trip_history`
+> Individual trip history records for detailed reporting
+
+| Attribute | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `tripId` | string(36) | ✅ | - | Original trip document ID |
+| `driverId` | string(36) | ✅ | - | Driver document ID |
+| `childId` | string(36) | ✅ | - | Child document ID |
+| `parentId` | string(36) | ✅ | - | Parent document ID |
+| `activeServiceId` | string(36) | ✅ | - | Active service ID |
+| `tripType` | enum | ✅ | - | Values: `morning`, `afternoon` |
+| `tripDirection` | enum | ✅ | - | Values: `home_to_school`, `school_to_home` |
+| `scheduledDate` | datetime | ✅ | - | Original scheduled date |
+| `status` | enum | ✅ | - | Final status: `completed`, `cancelled`, `absent`, `no_show` |
+| `driverEnrouteAt` | datetime | ❌ | null | When driver started trip |
+| `arrivedAt` | datetime | ❌ | null | When driver arrived at pickup |
+| `pickedAt` | datetime | ❌ | null | When child was picked up |
+| `droppedAt` | datetime | ❌ | null | When child was dropped off |
+| `pickupDelayMins` | integer | ❌ | null | Delay from scheduled time |
+| `tripDurationMins` | integer | ❌ | null | Total trip time (arrived → dropped) |
+| `driverRating` | float | ❌ | null | Rating given for this trip |
+| `parentFeedback` | string(500) | ❌ | null | Parent feedback |
+| `incidentNotes` | string(500) | ❌ | null | Any incident notes |
+
+**Indexes**:
+- `driverId` (Key)
+- `parentId` (Key)
+- `childId` (Key)
+- `scheduledDate` (Key)
+- `status` (Key)
+
+> **Note**: Trip history is created when a trip reaches a terminal state (`completed`, `cancelled`, `absent`, `no_show`). This allows the `trips` collection to be cleaned up while preserving historical data.
+
+---
+
+### 📁 Collection 18: `ratings`
+> Driver ratings from parents after trips
+
+| Attribute | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `driverId` | string(36) | ✅ | - | Driver being rated |
+| `parentId` | string(36) | ✅ | - | Parent who gave rating |
+| `tripId` | string(36) | ❌ | null | Optional trip reference |
+| `rating` | integer (1-5) | ✅ | - | Star rating (1-5) |
+| `review` | string(1000) | ❌ | null | Optional text review |
+| `createdAt` | datetime | ✅ | - | When rating was submitted |
+
+**Relationships**:
+- `driver` → `drivers` (Many-to-One) — Two-way key: `ratings`
+- `parent` → `parents` (Many-to-One) — Two-way key: `ratings`
+- `trip` → `trips` (Many-to-One) — Two-way key: `rating`
+
+**Indexes**:
+- `driver_idx` (Key) — For querying ratings by driver
+- `parent_idx` (Key) — For querying ratings by parent
+- `trip_idx` (Key) — For querying rating by trip
+- `created_idx` (Key, DESC) — For ordering recent ratings first
+
+> **Note**: This collection triggers the `calculate-driver-rating` function on document create to update the driver's average rating in the `drivers` collection.
 
 ---
 
@@ -774,27 +2260,42 @@ GoDropMe operates on a **two-window daily service model** based on **Pakistan sc
 | **Morning** | 5:00 AM - 9:00 AM | Home → School | Child's Home | School |
 | **Afternoon** | 11:00 AM - 3:00 PM | School → Home | School | Child's Home |
 
-> **Note**: Service windows are **system-managed** — drivers don't select them. The system automatically generates trips for **both** windows based on active services.
+> **Note**: Service windows are **system-managed** — drivers don't select them. Trip generation is **split into two separate scheduled functions** for precise timing.
 
-### Daily Trip Generation Logic
+### Daily Trip Generation Logic (Split Functions)
 
+**🌅 Morning Trips** — Generated at **5:00 AM PKT** via `generate-morning-trips`:
 ```
-Every day at 4:30 AM (via Appwrite Function: generate-daily-trips):
-
 1. Get all active_services where status = 'active'
-2. For each service:
+2. For each service where driver offers morning:
    a. Get child's pickupLocation (home) and dropLocation (school)
    b. Create MORNING trip (home_to_school):
       - pickupLocation = child's home
       - dropLocation = school
+      - tripType = 'morning'
+      - tripDirection = 'home_to_school'
       - windowStartTime = 05:00
       - windowEndTime = 09:00
-   c. Create AFTERNOON trip (school_to_home):
+```
+
+**🌤️ Afternoon Trips** — Generated at **11:00 AM PKT** via `generate-afternoon-trips`:
+```
+1. Get all active_services where status = 'active'
+2. For each service where driver offers afternoon:
+   a. Get child's pickupLocation (home) and dropLocation (school)
+   b. Create AFTERNOON trip (school_to_home):
       - pickupLocation = school
       - dropLocation = child's home
+      - tripType = 'afternoon'
+      - tripDirection = 'school_to_home'
       - windowStartTime = 11:00
       - windowEndTime = 15:00
 ```
+
+> **Why Split?** Generating trips closer to their actual window ensures:
+> - More accurate driver availability tracking
+> - Allows for same-day changes (e.g., child marked absent before afternoon trips are created)
+> - Reduces system load by spreading operations
 
 ### Trip Status Flow
 
@@ -872,6 +2373,63 @@ Afternoon Trip (12-3 PM Window):
 | Picked | - | "Child picked up" (manual trigger) |
 | Dropped | 100m from dropLocation | "Child dropped off safely" |
 
+### 📱 Driver App: Trip Display Logic
+
+The driver app displays trips based on **current time window**:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        DRIVER HOME SCREEN                                │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  Time: 5:00 AM - 10:59 AM                                               │
+│  ────────────────────────                                               │
+│  📱 Shows: MORNING trips (tripType = 'morning')                         │
+│  📍 Direction: Home → School                                            │
+│  🏠 Pickup: Child's home addresses                                      │
+│  🏫 Drop: School locations                                              │
+│                                                                          │
+│  Time: 11:00 AM - 4:00 PM                                               │
+│  ────────────────────────                                               │
+│  📱 Shows: AFTERNOON trips (tripType = 'afternoon')                     │
+│  📍 Direction: School → Home                                            │
+│  🏫 Pickup: School gate/designated area                                 │
+│  🏠 Drop: Child's home addresses                                        │
+│                                                                          │
+│  Time: 4:01 PM - 4:59 AM                                                │
+│  ────────────────────────                                               │
+│  📱 Shows: No active trips (off-hours)                                  │
+│  📍 Display: "No trips scheduled" or next day preview                   │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Driver App Query Logic:**
+```dart
+// In DriverHomeController.fetchTodaysTrips()
+final now = DateTime.now();
+final tripType = (now.hour >= 5 && now.hour < 11) ? 'morning' : 'afternoon';
+
+final trips = await databases.listDocuments('godropme_db', 'trips', [
+  Query.equal('driverId', currentDriverId),
+  Query.equal('tripType', tripType),
+  Query.greaterThanEqual('scheduledDate', todayStart.toIso8601String()),
+  Query.lessThan('scheduledDate', tomorrowStart.toIso8601String()),
+  Query.notEqual('status', 'cancelled'),
+  Query.notEqual('status', 'dropped'),
+]);
+```
+
+**Trip Card Display:**
+| Field | Morning Display | Afternoon Display |
+|-------|-----------------|-------------------|
+| Pickup Icon | 🏠 (Home) | 🏫 (School) |
+| Pickup Label | "Pickup from Home" | "Pickup from School" |
+| Drop Icon | 🏫 (School) | 🏠 (Home) |
+| Drop Label | "Drop at School" | "Drop at Home" |
+| Window | "5:00 AM - 9:00 AM" | "11:00 AM - 3:00 PM" |
+| Direction Badge | "Home → School" | "School → Home" |
+
 ---
 
 ## 🌍 Geo Queries & Geofencing
@@ -901,18 +2459,23 @@ When driver location updates:
 
 ## ⚡ Appwrite Functions
 
-### Function 1: `generate-daily-trips`
-> **Trigger**: CRON (Daily at 4:30 AM PKT)  
+### Function 1a: `generate-morning-trips`
+> **Trigger**: CRON (Daily at **5:00 AM PKT** — `0 5 * * *` in Asia/Karachi)  
 > **Runtime**: Node.js 18+  
-> **Purpose**: Create trip records from active services based on service windows
+> **Purpose**: Create MORNING trip records from active services
 
 ```javascript
 // Input: None (CRON triggered)
-// Output: Created trip count
+// Output: Created morning trip count
 
 export default async ({ req, res, log }) => {
   const today = new Date();
   const dayOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][today.getDay()];
+  
+  // Skip weekends (no school)
+  if (dayOfWeek === 'sunday') {
+    return res.json({ success: true, message: 'Sunday - no trips', tripsCreated: 0 });
+  }
   
   // Get all active services
   const activeServices = await databases.listDocuments(
@@ -920,6 +2483,8 @@ export default async ({ req, res, log }) => {
     'active_services',
     [Query.equal('status', 'active')]
   );
+  
+  let count = 0;
   
   for (const service of activeServices.documents) {
     const driverConfig = await databases.getDocument('godropme_db', 'driver_services', service.driverId);
@@ -929,7 +2494,7 @@ export default async ({ req, res, log }) => {
     const operatingDays = JSON.parse(driverConfig.operatingDays);
     if (!operatingDays.includes(dayOfWeek)) continue;
     
-    // Create MORNING trip (Home → School)
+    // Only create if driver offers morning service
     if (driverConfig.serviceWindow === 'morning' || driverConfig.serviceWindow === 'both') {
       await databases.createDocument('godropme_db', 'trips', ID.unique(), {
         activeServiceId: service.$id,
@@ -950,9 +2515,58 @@ export default async ({ req, res, log }) => {
         pickedNotified: false,
         droppedNotified: false
       });
+      count++;
+    }
+  }
+  
+  log(`Generated ${count} morning trips for ${today.toDateString()}`);
+  return res.json({ success: true, tripType: 'morning', tripsCreated: count });
+};
+```
+
+### Function 1b: `generate-afternoon-trips`
+> **Trigger**: CRON (Daily at **11:00 AM PKT** — `0 11 * * *` in Asia/Karachi)  
+> **Runtime**: Node.js 18+  
+> **Purpose**: Create AFTERNOON trip records from active services
+
+```javascript
+// Input: None (CRON triggered)
+// Output: Created afternoon trip count
+
+export default async ({ req, res, log }) => {
+  const today = new Date();
+  const dayOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][today.getDay()];
+  
+  // Skip weekends (no school)
+  if (dayOfWeek === 'sunday') {
+    return res.json({ success: true, message: 'Sunday - no trips', tripsCreated: 0 });
+  }
+  
+  // Get all active services
+  const activeServices = await databases.listDocuments(
+    'godropme_db', 
+    'active_services',
+    [Query.equal('status', 'active')]
+  );
+  
+  let count = 0;
+  
+  for (const service of activeServices.documents) {
+    const driverConfig = await databases.getDocument('godropme_db', 'driver_services', service.driverId);
+    const child = await databases.getDocument('godropme_db', 'children', service.childId);
+    
+    // Check if driver operates today
+    const operatingDays = JSON.parse(driverConfig.operatingDays);
+    if (!operatingDays.includes(dayOfWeek)) continue;
+    
+    // Check if child was marked absent for afternoon
+    // (Parent can mark absent before 11 AM, so afternoon trip won't be created)
+    if (service.absentToday === true && service.absentWindow === 'afternoon') {
+      log(`Skipping afternoon trip for child ${service.childId} - marked absent`);
+      continue;
     }
     
-    // Create AFTERNOON trip (School → Home)
+    // Only create if driver offers afternoon service
     if (driverConfig.serviceWindow === 'afternoon' || driverConfig.serviceWindow === 'both') {
       await databases.createDocument('godropme_db', 'trips', ID.unique(), {
         activeServiceId: service.$id,
@@ -963,7 +2577,7 @@ export default async ({ req, res, log }) => {
         tripDirection: 'school_to_home',
         status: 'scheduled',
         scheduledDate: today.toISOString(),
-        windowStartTime: driverConfig.afternoonStartTime || '12:00',
+        windowStartTime: driverConfig.afternoonStartTime || '11:00',
         windowEndTime: driverConfig.afternoonEndTime || '15:00',
         pickupLocation: child.dropLocation,   // School
         dropLocation: child.pickupLocation,   // Home
@@ -973,10 +2587,12 @@ export default async ({ req, res, log }) => {
         pickedNotified: false,
         droppedNotified: false
       });
+      count++;
     }
   }
   
-  return res.json({ success: true, tripsCreated: count });
+  log(`Generated ${count} afternoon trips for ${today.toDateString()}`);
+  return res.json({ success: true, tripType: 'afternoon', tripsCreated: count });
 };
 ```
 
@@ -1300,6 +2916,219 @@ export default async ({ req, res, log }) => {
     deletedNotifications: oldNotifications.total,
     deletedEvents: oldEvents.total 
   });
+};
+```
+
+### Function 8: `generate-daily-analytics`
+> **Trigger**: CRON (Daily at **11:59 PM PKT** — `59 23 * * *` in Asia/Karachi)  
+> **Runtime**: Node.js 18+  
+> **Purpose**: Generate daily analytics summary and archive trip history
+
+```javascript
+// Input: None (CRON triggered)
+// Output: Created analytics document
+
+export default async ({ req, res, log }) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Start of today
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  // Get all trips for today
+  const todaysTrips = await databases.listDocuments('godropme_db', 'trips', [
+    Query.greaterThanEqual('scheduledDate', today.toISOString()),
+    Query.lessThan('scheduledDate', tomorrow.toISOString())
+  ]);
+  
+  const trips = todaysTrips.documents;
+  
+  // Calculate metrics
+  const morningTrips = trips.filter(t => t.tripType === 'morning');
+  const afternoonTrips = trips.filter(t => t.tripType === 'afternoon');
+  const completedMorning = morningTrips.filter(t => t.status === 'dropped').length;
+  const completedAfternoon = afternoonTrips.filter(t => t.status === 'dropped').length;
+  const cancelledTrips = trips.filter(t => t.status === 'cancelled').length;
+  const absentChildren = trips.filter(t => t.status === 'absent').length;
+  const noShowTrips = trips.filter(t => t.status === 'no_show').length;
+  
+  // Calculate average delays and durations
+  const completedTrips = trips.filter(t => t.status === 'dropped' && t.pickedAt && t.droppedAt);
+  let avgPickupDelay = null;
+  let avgTripDuration = null;
+  
+  if (completedTrips.length > 0) {
+    const delays = completedTrips
+      .filter(t => t.arrivedAt)
+      .map(t => {
+        const scheduled = new Date(`${t.scheduledDate.split('T')[0]}T${t.windowStartTime}:00`);
+        const actual = new Date(t.arrivedAt);
+        return (actual - scheduled) / (1000 * 60); // Minutes
+      });
+    
+    if (delays.length > 0) {
+      avgPickupDelay = delays.reduce((a, b) => a + b, 0) / delays.length;
+    }
+    
+    const durations = completedTrips.map(t => {
+      const picked = new Date(t.pickedAt);
+      const dropped = new Date(t.droppedAt);
+      return (dropped - picked) / (1000 * 60); // Minutes
+    });
+    
+    avgTripDuration = durations.reduce((a, b) => a + b, 0) / durations.length;
+  }
+  
+  // Count unique drivers
+  const uniqueDrivers = new Set(trips.map(t => t.driverId)).size;
+  
+  // Get service requests created today
+  const todaysRequests = await databases.listDocuments('godropme_db', 'service_requests', [
+    Query.greaterThanEqual('$createdAt', today.toISOString()),
+    Query.lessThan('$createdAt', tomorrow.toISOString())
+  ]);
+  
+  const acceptedRequests = todaysRequests.documents.filter(r => r.status === 'accepted').length;
+  const rejectedRequests = todaysRequests.documents.filter(r => r.status === 'rejected').length;
+  
+  // Get notification count
+  const todaysNotifications = await databases.listDocuments('godropme_db', 'notifications', [
+    Query.greaterThanEqual('$createdAt', today.toISOString()),
+    Query.lessThan('$createdAt', tomorrow.toISOString())
+  ]);
+  
+  // Get geofence events count
+  const todaysGeofenceEvents = await databases.listDocuments('godropme_db', 'geofence_events', [
+    Query.greaterThanEqual('$createdAt', today.toISOString()),
+    Query.lessThan('$createdAt', tomorrow.toISOString())
+  ]);
+  
+  // Get active services count
+  const activeServices = await databases.listDocuments('godropme_db', 'active_services', [
+    Query.equal('status', 'active')
+  ]);
+  
+  // Get reports filed today
+  const todaysReports = await databases.listDocuments('godropme_db', 'reports', [
+    Query.greaterThanEqual('$createdAt', today.toISOString()),
+    Query.lessThan('$createdAt', tomorrow.toISOString())
+  ]);
+  
+  // Create analytics document
+  await databases.createDocument('godropme_db', 'daily_analytics', ID.unique(), {
+    date: today.toISOString(),
+    totalActiveServices: activeServices.total,
+    totalMorningTrips: morningTrips.length,
+    totalAfternoonTrips: afternoonTrips.length,
+    completedMorningTrips: completedMorning,
+    completedAfternoonTrips: completedAfternoon,
+    cancelledTrips: cancelledTrips,
+    absentChildren: absentChildren,
+    noShowTrips: noShowTrips,
+    avgPickupDelayMins: avgPickupDelay ? parseFloat(avgPickupDelay.toFixed(1)) : null,
+    avgTripDurationMins: avgTripDuration ? parseFloat(avgTripDuration.toFixed(1)) : null,
+    activeDrivers: uniqueDrivers,
+    newServiceRequests: todaysRequests.total,
+    acceptedRequests: acceptedRequests,
+    rejectedRequests: rejectedRequests,
+    totalNotificationsSent: todaysNotifications.total,
+    geofenceEventsCount: todaysGeofenceEvents.total,
+    issuesReported: todaysReports.total
+  });
+  
+  // Archive completed trips to trip_history
+  for (const trip of completedTrips) {
+    await databases.createDocument('godropme_db', 'trip_history', ID.unique(), {
+      tripId: trip.$id,
+      driverId: trip.driverId,
+      childId: trip.childId,
+      parentId: trip.parentId,
+      activeServiceId: trip.activeServiceId,
+      tripType: trip.tripType,
+      tripDirection: trip.tripDirection,
+      scheduledDate: trip.scheduledDate,
+      status: 'completed',
+      driverEnrouteAt: trip.driverEnrouteAt || null,
+      arrivedAt: trip.arrivedAt || null,
+      pickedAt: trip.pickedAt || null,
+      droppedAt: trip.droppedAt || null,
+      tripDurationMins: trip.pickedAt && trip.droppedAt 
+        ? Math.round((new Date(trip.droppedAt) - new Date(trip.pickedAt)) / (1000 * 60))
+        : null
+    });
+  }
+  
+  log(`Analytics generated for ${today.toDateString()}: ${trips.length} trips, ${completedMorning + completedAfternoon} completed`);
+  
+  return res.json({ 
+    success: true, 
+    date: today.toISOString(),
+    totalTrips: trips.length,
+    completedTrips: completedMorning + completedAfternoon,
+    archivedToHistory: completedTrips.length
+  });
+};
+```
+
+### Function 9: `archive-trip-to-history`
+> **Trigger**: Event - `databases.godropme_db.collections.trips.documents.*.update`  
+> **Runtime**: Node.js 18+  
+> **Purpose**: Archive trip to history when it reaches terminal state
+
+```javascript
+export default async ({ req, res, log }) => {
+  const trip = req.body;
+  
+  // Only process terminal states
+  const terminalStates = ['dropped', 'cancelled', 'absent', 'no_show'];
+  if (!terminalStates.includes(trip.status)) {
+    return res.json({ skipped: true, reason: 'Not terminal state' });
+  }
+  
+  // Check if already archived
+  const existing = await databases.listDocuments('godropme_db', 'trip_history', [
+    Query.equal('tripId', trip.$id)
+  ]);
+  
+  if (existing.total > 0) {
+    return res.json({ skipped: true, reason: 'Already archived' });
+  }
+  
+  // Calculate trip duration
+  let tripDurationMins = null;
+  if (trip.pickedAt && trip.droppedAt) {
+    tripDurationMins = Math.round((new Date(trip.droppedAt) - new Date(trip.pickedAt)) / (1000 * 60));
+  }
+  
+  // Calculate pickup delay
+  let pickupDelayMins = null;
+  if (trip.arrivedAt && trip.windowStartTime) {
+    const scheduled = new Date(`${trip.scheduledDate.split('T')[0]}T${trip.windowStartTime}:00`);
+    const actual = new Date(trip.arrivedAt);
+    pickupDelayMins = Math.round((actual - scheduled) / (1000 * 60));
+  }
+  
+  // Create history record
+  await databases.createDocument('godropme_db', 'trip_history', ID.unique(), {
+    tripId: trip.$id,
+    driverId: trip.driverId,
+    childId: trip.childId,
+    parentId: trip.parentId,
+    activeServiceId: trip.activeServiceId,
+    tripType: trip.tripType,
+    tripDirection: trip.tripDirection,
+    scheduledDate: trip.scheduledDate,
+    status: trip.status === 'dropped' ? 'completed' : trip.status,
+    driverEnrouteAt: trip.driverEnrouteAt || null,
+    arrivedAt: trip.arrivedAt || null,
+    pickedAt: trip.pickedAt || null,
+    droppedAt: trip.droppedAt || null,
+    pickupDelayMins: pickupDelayMins,
+    tripDurationMins: tripDurationMins
+  });
+  
+  log(`Trip ${trip.$id} archived to history with status: ${trip.status}`);
+  
+  return res.json({ success: true, archived: true, tripId: trip.$id });
 };
 ```
 
@@ -1798,7 +3627,7 @@ class ParentTripsService {
 
 ## ✅ Development TODO List
 
-### Phase 1: Appwrite Setup & Authentication 🔐
+### Phase 1: Appwrite Setup & Authentication 🔐 ✅ COMPLETED
 > **Priority**: HIGH | **Estimated**: 2-3 days
 
 - [ ] **1.1** Create Appwrite Database `godropme_db` in console
@@ -1819,48 +3648,54 @@ class ParentTripsService {
   - [ ] `logout()` → `account.deleteSession('current')`
   - [ ] `isLoggedIn()` → Check session exists
 - [ ] **1.5** Update `EmailController` for OTP sending
-- [ ] **1.6** Update `OtpController` for OTP verification
+- [x] **1.6** Update `OtpController` for OTP verification
 - [ ] **1.7** Create `user_service.dart` for user document CRUD
-- [ ] **1.8** Add Realtime client helper to `appwrite_client.dart`
-- [ ] **1.9** Handle session persistence on app restart
+- [x] **1.8** Add Realtime client helper to `appwrite_client.dart`
+- [x] **1.9** Handle session persistence on app restart
 - [ ] **1.10** Create auth middleware for protected routes
 
 ---
 
-### Phase 2: Parent Registration 👨‍👩‍👧
-> **Priority**: HIGH | **Estimated**: 3-4 days
+### Phase 2: Parent Registration 👨‍👩‍👧 ✅ COMPLETED
+> **Priority**: HIGH | **Completed**: December 2, 2025
 
-- [ ] **2.1** Create `parents` collection in Appwrite
-- [ ] **2.2** Create `children` collection in Appwrite
-- [ ] **2.3** Create storage buckets: `profile_photos`, `child_photos`
-- [ ] **2.4** Create `storage_service.dart`
-  - [ ] `uploadFile(bucketId, file)` → Returns file ID
-  - [ ] `getFilePreview(bucketId, fileId)`
-  - [ ] `deleteFile(bucketId, fileId)`
-  - [ ] `compressImage(file)` → Compress before upload
-- [ ] **2.5** Create `parent_service.dart`
-  - [ ] `createParent(data)`
-  - [ ] `getParent(userId)`
-  - [ ] `updateParent(parentId, data)`
-  - [ ] `uploadProfilePhoto(file)` → Returns file ID
-- [ ] **2.6** Create `child_service.dart`
-  - [ ] `addChild(parentId, childData)`
-  - [ ] `getChildren(parentId)`
-  - [ ] `updateChild(childId, data)`
-  - [ ] `deleteChild(childId)`
-- [ ] **2.7** Update `ParentNameScreen` controller
-- [ ] **2.8** Update `AddChildrenScreen` controller
-- [ ] **2.9** Sync local drafts with Appwrite on submit
+- [x] **2.1** Create `parents` collection in Appwrite
+- [x] **2.2** Create `children` collection in Appwrite
+- [x] **2.3** Create storage buckets: `profile_photos`, `child_photos`
+- [x] **2.4** Create `storage_service.dart`
+  - [x] `uploadFile(bucketId, file)` → Returns file ID
+  - [x] `getFilePreview(bucketId, fileId)`
+  - [x] `deleteFile(bucketId, fileId)`
+  - [x] `compressImage(file)` → Compress before upload (max 1MB)
+- [x] **2.5** Create `parent_service.dart`
+  - [x] `createParent(data)`
+  - [x] `getParent(userId)`
+  - [x] `updateParent(parentId, data)`
+  - [x] `uploadProfilePhoto(file)` → Returns file ID
+- [x] **2.6** Create `child_service.dart`
+  - [x] `addChild(parentId, childData)`
+  - [x] `getChildren(parentId)`
+  - [x] `updateChild(childId, data)`
+  - [x] `deleteChild(childId)`
+- [x] **2.7** Update `ParentNameScreen` controller
+- [x] **2.8** Update `AddChildrenScreen` controller
+- [x] **2.9** Sync local drafts with Appwrite on submit
+
+**⚠️ LESSON LEARNED - Document ID Strategy:**
+- DON'T add `authUserId` column to `users` table
+- DO use Auth User ID AS the document ID: `documentId: authUserId`
+- This applies to: `users` collection only
+- Other collections use `ID.unique()` + foreign key columns
 
 ---
 
-### Phase 3: Driver Registration 🚗
+### Phase 3: Driver Registration 🚗 ✅ COMPLETED
 > **Priority**: HIGH | **Estimated**: 4-5 days
 
-- [ ] **3.1** Create `drivers` collection
-- [ ] **3.2** Create `vehicles` collection
-- [ ] **3.3** Create `driver_services` collection
-- [ ] **3.4** Create storage buckets: `documents`, `vehicle_photos`
+- [ ] **3.1** Create `drivers` collection 
+- [ ] **3.2** Create `vehicles` collection 
+- [ ] **3.3** Create `driver_services` collection 
+- [ ] **3.4** Create storage buckets: `documents`, `vehicle_photos` 
 - [ ] **3.5** Create `driver_service.dart`
   - [ ] `createDriver(data)`
   - [ ] `getDriver(userId)`
@@ -1892,8 +3727,8 @@ class ParentTripsService {
 ### Phase 4: Service Requests & Matching 🔍
 > **Priority**: HIGH | **Estimated**: 3-4 days
 
-- [ ] **4.1** Create `service_requests` collection
-- [ ] **4.2** Create `active_services` collection
+- [ ] **4.1** Create `service_requests` collection ✅ (already exists)
+- [ ] **4.2** Create `active_services` collection ✅ (already exists)
 - [ ] **4.3** Create Appwrite Function: `match-drivers`
 - [ ] **4.4** Create `service_request_service.dart`
   - [ ] `sendRequest(parentId, driverId, childId, data)`
@@ -1918,8 +3753,8 @@ class ParentTripsService {
 ### Phase 5: Trips & Geofencing 📍
 > **Priority**: HIGH | **Estimated**: 4-5 days
 
-- [ ] **5.1** Create `trips` collection
-- [ ] **5.2** Create `geofence_events` collection
+- [ ] **5.1** Create `trips` collection ✅ (already exists)
+- [ ] **5.2** Create `geofence_events` collection ✅ (already exists)
 - [ ] **5.3** Create Appwrite Function: `generate-daily-trips`
 - [ ] **5.4** Create Appwrite Function: `process-geofence`
 - [ ] **5.5** Create `trip_service.dart`
@@ -1954,8 +3789,8 @@ class ParentTripsService {
 ### Phase 6: Real-time Chat 💬
 > **Priority**: MEDIUM | **Estimated**: 3-4 days
 
-- [ ] **6.1** Create `chat_rooms` collection
-- [ ] **6.2** Create `messages` collection
+- [ ] **6.1** Create `chat_rooms` collection ✅ (already exists)
+- [ ] **6.2** Create `messages` collection ✅ (already exists)
 - [ ] **6.3** Create storage bucket: `chat_attachments`
 - [ ] **6.4** Create `chat_service.dart`
   - [ ] `getOrCreateChatRoom(parentId, driverId)`
@@ -1981,7 +3816,7 @@ class ParentTripsService {
 ### Phase 7: Push Notifications 🔔
 > **Priority**: MEDIUM | **Estimated**: 3 days
 
-- [ ] **7.1** Create `notifications` collection
+- [ ] **7.1** Create `notifications` collection ✅ (already exists)
 - [ ] **7.2** Setup Firebase Cloud Messaging (FCM)
 - [ ] **7.3** Configure Appwrite Messaging provider (FCM)
 - [ ] **7.4** Create Appwrite Function: `send-push-notification`
@@ -2008,8 +3843,8 @@ class ParentTripsService {
 ### Phase 8: Ratings & Reports ⭐
 > **Priority**: LOW | **Estimated**: 2-3 days
 
-- [ ] **8.1** Create `ratings` collection
-- [ ] **8.2** Create `reports` collection
+- [ ] **8.1** Create `ratings` collection ✅ (already exists)
+- [ ] **8.2** Create `reports` collection ✅ (already exists)
 - [ ] **8.3** Create storage bucket: `report_attachments`
 - [ ] **8.4** Create Appwrite Function: `calculate-driver-rating`
 - [ ] **8.5** Create `rating_service.dart`
@@ -2055,17 +3890,17 @@ class ParentTripsService {
 lib/services/
 ├── appwrite/
 │   ├── appwrite_client.dart       ✅ Exists (add Realtime, Functions)
-│   ├── auth_service.dart          🔴 Create
-│   ├── database_constants.dart    🔴 Create
-│   ├── storage_service.dart       🔴 Create
+│   ├── auth_service.dart          ✅ Created
+│   ├── database_constants.dart    ✅ Created
+│   ├── storage_service.dart       ✅ Created
 │   ├── realtime_service.dart      🔴 Create
 │   └── functions_service.dart     🔴 Create
 ├── user_service.dart              🔴 Create
-├── parent_service.dart            🔴 Create
-├── child_service.dart             🔴 Create
-├── driver_service.dart            🔴 Create
-├── vehicle_service.dart           🔴 Create
-├── driver_config_service.dart     🔴 Create
+├── parent_service.dart            ✅ Created
+├── child_service.dart             ✅ Created
+├── driver_service.dart            ✅ Created
+├── vehicle_service.dart           ✅ Created
+├── driver_config_service.dart     ✅ Created
 ├── service_request_service.dart   🔴 Create
 ├── active_service_service.dart    🔴 Create
 ├── trip_service.dart              🔴 Create
@@ -2338,13 +4173,18 @@ functions/
 
 | Function | Trigger | Runtime | Schedule/Event |
 |----------|---------|---------|----------------|
-| `generate-daily-trips` | CRON | Node.js 18 | `0 4 30 * * *` (4:30 AM daily) |
+| `generate-morning-trips` | CRON | Node.js 18 | `0 5 * * *` (5:00 AM daily PKT) |
+| `generate-afternoon-trips` | CRON | Node.js 18 | `0 11 * * *` (11:00 AM daily PKT) |
 | `process-geofence` | Event | Node.js 18 | `databases.godropme_db.collections.trips.documents.*.update` |
 | `notify-trip-status` | Event | Node.js 18 | `databases.godropme_db.collections.trips.documents.*.update` |
 | `calculate-driver-rating` | Event | Node.js 18 | `databases.godropme_db.collections.ratings.documents.*.create` |
 | `match-drivers` | HTTP | Node.js 18 | `POST /v1/functions/{functionId}/executions` |
 | `send-push-notification` | HTTP | Node.js 18 | `POST /v1/functions/{functionId}/executions` |
-| `cleanup-old-data` | CRON | Node.js 18 | `0 2 0 * * 0` (Sunday 2:00 AM) |
+| `cleanup-old-data` | CRON | Node.js 18 | `0 2 * * 0` (Sunday 2:00 AM) |
+| `generate-daily-analytics` | CRON | Node.js 18 | `59 23 * * *` (11:59 PM daily PKT) |
+| `archive-trip-to-history` | Event | Node.js 18 | `databases.godropme_db.collections.trips.documents.*.update` |
+
+> **Total Functions**: 10 (4 CRON, 4 Event-triggered, 2 HTTP)
 
 ---
 
@@ -2373,7 +4213,10 @@ functions/
 1. Go to https://cloud.appwrite.io/console
 2. Select project: 68ed397e000f277c6936
 3. Create Database: "godropme_db"
-4. Create all 15 collections with attributes (see schema above)
+4. Create all 17 collections with attributes (see schema above):
+   - users, parents, children, drivers, vehicles, driver_services
+   - service_requests, active_services, trips, chat_rooms, messages
+   - notifications, reports, geofence_events, daily_analytics, trip_history, ratings
 5. Create 6 Storage Buckets (profile_photos, documents, etc.)
 6. Configure collection permissions
 ```
@@ -2476,5 +4319,10 @@ Child dropped → 🔔 "Child safely dropped" (manual + geofence)
 
 ---
 
-> **Last Updated**: November 27, 2025  
+> **Last Updated**: December 3, 2025  
 > **Author**: Development Team
+> 
+> **Recent Schema Changes (Dec 3, 2025):**
+> - Unified status to `users.status` only (removed `drivers.verificationStatus`)
+> - Consolidated `suspensionReason` + `rejectionReason` → single `statusReason` column
+> - Added `CollectionEnums.statusPending/Active/Suspended/Rejected` constants

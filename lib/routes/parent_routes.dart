@@ -41,6 +41,7 @@ final List<GetPage<dynamic>> parentRoutes = [
   GetPage(
     name: AppRoutes.parentSettings,
     page: () => const parent_settings.ParentSettingsScreen(),
+    binding: SettingsBinding(),
   ),
   // Parent Notifications
   GetPage(
