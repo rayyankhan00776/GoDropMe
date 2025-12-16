@@ -62,6 +62,7 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
               markers: _mapController.markers.value,
               onMapCreated: (c) {
                 _controller = c;
+                _mapController.setMapReady(true);
                 // Move to current location once map is ready
                 _initializeLocation();
               },
@@ -82,9 +83,24 @@ class _ParentMapScreenState extends State<ParentMapScreen> {
             Positioned(
               right: 16,
               bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
-              child: _RoundFab(
-                icon: Icons.chat_bubble_outline_sharp,
-                onTap: () => Get.toNamed(AppRoutes.parentChat),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Refresh button
+                  Obx(
+                    () => _RoundFab(
+                      icon: Icons.refresh,
+                      isLoading: _mapController.isLoadingMarkers.value,
+                      onTap: () => _mapController.refreshMarkers(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Chat button
+                  _RoundFab(
+                    icon: Icons.chat_bubble_outline_sharp,
+                    onTap: () => Get.toNamed(AppRoutes.parentChat),
+                  ),
+                ],
               ),
             ),
             // Relocated custom "locate me" button bottom-left (avoid overlap)
@@ -151,15 +167,9 @@ class _RoundFab extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: isLoading
-              ? const Center(
-                  child: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      color: AppColors.white,
-                      strokeWidth: 2,
-                    ),
-                  ),
+              ? const CircularProgressIndicator(
+                  color: AppColors.white,
+                  strokeWidth: 2,
                 )
               : Icon(icon, color: AppColors.white),
         ),

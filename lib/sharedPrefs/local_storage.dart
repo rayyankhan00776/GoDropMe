@@ -33,6 +33,8 @@ class StorageKeys {
   // Profile images (local file paths)
   static const parentProfileImage = 'parent_profile_image';
   static const driverProfileImage = 'driver_profile_image';
+  // Push notification target ID (Appwrite Messaging)
+  static const pushTargetId = 'push_target_id';
 }
 
 /// A very small wrapper around SharedPreferences tailored for this app's

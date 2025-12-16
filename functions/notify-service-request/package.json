@@ -1,0 +1,16 @@
+{
+    "name": "notify-service-request",
+    "version": "1.0.0",
+    "description": "Event-triggered function to send notifications for service requests (accepted/rejected)",
+    "type": "module",
+    "main": "src/main.js",
+    "scripts": {
+        "format": "prettier --write ."
+    },
+    "dependencies": {
+        "node-appwrite": "^21.0.0"
+    },
+    "devDependencies": {
+        "prettier": "^3.0.0"
+    }
+}

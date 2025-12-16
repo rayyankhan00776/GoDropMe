@@ -101,7 +101,11 @@ class ParentNotificationItem {
     userId: json['userId']?.toString() ?? '',
     title: json['title']?.toString() ?? '',
     body: json['body']?.toString() ?? json['subtitle']?.toString() ?? '',
-    time: DateTime.tryParse(json['\$createdAt']?.toString() ?? json['time']?.toString() ?? '') ?? DateTime.now(),
+    time: DateTime.tryParse(
+      json['createdAt']?.toString() ?? 
+      json['\$createdAt']?.toString() ?? 
+      json['time']?.toString() ?? ''
+    ) ?? DateTime.now(),
     type: _typeFromString(json['type']?.toString()),
     data: json['data'] is Map ? json['data'] as Map<String, dynamic> : null,
     isRead: json['isRead'] == true,

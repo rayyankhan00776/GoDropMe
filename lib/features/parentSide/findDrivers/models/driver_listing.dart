@@ -79,6 +79,45 @@ class DriverListing {
     distanceKm: (json['distanceKm'] as num?)?.toDouble(),
   );
 
+  /// Create a copy with updated fields
+  DriverListing copyWith({
+    String? driverId,
+    String? name,
+    String? vehicle,
+    String? vehicleColor,
+    String? type,
+    int? seatsAvailable,
+    String? serving,
+    String? serviceArea,
+    String? serviceCategory,
+    int? monthlyPricePkr,
+    String? extraNotes,
+    String? photoAsset,
+    String? profilePhotoFileId,
+    double? rating,
+    int? totalTrips,
+    double? distanceKm,
+  }) {
+    return DriverListing(
+      driverId: driverId ?? this.driverId,
+      name: name ?? this.name,
+      vehicle: vehicle ?? this.vehicle,
+      vehicleColor: vehicleColor ?? this.vehicleColor,
+      type: type ?? this.type,
+      seatsAvailable: seatsAvailable ?? this.seatsAvailable,
+      serving: serving ?? this.serving,
+      serviceArea: serviceArea ?? this.serviceArea,
+      serviceCategory: serviceCategory ?? this.serviceCategory,
+      monthlyPricePkr: monthlyPricePkr ?? this.monthlyPricePkr,
+      extraNotes: extraNotes ?? this.extraNotes,
+      photoAsset: photoAsset ?? this.photoAsset,
+      profilePhotoFileId: profilePhotoFileId ?? this.profilePhotoFileId,
+      rating: rating ?? this.rating,
+      totalTrips: totalTrips ?? this.totalTrips,
+      distanceKm: distanceKm ?? this.distanceKm,
+    );
+  }
+
   // Single dummy entry requested for now.
   static DriverListing demo() => const DriverListing(
     driverId: 'driver_1',

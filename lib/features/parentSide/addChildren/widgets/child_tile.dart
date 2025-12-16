@@ -92,6 +92,14 @@ class _ChildTileState extends State<ChildTile> {
     }
   }
 
+  /// Clean address by removing coordinate prefixes (e.g., "2HCQ+R88, ")
+  String _cleanAddress(String address) {
+    if (address.isEmpty) return address;
+    // Remove patterns like "2HCQ+R88, " at the start
+    final cleaned = address.replaceFirst(RegExp(r'^[A-Z0-9]{4}\+[A-Z0-9]{3},\s*'), '');
+    return cleaned.isEmpty ? address : cleaned;
+  }
+
   Future<void> _confirmDelete() async {
     if (widget.onDelete == null) return;
     final res = await showDialog<bool>(
@@ -306,16 +314,18 @@ class _ChildTileState extends State<ChildTile> {
               children: [
                 const _ItemDivider(),
                 const SizedBox(height: 8),
-                _IconRow(
-                  icon: Icons.place_outlined,
+                _LocationIconRow(
+                  icon: Icons.radio_button_checked,
+                  iconColor: Colors.green,
                   label: AppStrings.childPickPointHint,
-                  value: widget.childData['pickPoint'],
+                  value: _cleanAddress(widget.childData['pickPoint']?.toString() ?? ''),
                 ),
                 const _ItemDivider(),
-                _IconRow(
-                  icon: Icons.flag_outlined,
+                _LocationIconRow(
+                  icon: Icons.location_on,
+                  iconColor: Colors.red,
                   label: AppStrings.childDropPointHint,
-                  value: widget.childData['dropPoint'],
+                  value: _cleanAddress(widget.childData['dropPoint']?.toString() ?? ''),
                 ),
                 const _ItemDivider(),
                 _IconRow(
@@ -389,6 +399,61 @@ class _ChildTileState extends State<ChildTile> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Location row widget with colored icon
+class _LocationIconRow extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String value;
+
+  const _LocationIconRow({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            size: 20,
+            color: iconColor,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTypography.helperSmall.copyWith(
+                    color: AppColors.darkGray,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value.isEmpty ? '-' : value,
+                  style: AppTypography.optionTerms.copyWith(
+                    color: AppColors.black,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

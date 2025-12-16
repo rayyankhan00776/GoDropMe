@@ -72,6 +72,13 @@ class DriverDrawer extends StatelessWidget {
                       },
                     ),
                     AppDrawerTile(
+                      icon: Icons.work_outline_rounded,
+                      title: 'Active Services',
+                      onTap: () {
+                        Get.toNamed(AppRoutes.driverActiveServices);
+                      },
+                    ),
+                    AppDrawerTile(
                       icon: Icons.chat_bubble_outline,
                       title: AppStrings.driverTabChat,
                       onTap: () {
@@ -117,7 +124,7 @@ class _DriverDrawerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
+      height: 80,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [AppColors.primary, AppColors.primaryDark],

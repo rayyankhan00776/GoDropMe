@@ -4,12 +4,437 @@
 > **Backend**: Appwrite Cloud (fra.cloud.appwrite.io)  
 > **Project ID**: `68ed397e000f277c6936`  
 > **Created**: November 27, 2025  
-> **Last Updated**: December 3, 2025  
-> **Status**: Phase 3 Driver Registration ✅ COMPLETE | Driver Auth Flow ✅ COMPLETE | Status Unification ✅ COMPLETE
+> **Last Updated**: December 9, 2025  
+> **Status**: Phase 5 Trips & Geofencing ✅ COMPLETE | Phase 4 ✅ COMPLETE
 
 ---
 
-## 🎯 Latest Session: Status Unification & Schema Cleanup (Dec 3, 2025)
+## 🎯 Latest Session: Phase 5 Trips & Geofencing (Dec 9, 2025)
+
+### ✅ Appwrite Functions - Fixed & Tested
+
+All Phase 5 Appwrite functions are now working correctly, plus new notification functions added.
+
+#### Functions Status
+
+| Function | Trigger | Status | Notes |
+|----------|---------|--------|-------|
+| `generate-morning-trips` | CRON 5AM PKT | ✅ Working | Creates Home→School trips |
+| `generate-afternoon-trips` | CRON 11AM PKT | ✅ Working | Creates School→Home trips |
+| `process-geofence` | Event (trips update) | ✅ Working | Geofence + notifications + FCM push |
+| `notify-service-request` | Event (service_requests create/update) | ✅ NEW | Service request notifications |
+| `notify-trip-status` | Event (trips update) | ✅ NEW | Trip started notifications |
+| `notify-child-status` | Event (trip_children update) | ✅ NEW | Child pickup/drop notifications |
+
+#### Notification Architecture (Hybrid Approach)
+
+The notification system uses a hybrid approach:
+1. **Server-side FCM push** - All functions send FCM push via Appwrite Messaging API
+2. **Client-side Realtime** - App subscribes to notifications collection on startup for live updates
+
+**Notification Flow:**
+```
+DB Event → Appwrite Function → Create notification in DB → Send FCM push
+                                      ↓
+                              Realtime subscription
+                                      ↓
+                              Show local notification + update badge
+```
+
+**App Initialization:**
+```dart
+// In splash_controller.dart after session restore:
+await NotificationService.instance.registerForPushNotifications();
+NotificationService.instance.startRealtimeSubscription();
+```
+
+#### Test Execution Results (Dec 9, 2025)
+
+**Morning Trips Function:**
+```
+[SUCCESS] Created morning trip 69386d10000c56a40a9b for child Ali Jan
+[SUMMARY] Created: 1, Skipped: 0, Errors: 0
+```
+
+**Afternoon Trips Function:**
+```
+[SUCCESS] Created afternoon trip 69386d2100094f62f83a for child Ali Jan
+[SUMMARY] Created: 1, Skipped: 0, Errors: 0
+```
+
+**Process Geofence Function:**
+```
+[INFO] Distance to target: 0m
+[SUCCESS] Logged geofence event: approaching_pickup
+[SUCCESS] Logged geofence event: arrived_pickup
+[SUCCESS] Created notification: trip_started
+[SUCCESS] Created notification: driver_arrived
+[SUMMARY] Distance: 0m, Notifications: 2, Events: 2
+```
+
+### ✅ Driver Online/Offline Toggle
+
+Added toggle button to `DriverOrdersScreen` that changes trip status from `scheduled` to `driver_enroute`.
+
+| Feature | Implementation |
+|---------|----------------|
+| `isOnline` state | RxBool in controller |
+| Toggle button | AppBar with animated container |
+| Go Online | Starts all scheduled trips in current window |
+| Go Offline | Updates local state only |
+
+### ✅ Order Tile Pick/Drop Labels
+
+Updated `DriverOrderTile` to show proper pickup/drop locations based on trip direction.
+
+| Direction | Pick Label | Drop Label |
+|-----------|------------|------------|
+| `home_to_school` (Morning) | Home: {address} | {School Name} |
+| `school_to_home` (Afternoon) | {School Name} | Home: {address} |
+
+### ✅ Flutter Service Updates
+
+| Service/File | Changes |
+|--------------|---------|
+| `GeofenceService` | Uses `CollectionEnums` for enum values |
+| `database_constants.dart` | Added correct notification & geofence enum values |
+| `DriverOrdersController` | Added `isOnline`, `toggleOnlineStatus()` |
+| `driver_order_tile.dart` | New `_LocationLine` widget with icons |
+
+---
+
+## 🚨 Important Lessons Learned (Appwrite Issues)
+
+### Issue 1: Missing `node-appwrite` Dependency
+**Problem**: Functions failed with `Cannot find package 'node-appwrite'`
+
+**Cause**: `package.json` had empty `dependencies: {}` - forgot to add the package.
+
+**Solution**: 
+```json
+"dependencies": {
+  "node-appwrite": "^14.0.0"
+}
+```
+Then run `npm install` to generate `package-lock.json` before pushing.
+
+### Issue 2: Wrong Environment Variable Name
+**Problem**: Functions failed with "user is not authorized"
+
+**Cause**: Created `CUSTOM_API_KEY` variable but code used `APPWRITE_API_KEY`.
+
+**Solution**: Create environment variable with exact name the code expects:
+```javascript
+.setKey(process.env.APPWRITE_API_KEY) // Must match exactly
+```
+
+### Issue 3: HTTP Body Parsing
+**Problem**: `req.body` was a string, not parsed JSON object.
+
+**Cause**: Appwrite sends HTTP body as string, not automatically parsed.
+
+**Solution**: Parse if string:
+```javascript
+let trip = req.body;
+if (typeof trip === 'string') {
+  trip = JSON.parse(trip);
+}
+```
+
+### Issue 4: REST API Query Syntax
+**Problem**: ALL query attempts failed with "Invalid query: Syntax error"
+
+**Cause**: Appwrite Cloud REST API has very strict, undocumented query syntax. Even `Query.limit(100)` fails.
+
+**Solution**: Remove ALL queries from REST API calls, fetch full tables, filter in JavaScript:
+```javascript
+// DON'T: const result = await databases.listDocuments(dbId, collId, [Query.equal('x', 'y')]);
+// DO:
+const result = await databases.listDocuments(dbId, collId);
+const filtered = result.documents.filter(doc => doc.x === 'y');
+```
+
+### Issue 5: Schema Column Mismatches
+**Problem**: Functions tried to access non-existent columns (`operatingDays`, `serviceWindow`, `locationType`)
+
+**Solution**: Always verify exact column names in Appwrite console before coding. Use `mcp_appwrite-api_tables_db_list_columns` to check schema.
+
+### Issue 6: Enum Value Mismatches
+**Problem**: Wrote `'approaching'` but DB expected `'approaching_pickup'`
+
+**Solution**: Check exact enum values in column definition:
+```
+geofence_events.eventType: ['approaching_pickup', 'arrived_pickup', 'approaching_drop', 'arrived_drop', 'left_geofence']
+notifications.type: ['trip_started', 'driver_arrived', 'child_picked', 'child_dropped', 'request_received', 'request_accepted', 'request_rejected', 'new_message', 'system']
+```
+
+---
+
+## 🎯 Previous Session: Phase 4 Service Requests Backend (Dec 4, 2025)
+
+### ✅ Backend Services Created
+
+Created complete backend service layer for service requests and active services using TablesDB API.
+
+#### Services Created
+
+| Service | File | Purpose | Lines |
+|---------|------|---------|-------|
+| `ServiceRequestService` | `lib/services/appwrite/service_request_service.dart` | CRUD for `service_requests` table | ~350 |
+| `ActiveServiceService` | `lib/services/appwrite/active_service_service.dart` | CRUD for `active_services` table | ~370 |
+
+#### ServiceRequestService Methods
+
+| Method | Description |
+|--------|-------------|
+| `sendRequest(parentId, driverId, childId, serviceType, proposedPrice, pickPoint, dropPoint, notes)` | Create new service request |
+| `getParentRequests(parentId, status?)` | Get requests sent by a parent |
+| `getDriverRequests(driverId, status?)` | Get requests received by a driver |
+| `acceptRequest(requestId)` | Driver accepts a request |
+| `rejectRequest(requestId, message?)` | Driver rejects with optional message |
+| `cancelRequest(requestId)` | Parent cancels pending request |
+| `getRequestById(requestId)` | Get single request details |
+
+#### ActiveServiceService Methods
+
+| Method | Description |
+|--------|-------------|
+| `createActiveService(requestId, driverId, parentId, childId, serviceType, monthlyFee)` | Create active service from accepted request |
+| `getParentActiveServices(parentId, status?)` | Get parent's active services |
+| `getDriverActiveServices(driverId, status?)` | Get driver's active services |
+| `pauseService(serviceId)` | Pause an active service |
+| `resumeService(serviceId)` | Resume a paused service |
+| `endService(serviceId)` | End a service permanently |
+| `getActiveServiceByRequestId(requestId)` | Get service by its originating request |
+
+### ✅ FindDriversScreen Backend Integration
+
+Created `FindDriversController` for parent-side driver discovery and service management.
+
+#### Controller Features
+
+| Feature | Implementation |
+|---------|----------------|
+| Children Loading | Fetches parent's children from backend |
+| Available Drivers | Lists drivers (demo mode with `useDemoData` flag) |
+| Pending Requests | Tracks requests sent to drivers |
+| Active Services | Shows ongoing services with children |
+| Send Request | Creates service request via backend |
+| Cancel Request | Cancels pending request via backend |
+| End Service | Ends active service via backend |
+
+#### UI Updates
+
+| Component | Changes |
+|-----------|---------|
+| `FindDriversScreen` | Rewrote with GetX controller, Obx bindings |
+| `DriverListingTile` | Added `onSendRequest`, `onCancelRequest` callbacks |
+
+### ✅ Driver Side Backend Integration
+
+Updated driver's request handling to use real backend services.
+
+#### Files Modified
+
+| File | Changes |
+|------|---------|
+| `DriverRequestsController` | Uses `ServiceRequestService`, `ActiveServiceService` |
+| `DriverRequest` model | Enhanced `fromJson` for Appwrite relationship data |
+
+#### DriverRequest Model Enhancement
+
+The model now handles Appwrite's relationship data format:
+
+```dart
+// Handles both flat JSON and relationship refs
+parentName: json['parentRef']?['fullName'] ?? json['parentName'] ?? ''
+childName: json['childRef']?['name'] ?? json['childName'] ?? ''
+childAge: json['childRef']?['age'] ?? json['childAge']
+schoolName: json['childRef']?['schoolId'] ?? json['schoolName'] ?? ''
+pickPoint: json['childRef']?['pickPoint'] ?? json['pickPoint'] ?? ''
+dropPoint: json['childRef']?['dropPoint'] ?? json['dropPoint'] ?? ''
+```
+
+### 📝 Schema Verification
+
+Verified both collections exist in Appwrite:
+
+#### `service_requests` Table (10 columns)
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `parentRef` | relationship | FK to parents |
+| `driverRef` | relationship | FK to drivers |
+| `childRef` | relationship | FK to children |
+| `serviceType` | string | pickup_only, drop_only, both |
+| `proposedPrice` | float | Monthly price in PKR |
+| `pickPoint` | point | [lng, lat] |
+| `dropPoint` | point | [lng, lat] |
+| `status` | string | pending, accepted, rejected, cancelled |
+| `notes` | string | Optional notes |
+| `responseMessage` | string | Driver's response |
+
+#### `active_services` Table (11 columns)
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `requestRef` | relationship | FK to service_requests |
+| `driverRef` | relationship | FK to drivers |
+| `parentRef` | relationship | FK to parents |
+| `childRef` | relationship | FK to children |
+| `serviceType` | string | pickup_only, drop_only, both |
+| `monthlyFeePkr` | float | Agreed monthly fee |
+| `status` | string | active, paused, ended |
+| `startDate` | datetime | Service start |
+| `endDate` | datetime | Service end (if ended) |
+| `rating` | float | Parent's rating |
+| `pauseReason` | string | Reason if paused |
+
+### 🏗️ Service Request Flow Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  Service Request Flow                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  PARENT SIDE (FindDriversScreen + FindDriversController)        │
+│  ┌───────────────────────────────────────────────────────┐      │
+│  │ 1. Load children from backend                          │      │
+│  │ 2. Load available drivers (demo/geo-query)            │      │
+│  │ 3. Select child + driver → Send Request               │      │
+│  │    └─► ServiceRequestService.sendRequest()            │      │
+│  │ 4. Track pending requests                              │      │
+│  │ 5. View active services                                │      │
+│  └───────────────────────────────────────────────────────┘      │
+│                          │                                       │
+│                          ▼                                       │
+│  APPWRITE (service_requests table)                              │
+│  ┌───────────────────────────────────────────────────────┐      │
+│  │ status: pending → accepted/rejected/cancelled         │      │
+│  └───────────────────────────────────────────────────────┘      │
+│                          │                                       │
+│                          ▼                                       │
+│  DRIVER SIDE (DriverRequestsController)                         │
+│  ┌───────────────────────────────────────────────────────┐      │
+│  │ 1. Load requests for driver                            │      │
+│  │    └─► ServiceRequestService.getDriverRequests()      │      │
+│  │ 2. Accept Request                                      │      │
+│  │    └─► ServiceRequestService.acceptRequest()          │      │
+│  │    └─► ActiveServiceService.createActiveService()     │      │
+│  │ 3. Reject Request                                      │      │
+│  │    └─► ServiceRequestService.rejectRequest()          │      │
+│  └───────────────────────────────────────────────────────┘      │
+│                          │                                       │
+│                          ▼                                       │
+│  APPWRITE (active_services table)                               │
+│  ┌───────────────────────────────────────────────────────┐      │
+│  │ Created when request accepted                          │      │
+│  │ status: active → paused → ended                       │      │
+│  └───────────────────────────────────────────────────────┘      │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### ✅ Phase 4 Complete - All Core Tasks Done (Dec 6, 2025)
+
+| Task | Status | Notes |
+|------|--------|-------|
+| match-drivers Appwrite Function | ✅ Complete | Implemented with full JavaScript filtering (REST API query issues) |
+| Vehicle lookup in function | ✅ Complete | Fixed: Uses `driverId` not `vehicleId` |
+| School names in response | ✅ Complete | Fetches schools table, maps IDs to names |
+| Available seats calculation | ✅ Complete | `vehicle.seatCapacity - service.occupiedSeats` |
+| Profile photos display | ✅ Complete | Uses AppwriteImage widget with URL from drivers table |
+| Geo-filtering (point-in-polygon) | ✅ Complete | Ray casting algorithm in JavaScript |
+| Rating display | ✅ Complete | Shows in tile badge from drivers.rating |
+| Driver MyServices backend | ⬜ Pending | Use ActiveServiceService |
+| School/ServiceType filters | ⬜ Pending | Add to FindDriversController |
+
+### 🔍 Issues Solved Today (Dec 6, 2025)
+
+#### Issue 1: Appwrite REST API Query Syntax Incompatibility
+**Problem**: 
+- All query attempts failed with 400 "Invalid query: Syntax error"
+- Tried: `Query.contains()`, `contains("attr","value")`, `equal()`, `limit(100)`
+- Even simple `limit(100)` query failed
+
+**Root Cause**: 
+- Appwrite Cloud REST API has very strict, undocumented query syntax
+- Query format that works in Dart SDK doesn't translate to REST API
+
+**Solution**: 
+- Removed ALL query parameters from REST API calls
+- Fetch complete tables: driver_services, drivers, users, vehicles, schools
+- Perform all filtering in JavaScript code
+- Still performant (single digit milliseconds with ~100 records total)
+
+#### Issue 2: GeoJSON Polygon Nesting
+**Problem**:
+- Point-in-polygon check always returned false (0 services after geo-filter)
+- Pickup point `[71.588, 34.021]` was clearly inside polygon visually
+
+**Root Cause**:
+- `serviceAreaPolygon` stored as GeoJSON format: `[[[lng,lat], ...]]` (3 levels)
+- Point-in-polygon function expected: `[[lng,lat], ...]` (2 levels)
+
+**Solution**:
+- Extract coordinate ring: `polygon[0]` before passing to algorithm
+- Added check: `Array.isArray(polygon[0]) && Array.isArray(polygon[0][0])`
+
+#### Issue 3: Vehicle Data Not Found
+**Problem**:
+- Function logs showed "Vehicle: none"
+- Available seats always 0
+- Vehicle brand/model not displaying in UI
+
+**Root Cause**:
+- Code tried: `driver.vehicleId` → `vehiclesMap[vehicleId]`
+- But `drivers` table has NO `vehicleId` field
+- `vehicles` table has `driverId` field pointing to driver
+
+**Solution**:
+- Changed mapping: `vehiclesByDriverId[vehicle.driverId] = vehicle`
+- Changed lookup: `vehiclesByDriverId[driver.$id]`
+- Now correctly finds vehicle and calculates seats
+
+#### Issue 4: School Names Missing
+**Problem**:
+- "Serving" field showed service area address instead of school names
+
+**Root Cause**:
+- Function returned `serviceAreaAddress` for both fields
+- No school name lookup implemented
+
+**Solution**:
+- Fetch schools table
+- Map school IDs to names: `schoolsMap[$id] = name`
+- Join multiple school names with comma
+
+### 📊 Function Performance Metrics
+
+Current implementation fetches ALL data (no queries):
+- driver_services: 1 row
+- drivers: 1 row  
+- users: ~10 rows
+- schools: 25 rows
+- vehicles: 1 row
+
+**Total API Calls**: 5 (one per table)
+**Filtering Time**: <10ms (JavaScript in-memory)
+**Total Execution**: ~500-800ms (mostly network latency)
+
+This approach scales well up to:
+- ~100 drivers
+- ~50 schools
+- ~100 vehicles
+
+Beyond this, consider:
+- Server-side caching (Redis)
+- Pagination
+- Geo-spatial indexes (if Appwrite adds query support)
+
+---
+
+## 🎯 Previous Session: Status Unification & Schema Cleanup (Dec 3, 2025)
 
 ### ✅ Unified Status to Users Table Only
 
@@ -1941,11 +2366,13 @@ SchoolsLoader.getByName(name)       // → School?
 | `driverId` | relationship | ✅ | - | Many-to-One → `drivers` |
 | `childId` | relationship | ✅ | - | Many-to-One → `children` |
 | `status` | enum | ✅ | `pending` | Values: `pending`, `accepted`, `rejected`, `cancelled` |
-| `requestType` | enum | ✅ | - | Values: `pickup`, `dropoff`, `both` |
-| `message` | string(500) | ❌ | null | Message to driver |
 | `proposedPrice` | float | ❌ | null | Proposed monthly fee (PKR) |
 | `responseMessage` | string(500) | ❌ | null | Driver's response |
 | `respondedAt` | datetime | ❌ | null | Response timestamp |
+
+**Removed Fields** (from previous version):
+- ~~`requestType`~~ — **DELETED** - All services are now "both" (pickup + dropoff), no selection needed
+- ~~`message`~~ — **DELETED** - Simplified UI, no message field needed
 
 **Indexes**:
 - `parentId` (Key)
@@ -1960,14 +2387,16 @@ SchoolsLoader.getByName(name)       // → School?
 
 | Attribute | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `parentId` | relationship | ✅ | - | Many-to-One → `parents` |
-| `driverId` | relationship | ✅ | - | Many-to-One → `drivers` |
-| `childId` | relationship | ✅ | - | Many-to-One → `children` |
-| `serviceType` | enum | ✅ | - | Values: `pickup`, `dropoff`, `both` |
+| `parentId` | string | ✅ | - | Many-to-One → `parents` |
+| `driverId` | string | ✅ | - | Many-to-One → `drivers` |
+| `childId` | string | ✅ | - | Many-to-One → `children` |
 | `monthlyFee` | float | ✅ | - | Agreed monthly fee (PKR) |
 | `startDate` | datetime | ✅ | - | Service start date |
 | `endDate` | datetime | ❌ | null | Service end date |
 | `status` | enum | ✅ | `active` | Values: `active`, `paused`, `ended` |
+
+**Removed Fields** (from previous version):
+- ~~`serviceType`~~ — **DELETED** - All services are now "both" (pickup + dropoff), no selection needed
 
 **Indexes**:
 - `parentId` (Key)
@@ -3724,69 +4153,97 @@ class ParentTripsService {
 
 ---
 
-### Phase 4: Service Requests & Matching 🔍
-> **Priority**: HIGH | **Estimated**: 3-4 days
+### Phase 4: Service Requests & Matching 🔍 ✅ COMPLETE
+> **Priority**: HIGH | **Estimated**: 3-4 days | **Completed**: Dec 6, 2025
 
-- [ ] **4.1** Create `service_requests` collection ✅ (already exists)
-- [ ] **4.2** Create `active_services` collection ✅ (already exists)
-- [ ] **4.3** Create Appwrite Function: `match-drivers`
-- [ ] **4.4** Create `service_request_service.dart`
-  - [ ] `sendRequest(parentId, driverId, childId, data)`
-  - [ ] `getParentRequests(parentId)`
-  - [ ] `getDriverRequests(driverId)`
-  - [ ] `acceptRequest(requestId)`
-  - [ ] `rejectRequest(requestId, message)`
-  - [ ] `cancelRequest(requestId)`
-- [ ] **4.5** Create `active_service_service.dart`
-  - [ ] `createActiveService(requestId)`
-  - [ ] `getActiveServices(parentId/driverId)`
-  - [ ] `pauseService(serviceId)`
-  - [ ] `endService(serviceId)`
-- [ ] **4.6** Update `FindDriversScreen` with real data
-  - [ ] Geo query for nearby drivers
-  - [ ] Filter by school, service type
-  - [ ] Show driver ratings
-- [ ] **4.7** Implement request flow UI
+- [x] **4.1** Create `service_requests` collection ✅ (already exists - 10 columns)
+- [x] **4.2** Create `active_services` collection ✅ (already exists - 11 columns)
+- [x] **4.3** Create Appwrite Function: `match-drivers` ✅ (Dec 6, 2025)
+  - **Decision**: Using server-side function for better performance and security
+  - Server function handles geo-queries, school filtering, and driver status checks
+  - Returns fully formatted driver listings with vehicle details
+  - Location: `functions/match-drivers/src/main.js`
+- [x] **4.4** Create `service_request_service.dart` ✅ (Dec 4, 2025)
+  - [x] `sendRequest(parentId, driverId, childId, data)`
+  - [x] `getParentRequests(parentId)`
+  - [x] `getDriverRequests(driverId)`
+  - [x] `acceptRequest(requestId)`
+  - [x] `rejectRequest(requestId, message)`
+  - [x] `cancelRequest(requestId)`
+  - **Note**: Removed relationship fields (`parentRef`, `driverRef`, `childRef`) - using only ID fields like other services
+- [x] **4.5** Create `active_service_service.dart` ✅ (Dec 4, 2025)
+  - [x] `createActiveService(requestId)`
+  - [x] `getActiveServices(parentId/driverId)`
+  - [x] `pauseService(serviceId)`
+  - [x] `endService(serviceId)`
+  - **Note**: Removed relationship fields - using only ID fields for consistency
+- [x] **4.6** Update `FindDriversScreen` with backend integration ✅ (Dec 4-6, 2025)
+  - [x] Created `FindDriversController` with backend calls
+  - [x] Reactive UI with GetX Obx bindings
+  - [x] Loading/error/empty states
+  - [x] Driver matching via Appwrite function `match-drivers` ✅
+  - [x] Filter by school, service category, geo-location ✅
+  - [x] Show driver ratings ✅
+- [x] **4.7** Implement request flow UI ✅ (Dec 4, 2025)
+  - [x] Parent can send service requests
+  - [x] Parent can cancel pending requests
+  - [x] Driver receives requests in list
+  - [x] Driver can accept/reject requests
+  - [x] Accepted requests create active services
 
----
-
-### Phase 5: Trips & Geofencing 📍
-> **Priority**: HIGH | **Estimated**: 4-5 days
-
-- [ ] **5.1** Create `trips` collection ✅ (already exists)
-- [ ] **5.2** Create `geofence_events` collection ✅ (already exists)
-- [ ] **5.3** Create Appwrite Function: `generate-daily-trips`
-- [ ] **5.4** Create Appwrite Function: `process-geofence`
-- [ ] **5.5** Create `trip_service.dart`
-  - [ ] `getTodayTrips(driverId)`
-  - [ ] `getParentTrips(parentId)`
-  - [ ] `startTrip(tripId)` → status: driver_enroute
-  - [ ] `markArrived(tripId)`
-  - [ ] `markPicked(tripId)`
-  - [ ] `markDropped(tripId)`
-  - [ ] `markAbsent(tripId, reason)`
-  - [ ] `updateDriverLocation(tripId, point)`
-  - [ ] `confirmDrop(tripId)` → parent confirmation
-- [ ] **5.6** Create `geofence_service.dart`
-  - [ ] `checkGeofence(driverLocation, targetLocation)`
-  - [ ] `logGeofenceEvent(tripId, eventType, location)`
-- [ ] **5.7** Update `DriverHomeScreen`
-  - [ ] Show today's trips
-  - [ ] Update trip status
-  - [ ] Real-time location sharing
-- [ ] **5.8** Update `ParentMapScreen`
-  - [ ] Track driver in real-time
-  - [ ] Show trip status
-  - [ ] Confirm drop-off
-- [ ] **5.9** Implement geofence notifications
-  - [ ] "Driver is approaching" (500m)
-  - [ ] "Driver has arrived" (100m)
-  - [ ] "Child picked up"
-  - [ ] "Child dropped off"
+**Key Changes (Dec 6, 2025)**:
+- ✅ Removed Appwrite relationship fields from Phase 4 services for consistency with existing services
+- ✅ Created server-side `match-drivers` function for optimal performance
+- ✅ Updated `FindDriversController` to call Appwrite function instead of client-side geo-queries
 
 ---
 
-### Phase 6: Real-time Chat 💬
+### Phase 5: Trips & Geofencing 📍 ✅ COMPLETE
+> **Priority**: HIGH | **Completed**: December 9, 2025
+
+- [x] **5.1** Create `trips` collection ✅ (already exists)
+- [x] **5.2** Create `geofence_events` collection ✅ (already exists)
+- [x] **5.3** Create Appwrite Functions: `generate-morning-trips` & `generate-afternoon-trips` ✅
+  - [x] Morning function (CRON 5AM) - Home → School trips
+  - [x] Afternoon function (CRON 11AM) - School → Home trips
+- [x] **5.4** Create Appwrite Function: `process-geofence` ✅
+  - [x] Event trigger on trip updates
+  - [x] Haversine distance calculation
+  - [x] 500m approaching + 100m arrived notifications
+  - [x] Geofence event logging
+- [x] **5.5** Create `trip_service.dart` ✅
+  - [x] `getTodayTrips(driverId)`, `getParentTrips(parentId)`
+  - [x] `startTrip`, `markArrived`, `markPicked`, `markDropped`, `markAbsent`
+  - [x] `updateDriverLocation(tripId, point)`, `confirmDrop(tripId)`
+- [x] **5.6** Create `geofence_service.dart` ✅
+  - [x] `calculateDistanceMeters`, `checkGeofence`, `logGeofenceEvent`
+- [x] **5.7** Update `DriverHomeScreen` ✅
+  - [x] `DriverOrdersController` loads trips from backend
+  - [x] Status update methods connected to TripService
+  - [x] Created `driver_location_service.dart` for GPS streaming
+- [x] **5.8** Real-time Tracking Services ✅
+  - [x] Created `trip_tracking_service.dart` for parent Realtime subscription
+  - [x] `subscribeToTrip()` - track specific trip location
+  - [x] `subscribeToParentTrips()` - monitor all children's trips
+- [x] **5.9** Geofence & Notification Infrastructure ✅
+  - [x] Server-side `process-geofence` function
+  - [x] Client-side `geofence_service.dart`
+  - [ ] Push notifications (Phase 7 - FCM)
+
+**Key Changes (Dec 9, 2025)**:
+- ✅ Created `trip_service.dart` (570 lines) - full trip lifecycle
+- ✅ Created `geofence_service.dart` (320 lines) - Haversine + events
+- ✅ Created `driver_location_service.dart` (200 lines) - GPS streaming
+- ✅ Created `trip_tracking_service.dart` (200 lines) - Realtime subscription
+- ✅ Created 3 Appwrite Functions (580 lines total)
+- ✅ Updated `appwrite.config.json` with new functions
+- ✅ Updated `DriverOrdersController` with backend integration
+
+---
+
+
+
+### Phase 6: Real-time Chat 💬 (Delayed For MVP)
 > **Priority**: MEDIUM | **Estimated**: 3-4 days
 
 - [ ] **6.1** Create `chat_rooms` collection ✅ (already exists)
@@ -3813,34 +4270,103 @@ class ParentTripsService {
 
 ---
 
-### Phase 7: Push Notifications 🔔
-> **Priority**: MEDIUM | **Estimated**: 3 days
+### Phase 7: Push Notifications 🔔 ✅ COMPLETE (Dec 15, 2025)
+> **Priority**: MEDIUM | **Completed**: December 15, 2025
 
-- [ ] **7.1** Create `notifications` collection ✅ (already exists)
-- [ ] **7.2** Setup Firebase Cloud Messaging (FCM)
-- [ ] **7.3** Configure Appwrite Messaging provider (FCM)
-- [ ] **7.4** Create Appwrite Function: `send-push-notification`
-- [ ] **7.5** Create `notification_service.dart`
-  - [ ] `registerFCMToken(userId, token)`
-  - [ ] `getNotifications(userId)`
-  - [ ] `markAsRead(notificationId)`
-  - [ ] `markAllAsRead(userId)`
-  - [ ] `clearAll(userId)`
-- [ ] **7.6** Implement notification triggers:
-  - [ ] Service request received (driver)
-  - [ ] Request accepted/rejected (parent)
-  - [ ] Driver approaching (parent)
-  - [ ] Driver arrived (parent)
-  - [ ] Child picked up (parent)
-  - [ ] Child dropped off (parent)
-  - [ ] New message (both)
-- [ ] **7.7** Update `ParentsNotificationScreen`
-- [ ] **7.8** Update `DriverNotificationsScreen`
-- [ ] **7.9** Handle notification tap navigation
+- [x] **7.1** Create `notifications` collection ✅ (already exists)
+- [x] **7.2** Setup Firebase Cloud Messaging (FCM) ✅
+  - [x] FCM permission request (iOS/Android)
+  - [x] Token registration and refresh handling
+  - [x] Topic subscriptions (`all_parents`, `all_drivers`, `trip_notifications`, etc.)
+- [x] **7.3** Configure Local Notifications ✅
+  - [x] Android notification channels (trip_updates, service_requests, messages, system)
+  - [x] iOS notification settings
+  - [x] Notification tap handling
+- [x] **7.4** Create `notification_service.dart` ✅ (~900 lines)
+  - [x] `initialize()` - FCM + local notifications setup
+  - [x] `createNotification(userId, targetRole, type, title, body, data)` - DB schema aligned
+  - [x] `getUserNotifications(userId?, isRead?, limit)` - with local filtering (REST API workaround)
+  - [x] `getUnreadCount(userId?)` - for badge display
+  - [x] `refreshUnreadCount()` - updates observable RxInt
+  - [x] `markAsRead(notificationId)` - updates DB + refreshes count
+  - [x] `markAllAsRead(userId?)` - batch operation
+  - [x] `deleteNotification(notificationId)` - with count refresh
+  - [x] `clearAllNotifications(userId?)` - batch delete
+  - [x] `subscribeToNotifications(onNotification)` - Appwrite Realtime
+  - [x] `showLocalNotification(title, body, payload)` - channel-aware
+  - [x] `showGeofenceNotification(title, body, eventType, tripId)` - for Phase 5
+  - [x] `createAppwriteSubscriber(topicId, targetId)` - Appwrite Messaging
+  - [x] `deleteAppwriteSubscriber(topicId, subscriberId)` - Appwrite Messaging
+- [x] **7.5** Database Schema Alignment ✅
+  - [x] `userId` (string, required)
+  - [x] `targetRole` (enum: parent/driver, required)
+  - [x] `title` (string, required, max 100)
+  - [x] `body` (string, required, max 500) - NOT "message"
+  - [x] `type` (enum: 9 values)
+  - [x] `payload` (string, optional, max 2000) - JSON encoded ⚠️ RENAMED from `data` to avoid SDK conflict
+  - [x] `isRead` (boolean, default: false)
+  - [x] `userRef` (relationship to users, cascade delete)
+- [x] **7.6** Updated Notification Controllers ✅
+  - [x] `ParentNotificationsController` - backend CRUD, realtime subscription
+  - [x] `DriverNotificationsController` - backend CRUD, realtime subscription
+- [x] **7.7** Update `ParentsNotificationScreen` ✅
+  - [x] Loading/error/empty states
+  - [x] Pull-to-refresh
+  - [x] Swipe-to-delete
+  - [x] Mark all as read button
+  - [x] Read/unread visual distinction
+  - [x] Unread indicator dot
+- [x] **7.8** Update `DriverNotificationsScreen` ✅
+  - [x] Same enhancements as parent screen
+- [x] **7.9** Handle notification tap navigation ✅
+  - [x] Trip notifications → Map screen (role-aware)
+  - [x] Request received → Driver map
+  - [x] Request accepted/rejected → Find drivers
+  - [x] New message → Chat conversation
+  - [x] System → Notifications screen
+- [x] **7.10** Notification Badge on Buttons ✅
+  - [x] `GlassNotificationButton` - red badge with count
+  - [x] `DriverGlassNotificationButton` - red badge with count
+  - [x] Observable `unreadCount` RxInt for reactive updates
+- [x] **7.11** Main.dart Integration ✅
+  - [x] `await NotificationService.instance.initialize()` after Firebase.initializeApp()
+- [x] **7.12** Android Build Configuration ✅
+  - [x] Core library desugaring enabled for flutter_local_notifications
+  - [x] MultiDex enabled
+  - [x] Desugar JDK libs dependency added
+
+#### Notification Type Enum Values (from DB)
+```
+['trip_started', 'driver_arrived', 'child_picked', 'child_dropped', 
+ 'request_received', 'request_accepted', 'request_rejected', 'new_message', 'system']
+```
+
+#### FCM Topic Subscriptions
+```dart
+Topics.allParents           // 'all_parents'
+Topics.allDrivers           // 'all_drivers'
+Topics.tripNotifications    // 'trip_notifications'
+Topics.serviceRequests      // 'service_requests'
+Topics.systemAnnouncements  // 'system_announcements'
+Topics.geofenceAlerts       // 'geofence_alerts'
+```
+
+#### Key Files Created/Modified
+| File | Status | Lines |
+|------|--------|-------|
+| `notification_service.dart` | ✅ Rewritten | ~900 |
+| `parent_notifications_controller.dart` | ✅ Updated | ~110 |
+| `driver_notifications_controller.dart` | ✅ Updated | ~110 |
+| `parents_notification_Screen.dart` | ✅ Enhanced | ~220 |
+| `driver_notifications_screen.dart` | ✅ Enhanced | ~220 |
+| `notification_button.dart` | ✅ Badge added | ~90 |
+| `driver_notification_button.dart` | ✅ Badge added | ~90 |
+| `main.dart` | ✅ Init added | +5 |
+| `android/app/build.gradle.kts` | ✅ Desugaring | +10 |
 
 ---
 
-### Phase 8: Ratings & Reports ⭐
+### Phase 8: Ratings & Reports ⭐ (Delayed For MVP)
 > **Priority**: LOW | **Estimated**: 2-3 days
 
 - [ ] **8.1** Create `ratings` collection ✅ (already exists)
@@ -3862,25 +4388,47 @@ class ParentTripsService {
 
 ---
 
-### Phase 9: Profile & Settings ⚙️
+### Phase 9: Profile & Settings ⚙️ ✅ PARTIAL (Dec 16, 2025)
 > **Priority**: LOW | **Estimated**: 2 days
 
 - [ ] **9.1** Update `ProfileScreen` (Parent)
-  - [ ] Display profile data from Appwrite
-  - [ ] Edit profile
-  - [ ] Change profile photo
-- [ ] **9.2** Update `DriverProfileScreen`
-  - [ ] Display profile data
-  - [ ] Show verification status
-  - [ ] Show rating & total trips
+  - [x] Display profile data from Appwrite ✅ (already done)
+  - [x] Edit profile ✅ (already done)
+  - [x] Change profile photo ✅ (already done)
+- [x] **9.2** Update `DriverProfileScreen` ✅ (Dec 16, 2025)
+  - [x] Converted to StatelessWidget with GetX controller
+  - [x] Display profile data from Appwrite (reactive)
+  - [x] Show verification status (CNIC, License)
+  - [ ] Show rating & total trips (UI ready, needs data binding)
 - [ ] **9.3** Update `ParentSettingsScreen`
   - [ ] Notification preferences
   - [ ] Privacy settings
-- [ ] **9.4** Update `DriverSettingsScreen`
+- [x] **9.4** Update `DriverSettingsScreen` ✅ (Dec 16, 2025)
+  - [x] Created `DriverSettingsController` with GetX
+  - [x] Email display (non-editable, auth-linked)
+  - [x] Confirmation dialogs for destructive actions
   - [ ] Notification preferences
-  - [ ] Online/offline toggle
-- [ ] **9.5** Implement account deletion
-- [ ] **9.6** Implement logout flow
+  - [ ] Online/offline toggle (moved to home screen)
+- [x] **9.5** Implement account deletion ✅ (Dec 16, 2025)
+  - [x] Driver: Deletes driver profile + user record + logout
+  - [x] Parent: Deletes parent profile + user record + logout
+  - [x] Confirmation dialog with warning
+- [x] **9.6** Implement logout flow ✅ (Dec 16, 2025)
+  - [x] Clear Appwrite session
+  - [x] Clear local storage
+  - [x] Navigate to option screen
+
+#### Key Files Created/Modified (Dec 16, 2025)
+| File | Status | Notes |
+|------|--------|-------|
+| `driver_profile_controller.dart` | ✅ Rewritten | ~284 lines, Appwrite + local fallback |
+| `driver_profile_screen.dart` | ✅ Rewritten | StatelessWidget with GetX |
+| `driver_profile_avatar.dart` | ✅ Updated | AppwriteImage + borderRadius |
+| `driver_settings_controller.dart` | ✅ Created | ~140 lines, logout/delete |
+| `driver_settings_confirm_dialog.dart` | ✅ Created | ~160 lines, confirmation dialogs |
+| `driver_settings_screen.dart` | ✅ Updated | Controller integration |
+| `driver_profile_tile.dart` (drawer) | ✅ Updated | Reactive with AppwriteImage |
+| `profile_header.dart` | ✅ Updated | Uses controller for name |
 
 ---
 

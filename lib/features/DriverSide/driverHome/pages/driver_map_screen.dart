@@ -132,6 +132,21 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
               },
               markers: _controller.markers.value,
             )),
+
+            // Refresh button (bottom-right, stacked above locate button)
+            Positioned(
+              right: 16,
+              bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
+              child: Obx(
+                () => _RoundFab(
+                  icon: Icons.refresh,
+                  isLoading: _controller.isLoadingMarkers.value,
+                  onTap: () => _controller.refreshMarkers(),
+                ),
+              ),
+            ),
+
+            // My location button (bottom-left)
             Positioned(
               left: 16,
               bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
@@ -152,14 +167,20 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
 class _RoundFab extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  const _RoundFab({required this.icon, required this.onTap});
+  final bool isLoading;
+  
+  const _RoundFab({
+    required this.icon,
+    required this.onTap,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: isLoading ? null : onTap,
         borderRadius: BorderRadius.circular(28),
         child: Container(
           height: 56,
@@ -172,7 +193,12 @@ class _RoundFab extends StatelessWidget {
             ),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: AppColors.white),
+          child: isLoading
+              ? const CircularProgressIndicator(
+                  color: AppColors.white,
+                  strokeWidth: 2,
+                )
+              : Icon(icon, color: AppColors.white),
         ),
       ),
     );

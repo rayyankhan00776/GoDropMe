@@ -4,7 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/driverProfile/controllers/driver_profile_controller.dart';
+import 'package:godropme/common_widgets/appwrite_image.dart';
+import 'package:godropme/features/DriverSide/driverProfile/controllers/driver_profile_controller.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_assets.dart';
@@ -87,6 +88,49 @@ class DriverProfileAvatar extends StatelessWidget {
     );
   }
 
+  /// Build placeholder widget while loading
+  Widget _buildPlaceholder() {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.grey.shade200,
+        border: Border.all(color: Colors.grey.shade400, width: 2),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: AppColors.primary,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build default avatar when no image
+  Widget _buildDefaultAvatar() {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.grey.shade200,
+        border: Border.all(color: Colors.grey.shade400, width: 2),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.person_outline_rounded,
+          size: size * 0.4,
+          color: Colors.grey.shade500,
+        ),
+      ),
+    );
+  }
+
   Widget _buildAvatar(BuildContext context, String? path) {
     // If it's an asset placeholder or null/empty, show default SVG
     if (path == null || path.isEmpty || path.startsWith('assets/')) {
@@ -131,40 +175,45 @@ class DriverProfileAvatar extends StatelessWidget {
             ? Get.find<DriverProfileController>()
             : Get.put(DriverProfileController()),
         builder: (controller) {
-          final hasImage = controller.hasProfileImage;
+          final hasAppwritePhoto = controller.hasAppwritePhoto;
+          final hasLocalImage = controller.hasProfileImage;
           final imageFile = controller.profileImageFile;
+          final appwriteUrl = controller.profileImageUrl.value;
 
           return GestureDetector(
             onTap: () => _showImagePickerOptions(context),
             child: Stack(
               children: [
-                Container(
-                  width: size,
-                  height: size,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey.shade200,
-                    border: Border.all(
-                      color: hasImage ? AppColors.primary : Colors.grey.shade400,
-                      width: 2,
+                // Priority: Appwrite URL > Local file > Default icon
+                if (hasAppwritePhoto)
+                  AppwriteImage(
+                    imageUrl: appwriteUrl,
+                    width: size,
+                    height: size,
+                    fit: BoxFit.cover,
+                    borderRadius: BorderRadius.circular(size / 2),
+                    placeholder: _buildPlaceholder(),
+                    errorWidget: _buildDefaultAvatar(),
+                  )
+                else if (hasLocalImage && imageFile != null)
+                  Container(
+                    width: size,
+                    height: size,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey.shade200,
+                      border: Border.all(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                      image: DecorationImage(
+                        image: FileImage(imageFile),
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    image: hasImage && imageFile != null
-                        ? DecorationImage(
-                            image: FileImage(imageFile),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  child: hasImage
-                      ? null
-                      : Center(
-                          child: Icon(
-                            Icons.person_outline_rounded,
-                            size: size * 0.4,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                ),
+                  )
+                else
+                  _buildDefaultAvatar(),
                 // Edit icon overlay
                 Positioned(
                   bottom: 0,
@@ -183,6 +232,26 @@ class DriverProfileAvatar extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Syncing indicator
+                if (controller.isSyncing.value)
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black.withValues(alpha: 0.3),
+                      ),
+                      child: const Center(
+                        child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           );

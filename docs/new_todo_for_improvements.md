@@ -107,6 +107,31 @@ lib/
 
 ---
 
+## ✅ Task 6: Map Marker Bug Fixes (December 11, 2025)
+**Status**: ✅ Completed
+
+### Issue
+Map markers not showing because controllers used auth `userId` instead of driver/parent document `$id`.
+
+### Fixes Applied
+- [x] `driver_home_controller.dart` - Added DriverService lookup to get driver doc ID before loading active services
+- [x] `parent_map_controller.dart` - Added ParentService lookup to get parent doc ID before loading trips
+
+---
+
+## ✅ Task 7: Driver Order Tile Enhancement (December 11, 2025)
+**Status**: ✅ Completed
+
+### Request
+Show child name and avatar on driver order tiles instead of parent info.
+
+### Changes Made
+- [x] `driver_order.dart` - Added `childAvatarUrl` field
+- [x] `driver_orders_controller.dart` - Fetch child's `photoUrl` in `_enrichTripData()`
+- [x] `driver_order_tile.dart` - Display child name and avatar in tile
+
+---
+
 ## 📊 Final Status
 
 | Task | Status |
@@ -116,6 +141,8 @@ lib/
 | Task 3: Parent Map | ✅ |
 | Task 4: Driver Map | ✅ |
 | Task 5: Code Cleanup | ✅ |
+| Task 6: Map ID Fixes | ✅ |
+| Task 7: Order Tile Child Info | ✅ |
 
 ---
 

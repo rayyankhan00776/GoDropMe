@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:godropme/features/driverSide/driverProfile/controllers/driver_profile_controller.dart';
+import 'package:godropme/features/DriverSide/driverProfile/controllers/driver_profile_controller.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';

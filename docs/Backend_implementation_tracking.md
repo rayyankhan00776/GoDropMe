@@ -4,7 +4,7 @@
 > **Backend**: Appwrite Cloud (fra.cloud.appwrite.io)  
 > **Project ID**: `68ed397e000f277c6936`  
 > **Database ID**: `godropme_db`  
-> **Last Updated**: December 3, 2025
+> **Last Updated**: December 16, 2025
 
 ---
 
@@ -20,10 +20,12 @@
 | **Storage Service** | ✅ Complete | File upload with compression |
 | **Parent Service** | ✅ Complete | CRUD operations, uses TablesDB |
 | **Child Service** | ✅ Complete | CRUD operations, uses TablesDB |
-| **Driver Service** | ✅ Complete | CRUD for `drivers` table |
+| **Driver Service** | ✅ Complete | CRUD for `drivers` table + photo upload |
 | **Vehicle Service** | ✅ Complete | CRUD for `vehicles` table |
 | **Driver Config Service** | ✅ Complete | CRUD for `driver_services` table |
 | **Driver Registration Service** | ✅ Complete | Orchestrates complete registration |
+| **Service Request Service** | ✅ Complete | CRUD for `service_requests` table |
+| **Active Service Service** | ✅ Complete | CRUD for `active_services` table |
 | **UI Integration** | ✅ Complete | Controllers bound to services |
 | **First-time User Flow** | ✅ Complete | Splash → Onboard → Option |
 | **Session Management** | ✅ Complete | Auto-restore + incomplete registration resume |
@@ -31,17 +33,522 @@
 | **Driver Registration** | ✅ Complete | Full flow tested & working |
 | **AppwriteImage Widget** | ✅ Complete | Authenticated image loading from storage |
 | **Profile Edit Sync** | ✅ Complete | Name, Phone sync to Account + Users + Parents |
-| **Settings Actions** | ⚠️ Partial | Logout works, Delete Account incomplete |
+| **Settings Actions** | ✅ Complete | Logout + Delete Account (both roles) |
 | **TablesDB Migration** | ✅ Complete | All services migrated from deprecated Databases API |
 | **Driver Model Alignment** | ✅ Complete | All models aligned with Appwrite schema |
 | **Schools Table** | ✅ Complete | Central lookup table with 32 schools seeded |
 | **SchoolsLoader** | ✅ Complete | Fetches from Appwrite only (no JSON fallback) |
 | **School FK Refactor** | ✅ Complete | `schoolId`/`schoolIds` replace names everywhere |
 | **Status Unification** | ✅ Complete | All status managed in `users.status` only |
+| **FindDriversScreen Backend** | ✅ Complete | Controller with backend integration |
+| **Driver Requests Backend** | ✅ Complete | Accept/Reject with active service creation |
+| **Geo-Query Driver Matching** | ✅ Complete | Using Appwrite server function `match-drivers` |
+| **Phase 4 Relationship Fields** | ✅ Removed | Aligned with Phase 1-3 services (plain IDs only) |
+| **match-drivers Function** | ✅ Complete | REST API with all filtering in code, includes vehicle lookup |
+| **Trip Service** | ✅ Complete | CRUD for `trips` table with status lifecycle |
+| **Geofence Service** | ✅ Complete | Distance calculation + event logging |
+| **DriverOrdersController** | ✅ Updated | Uses TripService for real backend calls |
+| **generate-morning-trips** | ✅ Complete | CRON 5AM PKT, creates Home→School trips |
+| **generate-afternoon-trips** | ✅ Complete | CRON 11AM PKT, creates School→Home trips |
+| **process-geofence** | ✅ Complete | Event-triggered, geofence + notifications |
+| **Driver Online/Offline Toggle** | ✅ Complete | Changes trip status scheduled→driver_enroute |
+| **DriverProfileController** | ✅ Complete | Appwrite backend + local fallback |
+| **DriverSettingsController** | ✅ Complete | Logout + Delete Account |
+| **Driver Profile Screen** | ✅ Updated | Reactive GetX with Appwrite data |
+| **Driver Settings Screen** | ✅ Updated | Controller + confirmation dialogs |
 
 ---
 
-## 🔄 Status Unification (December 3, 2025 - Latest)
+## 🚀 Phase 9: Profile & Settings (December 16, 2025 - PARTIAL)
+
+### ✅ Driver Side - Complete
+
+Fully migrated driver profile and settings screens to use Appwrite backend with GetX reactive pattern.
+
+#### Files Created/Modified
+
+| File | Status | Lines | Description |
+|------|--------|-------|-------------|
+| `driver_profile_controller.dart` | ✅ Rewritten | ~284 | Appwrite backend + local fallback |
+| `driver_profile_screen.dart` | ✅ Rewritten | ~165 | StatelessWidget with GetX |
+| `driver_profile_avatar.dart` | ✅ Updated | ~300 | AppwriteImage + borderRadius |
+| `driver_settings_controller.dart` | ✅ Created | ~140 | Logout + Delete Account |
+| `driver_settings_confirm_dialog.dart` | ✅ Created | ~160 | Confirmation dialogs |
+| `driver_settings_screen.dart` | ✅ Updated | ~115 | Controller integration |
+| `driver_profile_tile.dart` (drawer) | ✅ Updated | ~128 | Reactive with AppwriteImage |
+| `profile_header.dart` | ✅ Updated | ~50 | Uses controller for name |
+
+#### DriverProfileController Features
+
+- **Load from Appwrite**: `DriverService.instance.getDriver()` → driver profile
+- **Local Fallback**: Falls back to `LocalStorage` keys if offline
+- **Photo Upload**: `updateProfilePhoto()` → Appwrite Storage + database update
+- **Reactive Properties**: `profile`, `displayName`, `profileImageUrl`, `profileImagePath`, `isLoading`, `isSyncing`
+- **Computed Getters**: `hasAppwritePhoto`, `hasProfileImage`, `profileImageFile`, `driverId`, `photoUrl`
+
+#### DriverSettingsController Features
+
+- **Logout Flow**: Clear Appwrite session → Clear local storage → Navigate to option screen
+- **Delete Account Flow**:
+  1. Delete driver profile from `drivers` table (handles photo deletion)
+  2. Delete user record from `users` table
+  3. Logout from Appwrite
+  4. Clear all local data
+  5. Navigate to option screen
+
+#### Key Bug Fixes (Dec 16, 2025)
+
+| Issue | Solution |
+|-------|----------|
+| Case-sensitive imports | Changed `driverSide` → `DriverSide` in all import paths |
+| ClipOval wrapping AppwriteImage | Use `borderRadius` parameter instead |
+| Email editable in settings | Disabled (linked to auth, shouldn't be editable) |
+
+### ⏳ Parent Side - Already Done
+
+Parent profile and settings were updated in earlier phases:
+- `ParentProfileController` with Appwrite integration
+- `ProfileAvatar` with AppwriteImage
+- `SettingsController` with logout/delete
+
+### 📋 Remaining Tasks
+
+- [ ] Notification preferences (both roles)
+- [ ] Privacy settings
+- [ ] Rating & total trips display for driver
+
+---
+
+## 🚀 Phase 5: Trips & Geofencing (December 9, 2025 - COMPLETE)
+
+### ✅ Appwrite Functions - Working
+
+All three Phase 5 functions are deployed and tested successfully.
+
+| Function | Trigger | Purpose |
+|----------|---------|---------|
+| `generate-morning-trips` | CRON `0 5 * * *` (5AM PKT) | Create morning trips (Home→School) |
+| `generate-afternoon-trips` | CRON `0 11 * * *` (11AM PKT) | Create afternoon trips (School→Home) |
+| `process-geofence` | Event on `trips` update | Check proximity, send notifications |
+
+#### Function Environment Variables
+
+All functions require:
+```
+APPWRITE_API_KEY = <your_api_key>
+APPWRITE_FUNCTION_PROJECT_ID = (auto-set by Appwrite)
+APPWRITE_ENDPOINT = https://fra.cloud.appwrite.io/v1 (default)
+```
+
+#### trips Table Status Enum
+```
+['scheduled', 'driver_enroute', 'arrived', 'picked', 'in_transit', 'dropped', 'cancelled', 'absent']
+```
+
+#### geofence_events Table eventType Enum
+```
+['approaching_pickup', 'arrived_pickup', 'approaching_drop', 'arrived_drop', 'left_geofence']
+```
+
+#### notifications Table type Enum
+```
+['trip_started', 'driver_arrived', 'child_picked', 'child_dropped', 'request_received', 'request_accepted', 'request_rejected', 'new_message', 'system']
+```
+
+### ✅ Driver Online/Offline Toggle
+
+Added to `DriverOrdersScreen` header - toggles driver status which starts all scheduled trips.
+
+| State | Action |
+|-------|--------|
+| Offline → Online | Start all scheduled trips in current window (status → `driver_enroute`) |
+| Online → Offline | Update local state only (trips continue) |
+
+### ✅ Order Tile Pick/Drop Labels
+
+Updated to show proper locations based on trip direction:
+
+| Direction | Pick | Drop |
+|-----------|------|------|
+| Morning (`home_to_school`) | Home: {address} | {School Name} |
+| Afternoon (`school_to_home`) | {School Name} | Home: {address} |
+
+---
+
+## 🚨 Critical Lessons: Appwrite Issues & Solutions
+
+### 1. Function Dependencies
+**Issue**: `Cannot find package 'node-appwrite'`
+**Solution**: Add to `package.json` + run `npm install`:
+```json
+"dependencies": { "node-appwrite": "^14.0.0" }
+```
+
+### 2. Environment Variable Names
+**Issue**: "User not authorized" despite having API key
+**Solution**: Variable name must EXACTLY match code:
+```javascript
+process.env.APPWRITE_API_KEY  // NOT CUSTOM_API_KEY
+```
+
+### 3. HTTP Body is String
+**Issue**: `req.body.$id` undefined
+**Solution**: Parse string to JSON:
+```javascript
+if (typeof req.body === 'string') {
+  trip = JSON.parse(req.body);
+}
+```
+
+### 4. REST API Query Syntax BROKEN
+**Issue**: ALL queries fail with "Invalid query: Syntax error"
+**Solution**: Fetch ALL data, filter in code:
+```javascript
+// NO queries - fetch everything
+const result = await databases.listDocuments(dbId, collId);
+const filtered = result.documents.filter(d => d.status === 'active');
+```
+
+### 5. Schema Mismatches
+**Issue**: Accessing non-existent columns
+**Solution**: Always verify schema before coding with:
+```
+mcp_appwrite-api_tables_db_list_columns
+```
+
+### 6. Enum Value Mismatches  
+**Issue**: DB rejected `'approaching'`
+**Solution**: Use exact enum values from schema:
+```
+'approaching_pickup'  // NOT 'approaching'
+'driver_enroute'      // NOT 'enroute'
+```
+
+---
+
+## 🚀 Phase 4: Service Requests & Matching (December 4-6, 2025 - COMPLETE)
+
+### ✅ Backend Services Created
+
+Created complete backend service layer for service requests and active services.
+
+#### Services Created
+
+| Service | File | Purpose | Lines |
+|---------|------|---------|-------|
+| `ServiceRequestService` | `lib/services/appwrite/service_request_service.dart` | CRUD for `service_requests` table | ~350 |
+| `ActiveServiceService` | `lib/services/appwrite/active_service_service.dart` | CRUD for `active_services` table | ~370 |
+
+**IMPORTANT**: Phase 4 services **DO NOT use relationship fields** (`parentRef`, `driverRef`, `childRef`) to maintain consistency with Phase 1-3 services. All services use only plain ID fields.
+
+#### ServiceRequestService Methods
+
+| Method | Description |
+|--------|-------------|
+| `sendRequest(parentId, driverId, childId, serviceType, proposedPrice, pickPoint, dropPoint, notes)` | Create new service request (uses plain IDs only) |
+| `getParentRequests(parentId, status?)` | Get requests sent by a parent |
+| `getDriverRequests(driverId, status?)` | Get requests received by a driver |
+| `acceptRequest(requestId)` | Driver accepts a request |
+| `rejectRequest(requestId, message?)` | Driver rejects with optional message |
+| `cancelRequest(requestId)` | Parent cancels pending request |
+| `getRequestById(requestId)` | Get single request details |
+
+#### ActiveServiceService Methods
+
+| Method | Description |
+|--------|-------------|
+| `createActiveService(requestId, driverId, parentId, childId, serviceType, monthlyFee)` | Create active service (uses plain IDs only) |
+| `getParentActiveServices(parentId, status?)` | Get parent's active services |
+| `getDriverActiveServices(driverId, status?)` | Get driver's active services |
+| `pauseService(serviceId)` | Pause an active service |
+| `resumeService(serviceId)` | Resume a paused service |
+| `endService(serviceId)` | End a service permanently |
+| `getActiveServiceByRequestId(requestId)` | Get service by its originating request |
+
+### ✅ FindDriversScreen Backend Integration
+
+Created `FindDriversController` for parent-side driver discovery and service management.
+
+| Feature | Implementation |
+|---------|----------------|
+| Children Loading | `ChildService.getChildren(parentId)` |
+| Available Drivers | Appwrite Function `match-drivers` |
+| Pending Requests | `ServiceRequestService.getParentRequests(parentId, 'pending')` |
+| Active Services | `ActiveServiceService.getParentActiveServices(parentId, 'active')` |
+| Send Request | `ServiceRequestService.sendRequest(...)` |
+| Cancel Request | `ServiceRequestService.cancelRequest(requestId)` |
+| End Service | `ActiveServiceService.endService(serviceId)` |
+
+#### Files Created/Modified
+
+| File | Changes |
+|------|---------|
+| `find_drivers_controller.dart` | Updated to call Appwrite function instead of client-side queries |
+| `find_drivers_screen.dart` | Rewrote with GetX Obx bindings |
+| `driver_listing_tile.dart` | Added `onSendRequest`, `onCancelRequest` callbacks |
+
+### ✅ Driver Side Backend Integration
+
+Updated driver's request handling to use real backend services.
+
+| File | Changes |
+|------|---------|
+| `driver_requests_controller.dart` | Uses `ServiceRequestService`, `ActiveServiceService` |
+| `driver_request.dart` | Enhanced `fromJson` for Appwrite relationship data |
+
+#### DriverRequest Model Enhancement
+
+```dart
+// Handles both flat JSON and Appwrite relationship refs
+parentName: json['parentRef']?['fullName'] ?? json['parentName'] ?? ''
+childName: json['childRef']?['name'] ?? json['childName'] ?? ''
+childAge: json['childRef']?['age'] ?? json['childAge']
+schoolName: json['childRef']?['schoolId'] ?? json['schoolName'] ?? ''
+pickPoint: json['childRef']?['pickPoint'] ?? json['pickPoint'] ?? ''
+dropPoint: json['childRef']?['dropPoint'] ?? json['dropPoint'] ?? ''
+```
+
+### 📝 Schema Verification
+
+#### `service_requests` Table (10 columns)
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `parentId` | string | FK to parents.$id (plain ID, no relationship field) |
+| `driverId` | string | FK to drivers.$id (plain ID, no relationship field) |
+| `childId` | string | FK to children.$id (plain ID, no relationship field) |
+| `serviceType` | string | pickup_only, drop_only, both |
+| `proposedPrice` | float | Monthly price in PKR |
+| `pickPoint` | point | [lng, lat] |
+| `dropPoint` | point | [lng, lat] |
+| `status` | string | pending, accepted, rejected, cancelled |
+| `notes` | string | Optional notes |
+| `responseMessage` | string | Driver's response |
+
+#### `active_services` Table (11 columns)
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `requestId` | string | FK to service_requests.$id |
+| `driverId` | string | FK to drivers.$id (plain ID, no relationship field) |
+| `parentId` | string | FK to parents.$id (plain ID, no relationship field) |
+| `childId` | string | FK to children.$id (plain ID, no relationship field) |
+| `serviceType` | string | pickup_only, drop_only, both |
+| `monthlyFee` | float | Agreed monthly fee |
+| `status` | string | active, paused, ended |
+| `startDate` | datetime | Service start |
+| `endDate` | datetime | Service end (if ended) |
+| `rating` | float | Parent's rating |
+| `pauseReason` | string | Reason if paused |
+
+### 🗺️ Appwrite Function: match-drivers
+
+**Decision (Dec 6, 2025)**: Use server-side Appwrite Function for driver matching instead of client-side geo-queries.
+
+**Implementation Challenge (Dec 6, 2025)**: Appwrite Cloud REST API query syntax is extremely strict and doesn't support complex queries reliably. After multiple iterations trying different query formats, switched to fetching all data and filtering in JavaScript code.
+
+#### Why Appwrite Function?
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| **Appwrite Function** ✅ | Server-side, secure API key, better performance, complex logic | Requires deployment |
+| **Client Geo Queries** ❌ | Simpler, no deployment | Limited query capabilities, multiple round-trips |
+
+#### Function Location
+
+```
+functions/match-drivers/
+├── package.json
+├── README.md
+└── src/
+    └── main.js
+```
+
+#### Function Implementation (Final - Dec 6, 2025)
+
+The `match-drivers` function performs **all filtering in JavaScript code** due to REST API query limitations:
+
+1. **Fetch All Data**: No query parameters - fetches all driver_services, drivers, users, schools, vehicles
+2. **School Filter (Code)**: Filters services where `schoolIds` array includes child's school
+3. **Geo-Query (Code)**: Point-in-polygon algorithm checks if pickup point is inside `serviceAreaPolygon` (GeoJSON format `[[[lng,lat],...]]`)
+4. **Gender Filter (Code)**: Service category matches child's gender or "Both"
+5. **Status Check (Code)**: Only active drivers (`users.status = 'active'`)
+6. **Vehicle Lookup**: Maps vehicles by `driverId` (not vehicleId - vehicles table has `driverId` field)
+7. **School Names**: Looks up school names from `schoolIds` array
+8. **Available Seats**: Calculates `vehicle.seatCapacity - service.occupiedSeats`
+9. **Response Format**: Returns fully formatted `DriverListing` compatible JSON with vehicle info, school names, ratings, profile photos
+
+#### Request Format
+
+```json
+{
+  "childId": "child_123",
+  "pickupPoint": [71.5249, 34.0151],
+  "schoolId": "school_456",
+  "gender": "Male"
+}
+```
+
+#### Response Format
+
+```json
+{
+  "success": true,
+  "drivers": [
+    {
+      "driverId": "69306d6e83e0764ee5a6",
+      "name": "Abdur Rahman",
+      "profilePhotoUrl": "https://fra.cloud.appwrite.io/v1/storage/buckets/profile_photos/files/.../view",
+      "rating": 4.6,
+      "totalTrips": 0,
+      "phone": "03123456789",
+      "vehicle": {
+        "type": "car",
+        "brand": "Toyota",
+        "model": "Corolla",
+        "color": "White",
+        "seatCapacity": 4,
+        "numberPlate": "ABC-123"
+      },
+      "serviceCategory": "Both",
+      "monthlyPricePkr": 8000,
+      "serviceAreaAddress": "Hayatabad, Peshawar",
+      "schoolNames": "Peshawar Model School Girls I, Peshawar Model School Boys II",
+      "availableSeats": 4,
+      "extraNotes": "",
+      "serviceId": "69306d72f29aa719f9c1"
+    }
+  ],
+  "count": 1,
+  "message": "Found 1 available drivers."
+}
+```
+
+#### Key Issues Solved (Dec 6, 2025)
+
+**Problem 1: REST API Query Syntax**
+- Appwrite Cloud REST API has very strict query syntax
+- Tried multiple formats: `Query.contains()`, `contains()`, `equal()`, `limit()`
+- ALL query attempts returned 400 "Invalid query: Syntax error"
+- **Solution**: Remove ALL queries, fetch full tables, filter in code
+
+**Problem 2: GeoJSON Polygon Format**
+- `serviceAreaPolygon` is stored as GeoJSON: `[[[lng,lat], [lng,lat], ...]]` (3 levels deep)
+- Point-in-polygon function expected 2 levels: `[[lng,lat], ...]`
+- **Solution**: Extract `polygon[0]` (the coordinate ring) before checking
+
+**Problem 3: Vehicle Lookup**
+- Initially tried `driver.vehicleId` → `vehiclesMap[vehicleId]`
+- But `drivers` table has NO `vehicleId` field
+- `vehicles` table has `driverId` field (reverse relationship)
+- **Solution**: Map vehicles by `driverId`: `vehiclesByDriverId[driver.$id]`
+
+**Problem 4: Zero Available Seats**
+- Vehicle `seatCapacity` was correct but seats showed as 0
+- Missing vehicle lookup caused fallback to 0
+- **Solution**: Fixed vehicle lookup by `driverId`, now correctly shows capacity
+
+**Problem 5: Missing School Names**
+- Initially returned "serviceAreaAddress" for both `serving` and `serviceArea` fields
+- **Solution**: Added schools table fetch, map `schoolIds` to comma-separated names
+
+#### FindDriversController Integration
+
+```dart
+// Call Appwrite function: match-drivers
+final functions = AppwriteClient.functionsService();
+
+final execution = await functions.createExecution(
+  functionId: 'match-drivers',
+  body: jsonEncode({
+    'childId': child.id,
+    'pickupPoint': child.pickLocation, // [lng, lat]
+    'schoolId': child.schoolId,
+    'gender': child.gender,
+  }),
+  xasync: false, // Wait for response
+);
+
+// Parse function response
+final response = jsonDecode(execution.responseBody);
+final driversData = response['drivers'] as List<dynamic>;
+```
+
+### 🏗️ Service Request Flow Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  Service Request Flow                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  PARENT SIDE (FindDriversScreen + FindDriversController)        │
+│  ┌───────────────────────────────────────────────────────┐      │
+│  │ 1. Load children from backend                          │      │
+│  │ 2. Select child → Call match-drivers function         │      │
+│  │    └─► Appwrite Function handles all matching logic   │      │
+│  │ 3. Select driver → Send Request                        │      │
+│  │    └─► ServiceRequestService.sendRequest()            │      │
+│  │ 4. Track pending requests                              │      │
+│  │ 5. View active services                                │      │
+│  └───────────────────────────────────────────────────────┘      │
+│                          │                                       │
+│                          ▼                                       │
+│  APPWRITE (service_requests table)                              │
+│  ┌───────────────────────────────────────────────────────┐      │
+│  │ status: pending → accepted/rejected/cancelled         │      │
+│  │ Uses: parentId, driverId, childId (plain IDs only)    │      │
+│  └───────────────────────────────────────────────────────┘      │
+│                          │                                       │
+│                          ▼                                       │
+│  DRIVER SIDE (DriverRequestsController)                         │
+│  ┌───────────────────────────────────────────────────────┐      │
+│  │ 1. Load requests for driver                            │      │
+│  │    └─► ServiceRequestService.getDriverRequests()      │      │
+│  │ 2. Accept Request                                      │      │
+│  │    └─► ServiceRequestService.acceptRequest()          │      │
+│  │    └─► ActiveServiceService.createActiveService()     │      │
+│  │ 3. Reject Request                                      │      │
+│  │    └─► ServiceRequestService.rejectRequest()          │      │
+│  └───────────────────────────────────────────────────────┘      │
+│                          │                                       │
+│                          ▼                                       │
+│  APPWRITE (active_services table)                               │
+│  ┌───────────────────────────────────────────────────────┐      │
+│  │ Created when request accepted                          │      │
+│  │ status: active → paused → ended                       │      │
+│  │ Uses: parentId, driverId, childId (plain IDs only)    │      │
+│  └───────────────────────────────────────────────────────┘      │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### ✅ Phase 4 Complete
+
+All Phase 4 tasks completed successfully. Key achievements:
+- ✅ Backend services for requests and active services
+- ✅ Removed relationship fields for consistency with other services
+- ✅ Created server-side match-drivers function with full JavaScript filtering
+- ✅ Solved REST API query limitations by fetching all data
+- ✅ Implemented point-in-polygon geo-filtering
+- ✅ Fixed vehicle lookup using driverId instead of vehicleId
+- ✅ Added school name lookup and available seats calculation
+- ✅ Profile photos, ratings, and vehicle details all displaying correctly
+- ✅ Full parent and driver flow integration
+
+### 📋 Next Steps
+
+| Task | Priority | Notes |
+|------|----------|-------|
+| Test with multiple drivers | High | Verify geo-filtering with overlapping areas |
+| Add distance calculation | Medium | Calculate distance from pickup to service area center |
+| Optimize function performance | Medium | Consider caching frequently accessed data |
+| Add pagination support | Low | If driver count grows beyond 100 |
+| Driver ratings UI | Medium | Display ratings in expanded view |
+| Real-time availability | Future | WebSocket updates for online/offline status |
+
+---
+
+## 🔄 Status Unification (December 3, 2025)
 
 ### Problem: Redundant Status Fields
 

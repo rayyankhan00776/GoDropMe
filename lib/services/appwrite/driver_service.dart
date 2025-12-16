@@ -423,6 +423,64 @@ class DriverService {
     }
   }
   
+  /// Update only the profile photo without changing other data
+  Future<DriverResult> updateProfilePhoto({
+    required String driverId,
+    required File profilePhoto,
+    String? existingPhotoUrl,
+  }) async {
+    try {
+      // Delete old photo if exists
+      if (existingPhotoUrl != null) {
+        final oldFileId = _extractFileIdFromUrl(existingPhotoUrl);
+        if (oldFileId != null) {
+          await _storage.deleteFile(
+            bucketId: Buckets.profilePhotos,
+            fileId: oldFileId,
+          );
+        }
+      }
+      
+      // Upload new photo
+      final uploadResult = await _storage.uploadImage(
+        bucketId: Buckets.profilePhotos,
+        imageFile: profilePhoto,
+        fileName: 'driver_profile_${driverId}_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
+      
+      if (!uploadResult.success) {
+        return DriverResult.failure('Failed to upload profile photo');
+      }
+      
+      final profilePhotoUrl = Buckets.getFileUrl(Buckets.profilePhotos, uploadResult.fileId!);
+      debugPrint('📷 Profile photo updated: ${uploadResult.fileId}');
+      
+      // Update driver row
+      final row = await _tablesDB.updateRow(
+        databaseId: AppwriteConfig.databaseId,
+        tableId: Collections.drivers,
+        rowId: driverId,
+        data: {
+          'profilePhotoUrl': profilePhotoUrl,
+        },
+      );
+      
+      debugPrint('✅ Driver profile photo updated: $driverId');
+      
+      return DriverResult.success(
+        message: 'Profile photo updated',
+        driverId: row.$id,
+        driver: row.data,
+      );
+    } on AppwriteException catch (e) {
+      debugPrint('❌ Update profile photo error: ${e.message}');
+      return DriverResult.failure(_parseError(e));
+    } catch (e) {
+      debugPrint('❌ Update profile photo error: $e');
+      return DriverResult.failure('Failed to update profile photo.');
+    }
+  }
+  
   /// Update driver identification (CNIC) info
   Future<DriverResult> updateIdentification({
     required String driverId,

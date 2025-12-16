@@ -44,6 +44,7 @@ import 'package:godropme/features/DriverSide/driverChat/binding/driver_conversat
 import 'package:godropme/features/DriverSide/driverPendingApproval/pages/driver_pending_approval_screen.dart';
 import 'package:godropme/features/DriverSide/driverSuspended/pages/driver_suspended_screen.dart';
 import 'package:godropme/features/DriverSide/driverRejected/pages/driver_rejected_screen.dart';
+import 'package:godropme/features/DriverSide/driverHome/pages/driver_active_services_screen.dart';
 
 // Parent side
 // import 'package:godropme/features/parentSide/parentHome/extra/parent_Home_Screen.dart';
@@ -118,6 +119,7 @@ class AppRoutes {
   static const String driverPendingApproval = '/driver_pending_approval';
   static const String driverSuspended = '/driver_suspended';
   static const String driverRejected = '/driver_rejected';
+  static const String driverActiveServices = '/driver_active_services';
 
   static final routes = [...commonRoutes, ...driverRoutes, ...parentRoutes];
 }

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/features/parentSide/parentProfile/controllers/parent_profile_controller.dart';
 import 'package:godropme/services/appwrite/auth_service.dart';
+import 'package:godropme/services/appwrite/notification_service.dart';
 import 'package:godropme/services/appwrite/parent_service.dart';
 import 'package:godropme/services/appwrite/child_service.dart';
 import 'package:godropme/services/appwrite/appwrite_client.dart';
@@ -36,6 +37,9 @@ class SettingsController extends GetxController {
     isLoading.value = true;
 
     try {
+      // Stop realtime subscription before logout
+      NotificationService.instance.stopRealtimeSubscription();
+      
       // Logout from Appwrite (delete session)
       await AuthService.instance.logout();
       debugPrint('✅ Logged out from Appwrite');

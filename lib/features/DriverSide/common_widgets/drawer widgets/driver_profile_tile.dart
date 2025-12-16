@@ -3,8 +3,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:godropme/constants/app_strings.dart';
-import 'package:godropme/sharedPrefs/local_storage.dart';
+import 'package:get/get.dart';
+import 'package:godropme/common_widgets/appwrite_image.dart';
+import 'package:godropme/features/DriverSide/driverProfile/controllers/driver_profile_controller.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_assets.dart';
 import 'package:godropme/utils/app_typography.dart';
@@ -13,8 +14,8 @@ class DriverProfileTile extends StatelessWidget {
   final VoidCallback? onTap;
   const DriverProfileTile({super.key, this.onTap});
 
-  Widget _buildAvatar(String? path) {
-    // First check driverProfileImage, then fallback to personalInfo imagePath
+  Widget _buildLocalAvatar(String? path) {
+    // Check if it's a valid local file path
     if (path != null && path.isNotEmpty && !path.startsWith('assets/')) {
       final file = File(path);
       if (file.existsSync()) {
@@ -23,7 +24,7 @@ class DriverProfileTile extends StatelessWidget {
         );
       }
     }
-    // If it's an asset path or null, fallback to default SVG avatar
+    // Fallback to default SVG avatar
     return ClipOval(
       child: SvgPicture.asset(
         AppAssets.defaultPersonSvg,
@@ -33,78 +34,99 @@ class DriverProfileTile extends StatelessWidget {
       ),
     );
   }
-  
-  /// Get full name from KYC personal info, fallback to registration name
-  Future<String> _getDisplayName() async {
-    // First try KYC personal info
-    final personalInfo = await LocalStorage.getJson(StorageKeys.personalInfo);
-    if (personalInfo != null) {
-      final f = (personalInfo['firstName'] ?? '').toString().trim();
-      final s = (personalInfo['surName'] ?? '').toString().trim();
-      final l = (personalInfo['lastName'] ?? '').toString().trim();
-      final kycName = [f, s, l].where((e) => e.isNotEmpty).join(' ');
-      if (kycName.isNotEmpty) return kycName;
-    }
-    // Fallback to registration name
-    final regName = await LocalStorage.getString(StorageKeys.driverName);
-    return regName ?? '';
-  }
-  
-  /// Get profile image path - check driverProfileImage first, then personalInfo
-  Future<String?> _getProfileImagePath() async {
-    // First check dedicated profile image
-    final profileImage = await LocalStorage.getString(StorageKeys.driverProfileImage);
-    if (profileImage != null && profileImage.isNotEmpty) {
-      return profileImage;
-    }
-    // Fallback to personalInfo imagePath
-    final personalInfo = await LocalStorage.getJson(StorageKeys.personalInfo);
-    return personalInfo?['imagePath'] as String?;
+
+  Widget _buildDefaultAvatar() {
+    return ClipOval(
+      child: SvgPicture.asset(
+        AppAssets.defaultPersonSvg,
+        width: 38,
+        height: 38,
+        fit: BoxFit.cover,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.all(12),
-      leading: CircleAvatar(
-        radius: 26,
-        backgroundColor: Colors.white,
-        child: FutureBuilder<String?>(
-          future: _getProfileImagePath(),
-          builder: (context, snapshot) {
-            return _buildAvatar(snapshot.data);
-          },
-        ),
-      ),
-      title: FutureBuilder<String>(
-        future: _getDisplayName(),
-        builder: (context, snapshot) {
-          final displayName = (snapshot.data != null && snapshot.data!.trim().isNotEmpty)
-              ? snapshot.data!.trim()
-              : AppStrings.drawerProfileNamePlaceholder;
-          return Text(
-            displayName,
+    return GetX<DriverProfileController>(
+      init: Get.isRegistered<DriverProfileController>()
+          ? Get.find<DriverProfileController>()
+          : Get.put(DriverProfileController()),
+      builder: (controller) {
+        final hasAppwritePhoto = controller.hasAppwritePhoto;
+        final hasLocalImage = controller.hasProfileImage;
+        final appwriteUrl = controller.profileImageUrl.value;
+        final localPath = controller.profileImagePath.value;
+        final displayName = controller.displayName.value;
+        final isLoading = controller.isLoading.value;
+
+        return ListTile(
+          contentPadding: const EdgeInsets.all(12),
+          leading: CircleAvatar(
+            radius: 26,
+            backgroundColor: Colors.white,
+            child: isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  )
+                : hasAppwritePhoto
+                    ? AppwriteImage(
+                        imageUrl: appwriteUrl,
+                        width: 52,
+                        height: 52,
+                        fit: BoxFit.cover,
+                        borderRadius: BorderRadius.circular(26),
+                        placeholder: const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        errorWidget: _buildDefaultAvatar(),
+                      )
+                    : hasLocalImage
+                        ? _buildLocalAvatar(localPath)
+                        : _buildDefaultAvatar(),
+          ),
+          title: isLoading
+              ? Container(
+                  height: 16,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                )
+              : Text(
+                  displayName.isNotEmpty ? displayName : 'Driver',
+                  style: AppTypography.optionLineSecondary.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.black,
+                  ),
+                ),
+          subtitle: Text(
+            'Driver',
             style: AppTypography.optionLineSecondary.copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: AppColors.black,
+              fontSize: 13,
+              color: AppColors.darkGray,
             ),
-          );
-        },
-      ),
-      subtitle: Text(
-        'Driver',
-        style: AppTypography.optionLineSecondary.copyWith(
-          fontSize: 13,
-          color: AppColors.darkGray,
-        ),
-      ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios_rounded,
-        color: AppColors.primary,
-        size: 24,
-      ),
-      onTap: onTap,
+          ),
+          trailing: const Icon(
+            Icons.arrow_forward_ios_rounded,
+            color: AppColors.primary,
+            size: 24,
+          ),
+          onTap: onTap,
+        );
+      },
     );
   }
 }

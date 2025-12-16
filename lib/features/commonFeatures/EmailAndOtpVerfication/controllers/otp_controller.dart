@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/services/appwrite/auth_service.dart';
 import 'package:godropme/services/appwrite/database_constants.dart';
+import 'package:godropme/services/appwrite/notification_service.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
 
 class OtpController extends GetxController {
@@ -117,6 +118,9 @@ class OtpController extends GetxController {
       }
 
       debugPrint('✅ OTP verified! isNewUser: ${result.isNewUser}, role: ${result.userRole}, status: ${result.status}, hasDriverProfile: ${result.hasDriverProfile}');
+
+      // Register for push notifications now that user is logged in
+      await NotificationService.instance.registerForPushNotifications();
 
       // Navigate based on user status
       if (result.isNewUser == true) {

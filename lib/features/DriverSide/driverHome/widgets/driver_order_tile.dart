@@ -55,14 +55,14 @@ class DriverOrderTile extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _Avatar(name: data.parentName, imageUrl: data.avatarUrl),
+                _Avatar(name: data.childName.isNotEmpty ? data.childName : data.parentName, imageUrl: data.childAvatarUrl ?? data.avatarUrl),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        data.parentName,
+                        data.childName.isNotEmpty ? data.childName : data.parentName,
                         style: AppTypography.optionLineSecondary.copyWith(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -83,9 +83,26 @@ class DriverOrderTile extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            _LabeledLine(label: 'Pick', value: data.pickPoint),
+            // Show Pick and Drop with proper labels based on trip direction
+            // Morning (home_to_school): Pick = Home address, Drop = School name
+            // Afternoon (school_to_home): Pick = School name, Drop = Home address
+            _LocationLine(
+              label: 'Pick',
+              icon: Icons.radio_button_checked,
+              iconColor: Colors.green,
+              value: data.tripDirection == 'home_to_school'
+                  ? _cleanAddress(data.pickPoint)
+                  : data.schoolName,
+            ),
             const SizedBox(height: 6),
-            _LabeledLine(label: 'Drop', value: data.dropPoint),
+            _LocationLine(
+              label: 'Drop',
+              icon: Icons.location_on,
+              iconColor: Colors.red,
+              value: data.tripDirection == 'home_to_school'
+                  ? data.schoolName
+                  : _cleanAddress(data.dropPoint),
+            ),
             const SizedBox(height: 12),
             // First row: Chat + Picked + Dropped
             Row(
@@ -184,6 +201,14 @@ class DriverOrderTile extends StatelessWidget {
       ),
     );
   }
+
+  /// Clean address by removing coordinate prefixes (e.g., "2HCQ+R88, ")
+  String _cleanAddress(String address) {
+    if (address.isEmpty) return address;
+    // Remove patterns like "2HCQ+R88, " at the start
+    final cleaned = address.replaceFirst(RegExp(r'^[A-Z0-9]{4}\+[A-Z0-9]{3},\s*'), '');
+    return cleaned.isEmpty ? address : cleaned;
+  }
 }
 
 class _StatusChip extends StatelessWidget {
@@ -229,18 +254,29 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
-class _LabeledLine extends StatelessWidget {
+/// Enhanced location line widget with icon and better styling
+class _LocationLine extends StatelessWidget {
   final String label;
   final String value;
-  const _LabeledLine({required this.label, required this.value});
+  final IconData icon;
+  final Color iconColor;
+  
+  const _LocationLine({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.iconColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Icon(icon, size: 16, color: iconColor),
+        const SizedBox(width: 6),
         SizedBox(
-          width: 44,
+          width: 36,
           child: Text(
             '$label:',
             style: AppTypography.helperSmall.copyWith(
@@ -249,11 +285,16 @@ class _LabeledLine extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 4),
         Expanded(
           child: Text(
             value,
-            style: AppTypography.helperSmall.copyWith(color: AppColors.black),
+            style: AppTypography.helperSmall.copyWith(
+              color: AppColors.black,
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

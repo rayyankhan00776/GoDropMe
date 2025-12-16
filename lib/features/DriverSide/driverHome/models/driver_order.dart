@@ -46,7 +46,8 @@ class DriverOrder {
   final String childId; // Reference to children.$id
   final String parentName; // Denormalized for display
   final String childName; // Denormalized for display
-  final String? avatarUrl;
+  final String? avatarUrl; // Parent avatar (legacy)
+  final String? childAvatarUrl; // Child photo URL
   final String schoolName;
   final String pickPoint; // Address text
   final String dropPoint; // Address text
@@ -73,6 +74,7 @@ class DriverOrder {
     required this.parentName,
     this.childName = '',
     this.avatarUrl,
+    this.childAvatarUrl,
     required this.schoolName,
     required this.pickPoint,
     required this.dropPoint,
@@ -95,6 +97,7 @@ class DriverOrder {
     'parentName': parentName,
     'childName': childName,
     'avatarUrl': avatarUrl,
+    'childAvatarUrl': childAvatarUrl,
     'schoolName': schoolName,
     'pickPoint': pickPoint,
     'dropPoint': dropPoint,
@@ -117,6 +120,7 @@ class DriverOrder {
     parentName: json['parentName']?.toString() ?? '',
     childName: json['childName']?.toString() ?? '',
     avatarUrl: json['avatarUrl']?.toString(),
+    childAvatarUrl: json['childAvatarUrl']?.toString(),
     schoolName: json['schoolName']?.toString() ?? '',
     pickPoint: json['pickPoint']?.toString() ?? '',
     dropPoint: json['dropPoint']?.toString() ?? '',
@@ -146,6 +150,7 @@ class DriverOrder {
     required String parentName,
     String childName = '',
     String? avatarUrl,
+    String? childAvatarUrl,
     required String schoolName,
     required String pickPoint,
     required String dropPoint,
@@ -156,6 +161,7 @@ class DriverOrder {
     parentName: parentName,
     childName: childName,
     avatarUrl: avatarUrl,
+    childAvatarUrl: childAvatarUrl,
     schoolName: schoolName,
     pickPoint: pickPoint,
     dropPoint: dropPoint,
