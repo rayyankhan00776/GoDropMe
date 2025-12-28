@@ -30,26 +30,42 @@ class DriverRequestsScreen extends StatelessWidget {
                   child: Obx(() {
                     final items = ctrl.requests;
                     if (items.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'No requests yet',
-                          style: AppTypography.helperSmall.copyWith(
-                            color: AppColors.darkGray,
-                          ),
+                      return RefreshIndicator(
+                        onRefresh: ctrl.refresh,
+                        child: ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.5,
+                              child: Center(
+                                child: Text(
+                                  'No requests yet',
+                                  style: AppTypography.helperSmall.copyWith(
+                                    color: AppColors.darkGray,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     }
-                    return ListView.separated(
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (context, i) {
-                        final req = items[i];
-                        return DriverRequestTile(
-                          data: req,
-                          onAccept: () => ctrl.accept(req.id),
-                          onReject: () => ctrl.reject(req.id),
-                        );
-                      },
+                    return RefreshIndicator(
+                      onRefresh: ctrl.refresh,
+                      color: AppColors.primary,
+                      child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: items.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
+                        itemBuilder: (context, i) {
+                          final req = items[i];
+                          return DriverRequestTile(
+                            data: req,
+                            onAccept: () => ctrl.accept(req.id),
+                            onReject: () => ctrl.reject(req.id),
+                          );
+                        },
+                      ),
                     );
                   }),
                 ),

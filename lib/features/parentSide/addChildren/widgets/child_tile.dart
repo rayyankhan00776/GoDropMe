@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:get/get.dart';
+import 'package:godropme/features/parentSide/addChildren/controllers/add_children_controller.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
@@ -18,6 +19,7 @@ class ChildTile extends StatefulWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onMarkAbsent;
   final bool isAbsentToday;
+  final AbsentButtonState absentButtonState;
   
   const ChildTile({
     super.key, 
@@ -26,6 +28,7 @@ class ChildTile extends StatefulWidget {
     this.onEdit,
     this.onMarkAbsent,
     this.isAbsentToday = false,
+    this.absentButtonState = AbsentButtonState.loading,
   });
 
   @override
@@ -90,6 +93,86 @@ class _ChildTileState extends State<ChildTile> {
         setState(() => _schoolName = '-');
       }
     }
+  }
+
+  /// Clean address by removing coordinate prefixes (e.g., "2HCQ+R88, ")
+  String _cleanAddress(String address) {
+    if (address.isEmpty) return address;
+    // Remove patterns like "2HCQ+R88, " at the start
+    final cleaned = address.replaceFirst(RegExp(r'^[A-Z0-9]{4}\+[A-Z0-9]{3},\s*'), '');
+    return cleaned.isEmpty ? address : cleaned;
+  }
+  
+  /// Build the absent button based on trip state
+  Widget _buildAbsentButton() {
+    final state = widget.absentButtonState;
+    
+    // Determine button properties based on state
+    final IconData icon;
+    final String label;
+    final bool isActive;
+    final bool isDisabled;
+    final Color activeColor;
+    
+    switch (state) {
+      case AbsentButtonState.loading:
+        icon = Icons.hourglass_empty;
+        label = 'Loading...';
+        isActive = false;
+        isDisabled = true;
+        activeColor = Colors.grey;
+        
+      case AbsentButtonState.noService:
+        icon = Icons.no_accounts_outlined;
+        label = 'No service';
+        isActive = false;
+        isDisabled = true;
+        activeColor = Colors.grey;
+        
+      case AbsentButtonState.noTrips:
+        icon = Icons.event_busy_outlined;
+        label = 'No trips';
+        isActive = false;
+        isDisabled = true;
+        activeColor = Colors.grey;
+        
+      case AbsentButtonState.canMarkAbsent:
+        icon = Icons.person_off_outlined;
+        label = 'Mark Absent';
+        isActive = false;
+        isDisabled = false;
+        activeColor = Colors.orange;
+        
+      case AbsentButtonState.alreadyAbsent:
+        icon = Icons.check_circle;
+        label = 'Absent';
+        isActive = true;
+        isDisabled = true;  // Can't undo once marked
+        activeColor = Colors.orange;
+        
+      case AbsentButtonState.tripInProgress:
+        icon = Icons.directions_bus;
+        label = 'In transit';
+        isActive = true;
+        isDisabled = true;
+        activeColor = Colors.blue;
+        
+      case AbsentButtonState.tripsCompleted:
+        icon = Icons.check_circle_outline;
+        label = 'Done';
+        isActive = true;
+        isDisabled = true;
+        activeColor = Colors.green;
+    }
+    
+    return _QuickActionButton(
+      icon: icon,
+      label: label,
+      isActive: isActive,
+      isDisabled: isDisabled,
+      activeColor: activeColor,
+      onTap: isDisabled ? null : widget.onMarkAbsent,
+    );
   }
 
   Future<void> _confirmDelete() async {
@@ -279,15 +362,7 @@ class _ChildTileState extends State<ChildTile> {
                         // Mark Absent button
                         if (widget.onMarkAbsent != null)
                           Expanded(
-                            child: _QuickActionButton(
-                              icon: widget.isAbsentToday 
-                                  ? Icons.check_circle 
-                                  : Icons.person_off_outlined,
-                              label: widget.isAbsentToday ? 'Absent' : 'Mark Absent',
-                              isActive: widget.isAbsentToday,
-                              activeColor: Colors.orange,
-                              onTap: widget.onMarkAbsent!,
-                            ),
+                            child: _buildAbsentButton(),
                           ),
                         if (widget.onMarkAbsent != null) const SizedBox(width: 8),
                         // Find Driver button
@@ -306,16 +381,18 @@ class _ChildTileState extends State<ChildTile> {
               children: [
                 const _ItemDivider(),
                 const SizedBox(height: 8),
-                _IconRow(
-                  icon: Icons.place_outlined,
+                _LocationIconRow(
+                  icon: Icons.radio_button_checked,
+                  iconColor: Colors.green,
                   label: AppStrings.childPickPointHint,
-                  value: widget.childData['pickPoint'],
+                  value: _cleanAddress(widget.childData['pickPoint']?.toString() ?? ''),
                 ),
                 const _ItemDivider(),
-                _IconRow(
-                  icon: Icons.flag_outlined,
+                _LocationIconRow(
+                  icon: Icons.location_on,
+                  iconColor: Colors.red,
                   label: AppStrings.childDropPointHint,
-                  value: widget.childData['dropPoint'],
+                  value: _cleanAddress(widget.childData['dropPoint']?.toString() ?? ''),
                 ),
                 const _ItemDivider(),
                 _IconRow(
@@ -394,13 +471,69 @@ class _ChildTileState extends State<ChildTile> {
   }
 }
 
+/// Location row widget with colored icon
+class _LocationIconRow extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String value;
+
+  const _LocationIconRow({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            size: 20,
+            color: iconColor,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTypography.helperSmall.copyWith(
+                    color: AppColors.darkGray,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value.isEmpty ? '-' : value,
+                  style: AppTypography.optionTerms.copyWith(
+                    color: AppColors.black,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Compact action button for the quick actions row
 class _QuickActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool isActive;
   final Color? activeColor;
+  final bool isDisabled;
 
   const _QuickActionButton({
     required this.icon,
@@ -408,22 +541,30 @@ class _QuickActionButton extends StatelessWidget {
     required this.onTap,
     this.isActive = false,
     this.activeColor,
+    this.isDisabled = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? (activeColor ?? AppColors.primary) : AppColors.darkGray;
+    final effectiveDisabled = isDisabled || onTap == null;
+    final color = effectiveDisabled 
+        ? Colors.grey.shade400
+        : isActive 
+            ? (activeColor ?? AppColors.primary) 
+            : AppColors.darkGray;
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: effectiveDisabled ? null : onTap,
         borderRadius: BorderRadius.circular(8),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
             color: isActive 
                 ? color.withValues(alpha: 0.1) 
-                : AppColors.grayLight.withValues(alpha: 0.5),
+                : effectiveDisabled
+                    ? Colors.grey.shade100
+                    : AppColors.grayLight.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isActive ? color : Colors.transparent,

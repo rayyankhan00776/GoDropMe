@@ -6,104 +6,136 @@ import 'package:get/get.dart';
 import 'package:godropme/constants/app_strings.dart';
 import 'package:godropme/features/DriverSide/common_widgets/drawer widgets/driver_drawer_card.dart';
 import 'package:godropme/features/DriverSide/common_widgets/drawer widgets/driver_profile_tile.dart';
+import 'package:godropme/features/DriverSide/common_widgets/driver_drawer_controller.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/shared/widgets/drawer_button.dart';
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/shared/widgets/drawer_version_label.dart';
 import 'package:godropme/utils/app_typography.dart';
+import 'package:godropme/utils/responsive.dart';
 
 class DriverDrawer extends StatelessWidget {
   const DriverDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final drawerCtrl = Get.find<DriverDrawerController>();
+    
     return Drawer(
       backgroundColor: AppColors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(24),
+        ),
+      ),
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header with centered app name
+            // Header with centered app name (fixed at top)
             const _DriverDrawerHeader(),
-            // Profile card
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-              child: DriverDrawerCard(
-                child: DriverProfileTile(
-                  onTap: () {
-                    Get.toNamed(AppRoutes.driverProfile);
-                  },
-                ),
-              ),
-            ),
-
-            // Quick actions
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              child: DriverDrawerCard(
+            // Scrollable content
+            Expanded(
+              child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    AppDrawerTile(
-                      icon: Icons.home_rounded,
-                      title: AppStrings.drawerMapScreen,
-                      onTap: () {
-                        // Navigate to the main driver nav bar (DriverHomeScreen)
-                        Get.offAllNamed(AppRoutes.driverMap);
-                      },
+                    // Profile card
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                      child: DriverDrawerCard(
+                        child: DriverProfileTile(
+                          onTap: () {
+                            drawerCtrl.close();
+                            Get.toNamed(AppRoutes.driverProfile);
+                          },
+                        ),
+                      ),
                     ),
-                    AppDrawerTile(
-                      icon: Icons.list_alt,
-                      title: AppStrings.driverTabRequests,
-                      onTap: () {
-                        Get.offAllNamed(
-                          AppRoutes.driverMap,
-                          arguments: {'tab': 0},
-                        );
-                      },
+
+                    // Quick actions
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                      child: DriverDrawerCard(
+                        child: Column(
+                          children: [
+                            AppDrawerTile(
+                              icon: Icons.home_rounded,
+                              title: AppStrings.drawerMapScreen,
+                              onTap: () {
+                                drawerCtrl.close();
+                                // Navigate to the main driver nav bar (DriverHomeScreen)
+                                Get.offAllNamed(AppRoutes.driverMap);
+                              },
+                            ),
+                            AppDrawerTile(
+                              icon: Icons.list_alt,
+                              title: AppStrings.driverTabRequests,
+                              onTap: () {
+                                drawerCtrl.close();
+                                Get.offAllNamed(
+                                  AppRoutes.driverMap,
+                                  arguments: {'tab': 0},
+                                );
+                              },
+                            ),
+                            AppDrawerTile(
+                              icon: Icons.assignment,
+                              title: AppStrings.driverTabOrders,
+                              onTap: () {
+                                drawerCtrl.close();
+                                Get.offAllNamed(
+                                  AppRoutes.driverMap,
+                                  arguments: {'tab': 1},
+                                );
+                              },
+                            ),
+                            AppDrawerTile(
+                              icon: Icons.work_outline_rounded,
+                              title: 'Active Services',
+                              onTap: () {
+                                drawerCtrl.close();
+                                Get.toNamed(AppRoutes.driverActiveServices);
+                              },
+                            ),
+                            AppDrawerTile(
+                              icon: Icons.chat_bubble_outline,
+                              title: AppStrings.driverTabChat,
+                              onTap: () {
+                                drawerCtrl.close();
+                                Get.offAllNamed(
+                                  AppRoutes.driverMap,
+                                  arguments: {'tab': 3},
+                                );
+                              },
+                            ),
+                            AppDrawerTile(
+                              icon: Icons.receipt_long_rounded,
+                              title: AppStrings.report,
+                              onTap: () {
+                                drawerCtrl.close();
+                                Get.toNamed(AppRoutes.driverReport);
+                              },
+                            ),
+                            AppDrawerTile(
+                              icon: Icons.settings_rounded,
+                              title: AppStrings.drawerSettings,
+                              onTap: () {
+                                drawerCtrl.close();
+                                Get.toNamed(AppRoutes.driverSettings);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    AppDrawerTile(
-                      icon: Icons.assignment,
-                      title: AppStrings.driverTabOrders,
-                      onTap: () {
-                        Get.offAllNamed(
-                          AppRoutes.driverMap,
-                          arguments: {'tab': 1},
-                        );
-                      },
-                    ),
-                    AppDrawerTile(
-                      icon: Icons.chat_bubble_outline,
-                      title: AppStrings.driverTabChat,
-                      onTap: () {
-                        Get.offAllNamed(
-                          AppRoutes.driverMap,
-                          arguments: {'tab': 3},
-                        );
-                      },
-                    ),
-                    AppDrawerTile(
-                      icon: Icons.receipt_long_rounded,
-                      title: AppStrings.report,
-                      onTap: () {
-                        Get.toNamed(AppRoutes.driverReport);
-                      },
-                    ),
-                    AppDrawerTile(
-                      icon: Icons.settings_rounded,
-                      title: AppStrings.drawerSettings,
-                      onTap: () {
-                        Get.toNamed(AppRoutes.driverSettings);
-                      },
-                    ),
+
+                    // Version label (shared, consistent)
+                    const DrawerVersionLabel(),
                   ],
                 ),
               ),
             ),
-
-            const SizedBox(height: 5),
-
-            // Version label (shared, consistent)
-            const DrawerVersionLabel(),
           ],
         ),
       ),
@@ -117,7 +149,7 @@ class _DriverDrawerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
+      height: Responsive.scaleClamped(context, 70, 70, 70),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [AppColors.primary, AppColors.primaryDark],

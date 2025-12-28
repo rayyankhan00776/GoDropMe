@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';

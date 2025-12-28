@@ -1,12 +1,776 @@
 # GoDropMe Codebase Schema Audit
 
-> **Last Updated**: November 28, 2025  
+> **Last Updated**: December 20, 2025  
 > **Auditor**: GitHub Copilot  
 > **Reference**: `docs/TODO.md` Appwrite Schema
 
 ---
 
-## 🔧 ID Handling Fixes (Latest)
+## 🎨 Phase 6.5: Chat UI Improvements (December 20, 2025)
+
+### Overview
+Comprehensive UI overhaul for the entire chat module including chat initiation functionality (which was missing), improved chat list screens, and modernized conversation screens.
+
+### Issues Fixed
+1. **Missing Chat Initiation** - Parents and drivers had no way to start a chat from their respective screens
+2. **Basic List UI** - Chat list screens lacked modern design elements
+3. **Simple Conversation UI** - Conversation screens needed date separators, read receipts, and better message bubbles
+
+### Files Modified
+
+| File | Changes |
+|------|---------|
+| `lib/common_widgets/active_service_tile.dart` | Added `onChat` callback parameter |
+| `lib/features/parentSide/find_drivers/pages/find_drivers_screen.dart` | Added `_openChatWithDriver()` method, ChatService import |
+| `lib/features/DriverSide/driverOrders/pages/driver_orders_screen.dart` | Implemented `_openChatWithParent()` method |
+| `lib/features/parentSide/parentChat/pages/parent_chat_screen.dart` | Complete rewrite with modern UI |
+| `lib/features/DriverSide/driverChat/pages/driver_chat_screen.dart` | Complete rewrite with modern UI |
+| `lib/features/parentSide/parentChat/pages/parent_conversation_screen.dart` | Complete rewrite with modern UI |
+| `lib/features/DriverSide/driverChat/pages/driver_conversation_screen.dart` | Complete rewrite with modern UI |
+
+### Chat Initiation Implementation
+
+#### Parent Side (`find_drivers_screen.dart`)
+```dart
+void _openChatWithDriver(ActiveService service) async {
+  final parentId = _authService.currentUser.value?.$id;
+  if (parentId == null) return;
+  
+  final result = await ChatService.instance.getOrCreateChatRoom(
+    parentId: parentId,
+    driverId: service.driverId,
+  );
+  
+  if (result.isSuccess) {
+    Get.toNamed(
+      AppRoutes.parentConversation,
+      arguments: {
+        'chatRoomId': result.success.$id,
+        'name': service.driverName ?? 'Driver',
+      },
+    );
+  }
+}
+```
+
+#### Driver Side (`driver_orders_screen.dart`)
+```dart
+void _openChatWithParent() async {
+  final driverId = _authService.currentUser.value?.$id;
+  if (driverId == null) return;
+  
+  final result = await ChatService.instance.getOrCreateChatRoom(
+    parentId: parentId,
+    driverId: driverId,
+  );
+  
+  if (result.isSuccess) {
+    Get.toNamed(
+      AppRoutes.driverConversation,
+      arguments: {
+        'chatRoomId': result.success.$id,
+        'name': parentName ?? 'Parent',
+      },
+    );
+  }
+}
+```
+
+### New UI Components
+
+#### Chat List Screen Components
+- `_ChatListTile` - Modern tile with avatar, name, last message, timestamp, unread badge
+- `_ContactAvatar` - Profile image with AppwriteImage and initials fallback
+- Empty state with chat bubble icon
+- Error state with retry button
+- Header with refresh button
+
+#### Conversation Screen Components
+- `_DateSeparator` - Shows Today/Yesterday/Day name/Full date
+- `_AttachmentOption` - Share sheet option with icon and label
+- `_MessageBubble` - Improved bubble with:
+  - Asymmetric border radius (WhatsApp style)
+  - Read receipt icons (single/double checkmark, blue when read)
+  - Improved image preview with close button in viewer
+  - Better location card with "Tap to open in Maps" hint
+  
+#### UI Features
+- App bar with contact avatar, name, and role subtitle
+- Modern share sheet with Gallery/Camera/Location options
+- Multi-line text input with max height (120px)
+- Send button with loading spinner when sending
+- Date separators between messages from different days
+- Subtle shadows on message bubbles
+- Gray background (#F5F6FA) for better contrast
+
+### Schema Verification
+
+Verified against Appwrite tables:
+
+**chat_rooms** (9 columns):
+- `parentId`, `driverId` - User references
+- `lastMessage`, `lastMessageAt` - Last message preview
+- `parentUnreadCount`, `driverUnreadCount` - Unread counts
+- `parentRef`, `driverRef` - Relationship columns
+- `messages` - Related messages
+
+**messages** (9 columns):
+- `chatRoomId`, `senderId`, `senderRole` (enum: parent/driver)
+- `messageType` (enum: text/image/location)
+- `text`, `imageUrl`, `location` (point)
+- `isRead`, `chatRoom` (relationship)
+
+---
+
+## 💬 Phase 6: Chat Feature Implementation (December 17, 2025)
+
+### Overview
+Complete implementation of real-time chat system between parents and drivers using Appwrite TablesDB and Realtime subscriptions.
+
+### Files Created/Modified
+
+#### New Files
+| File | Description |
+|------|-------------|
+| `lib/services/appwrite/chat_service.dart` | Chat service with CRUD operations, real-time subscriptions |
+
+#### Modified Files
+| File | Changes |
+|------|---------|
+| `lib/features/parentSide/parentChat/controllers/parent_chat_controller.dart` | Backend integration, realtime subscription |
+| `lib/features/parentSide/parentChat/controllers/parent_conversation_controller.dart` | Send/receive messages, pagination, realtime |
+| `lib/features/DriverSide/driverChat/controllers/driver_chat_controller.dart` | Backend integration, realtime subscription |
+| `lib/features/DriverSide/driverChat/controllers/driver_conversation_controller.dart` | Send/receive messages, pagination, realtime |
+| `lib/features/parentSide/parentChat/pages/parent_conversation_screen.dart` | Image/location message support, modern UI |
+| `lib/features/DriverSide/driverChat/pages/driver_conversation_screen.dart` | Image/location message support, modern UI |
+
+### ChatService Features
+
+#### Chat Room Operations
+```dart
+// Get or create chat room between parent and driver
+final result = await ChatService.instance.getOrCreateChatRoom(
+  parentId: 'parent_123',
+  driverId: 'driver_456',
+);
+
+// Get all chat rooms for parent
+final rooms = await ChatService.instance.getParentChatRooms(parentId: parentId);
+
+// Get all chat rooms for driver
+final rooms = await ChatService.instance.getDriverChatRooms(driverId: driverId);
+```
+
+#### Message Operations
+```dart
+// Send text message
+await ChatService.instance.sendTextMessage(
+  chatRoomId: roomId,
+  senderId: parentId,
+  senderRole: 'parent',
+  text: 'Hello!',
+);
+
+// Send image message
+await ChatService.instance.sendImageMessage(
+  chatRoomId: roomId,
+  senderId: driverId,
+  senderRole: 'driver',
+  imageFile: imageFile,
+);
+
+// Send location message
+await ChatService.instance.sendLocationMessage(
+  chatRoomId: roomId,
+  senderId: driverId,
+  senderRole: 'driver',
+  latitude: 33.6844,
+  longitude: 73.0479,
+  locationName: 'Current Location',
+);
+
+// Mark messages as read
+await ChatService.instance.markMessagesAsRead(
+  chatRoomId: roomId,
+  readerRole: 'parent',
+);
+```
+
+#### Realtime Subscriptions
+```dart
+// Subscribe to messages in a chat room
+ChatService.instance.subscribeToMessages(
+  chatRoomId: roomId,
+  onNewMessage: (messageData) {
+    // Handle new message
+  },
+);
+
+// Subscribe to chat room updates (for chat list)
+ChatService.instance.subscribeToChatRooms(
+  userId: parentId,
+  userRole: 'parent',
+  onChatRoomUpdate: (roomData) {
+    // Handle chat room update
+  },
+);
+```
+
+### Conversation Screen Features
+
+1. **Text Messages**: Standard chat bubbles with timestamps
+2. **Image Messages**: 
+   - Pick from gallery
+   - Upload to `chat_attachments` bucket
+   - Display with cached network image
+   - Tap to view full screen
+3. **Location Messages**:
+   - Share current GPS location
+   - Tap to open in Google Maps
+4. **Real-time Updates**: Messages appear instantly via Appwrite Realtime
+5. **Pagination**: Load older messages on scroll
+6. **Read Receipts**: Mark messages as read when viewing
+
+### Database Tables Used
+
+| Table | Purpose |
+|-------|---------|
+| `chat_rooms` | Chat room metadata, last message, unread counts |
+| `messages` | Individual messages with type (text/image/location) |
+
+### Storage Bucket
+- `chat_attachments`: Image messages (5MB max, jpg/jpeg/png/webp)
+
+### Realtime Channel Format
+```
+databases.godropme_db.tables.messages.rows
+databases.godropme_db.tables.chat_rooms.rows
+```
+
+---
+
+## 🔧 Appwrite Functions Migration to TablesDB API (December 16, 2025)
+
+### Overview
+Complete migration of notification Appwrite Functions from deprecated Databases API to the new TablesDB API. Fixed multiple issues preventing push notifications from being delivered.
+
+### Issues Fixed
+
+#### 1. Event Format Mismatch ❌→✅
+**Problem**: Functions were subscribed to Documents API event format, but TablesDB uses a different format.
+- **Old (wrong)**: `databases.godropme_db.collections.service_requests.documents.*.update`
+- **New (correct)**: `databases.godropme_db.tables.service_requests.rows.*.update`
+
+**Solution**: Updated all function event triggers to Tables DB format.
+
+#### 2. Row Data Not in Event Body ❌→✅
+**Problem**: Unlike Documents API, TablesDB doesn't send row data in `req.body`. Functions were failing because `req.body` was empty.
+
+**Solution**: Added `extractRowIdFromEvent()` function to parse row ID from event string, then fetch row data using `tablesDB.getRow()`.
+
+#### 3. FCM Badge Parameter Error ❌→✅
+**Problem**: Appwrite Messaging `createPush()` was failing because `badge: null` is invalid.
+
+**Solution**: Changed optional params from `null` to `undefined` so they're omitted from the API call.
+
+#### 4. Wrong User ID for FCM Targets ❌→✅
+**Problem**: Functions were using `trip.parentId` / `trip.driverId` (which are table row IDs) instead of the actual `userId` field needed for FCM targets.
+
+**Solution**: Added lookup step to fetch the user's actual `userId` from parents/drivers tables before sending notifications.
+
+#### 5. API Migration: Databases → TablesDB ❌→✅
+**Problem**: `databases.listDocuments()`, `databases.createDocument()`, `databases.updateDocument()` are deprecated for TablesDB databases.
+
+**Solution**: Migrated to TablesDB SDK:
+```javascript
+// Old (deprecated)
+const databases = new Databases(client);
+await databases.listDocuments(databaseId, 'trips', [Query.equal('$id', tripId)]);
+
+// New (correct)
+const tablesDB = new TablesDB(client);
+await tablesDB.getRow({ databaseId, tableId: 'trips', rowId: tripId });
+```
+
+#### 6. Dual Event Format Support (Migration Bridge) ❌→✅
+**Problem**: Flutter app's `ServiceRequestService` uses old Documents API for creates, while TablesDB is used for updates. This caused CREATE events to use Documents API format while UPDATE events use Tables DB format.
+
+**Solution**: Updated `notify-service-request` function to handle BOTH event formats during migration:
+```javascript
+const isTablesDBEvent = event.includes('tables.service_requests.rows');
+const isDocumentsAPIEvent = event.includes('collections.service_requests.documents');
+if (!isTablesDBEvent && !isDocumentsAPIEvent) {
+    return res.json({ success: true, message: 'Not a service_requests event' });
+}
+```
+
+### Functions Updated
+
+| Function | Purpose | Status |
+|----------|---------|--------|
+| `notify-service-request` | Service request notifications (create/accept/reject) | ✅ Deployed |
+| `notify-trip-status` | Trip status change notifications | ✅ Deployed |
+| `process-geofence` | Geofence-based proximity notifications | ✅ Deployed |
+
+### TablesDB API Reference
+```javascript
+import { TablesDB } from 'node-appwrite';
+
+const tablesDB = new TablesDB(client);
+
+// Get single row
+await tablesDB.getRow({ databaseId, tableId, rowId });
+
+// Create row
+await tablesDB.createRow({ databaseId, tableId, rowId: ID.unique(), data: {...} });
+
+// Update row
+await tablesDB.updateRow({ databaseId, tableId, rowId, data: {...} });
+
+// List rows
+await tablesDB.listRows({ databaseId, tableId, queries: [...] });
+```
+
+### Event Format Reference
+```
+Tables DB Format:
+databases.{databaseId}.tables.{tableId}.rows.{rowId}.{action}
+
+Documents API Format (legacy):
+databases.{databaseId}.collections.{collectionId}.documents.{documentId}.{action}
+```
+
+### Future Work
+- [ ] Migrate Flutter `ServiceRequestService` from Databases API to TablesDB API
+- [ ] Update Realtime subscription channels in Flutter to use Tables DB format
+
+---
+
+## 🔔 Phase 7: Push Notifications Implementation - COMPLETE (December 15, 2025)
+
+### Overview
+Full implementation of notification infrastructure including FCM, local notifications, Appwrite database CRUD, and UI enhancements for both parent and driver roles.
+
+### Database Schema Verification ✅
+Verified `notifications` table schema via Appwrite API:
+
+| Column | Type | Required | Size/Values | Default |
+|--------|------|----------|-------------|---------|
+| `userId` | string | ✅ | 36 | - |
+| `targetRole` | enum | ✅ | parent, driver | - |
+| `title` | string | ✅ | 100 | - |
+| `body` | string | ✅ | 500 | - |
+| `type` | enum | ✅ | 9 values | - |
+| `payload` | string | ❌ | 2000 | - |
+| `isRead` | boolean | ❌ | - | false |
+| `userRef` | relationship | - | manyToOne→users | cascade |
+
+⚠️ **CRITICAL FIX (Dec 15, 2025)**: Column renamed from `data` to `payload` to avoid SDK conflict.
+The Appwrite SDK's `Row.fromMap` uses `data: map["data"] ?? map`, which caused our `data` column 
+value (a JSON string) to be assigned to `row.data` instead of the nested field map. This broke 
+all field access like `row.data['userId']`.
+
+**Notification Types Enum:**
+```
+trip_started, driver_arrived, child_picked, child_dropped,
+request_received, request_accepted, request_rejected, new_message, system
+```
+
+### Files Modified/Created
+
+#### 1. `notification_service.dart` ✅ (~900 lines)
+**Path**: `lib/services/appwrite/notification_service.dart`
+
+**Key Changes**:
+- Fixed schema alignment: `body` (not `message`), added `targetRole`
+- **Fixed SDK column name conflict: `data` → `payload`**
+- Removed manual `createdAt` (auto-generated by Appwrite)
+- Added `unreadCount` observable RxInt for badge displays
+- Implemented REST API workaround for local filtering (Appwrite REST limitation)
+- Added Appwrite Messaging subscriber methods
+
+**Methods Implemented**:
+```dart
+// Initialization
+initialize() async
+_requestPermissions() async
+_configureFCMHandlers() void
+_configureLocalNotifications() async
+
+// Topic Subscriptions
+_subscribeToTopics() async
+_unsubscribeFromTopics() async
+
+// Database CRUD (Schema-aligned)
+createNotification({userId, targetRole, type, title, body, data}) async
+getUserNotifications({userId, isRead, limit}) async  // with local filtering
+getUnreadCount({userId}) async
+refreshUnreadCount() async
+markAsRead(notificationId) async
+markAllAsRead({userId}) async
+deleteNotification(notificationId) async
+clearAllNotifications({userId}) async
+
+// Realtime
+subscribeToNotifications(onNotification) 
+
+// Local Notifications
+showLocalNotification({id, title, body, payload}) async
+showGeofenceNotification({title, body, eventType, tripId}) async
+
+// Appwrite Messaging
+createAppwriteSubscriber(topicId, targetId) async
+deleteAppwriteSubscriber(topicId, subscriberId) async
+
+// Navigation
+_handleNotificationTap(payload) void
+```
+
+#### 2. `main.dart` ✅
+**Path**: `lib/main.dart`
+
+**Added**:
+```dart
+// After Firebase.initializeApp()
+await NotificationService.instance.initialize();
+```
+
+#### 3. `parent_notifications_controller.dart` ✅ (~110 lines)
+**Path**: `lib/features/parentSide/notifications/controllers/parent_notifications_controller.dart`
+
+**Changes**:
+- Integrated `NotificationService` for all operations
+- Added realtime subscription via `subscribeToNotifications()`
+- Backend methods: `loadNotifications()`, `markAsRead()`, `markAllAsRead()`, `deleteNotification()`
+- Updated badge count after each operation via `refreshUnreadCount()`
+
+#### 4. `driver_notifications_controller.dart` ✅ (~110 lines)
+**Path**: `lib/features/DriverSide/notifications/controllers/driver_notifications_controller.dart`
+
+**Changes**:
+- Same implementation pattern as parent controller
+- Integrated `NotificationService` for backend CRUD
+- Realtime subscription for live updates
+
+#### 5. `parents_notification_Screen.dart` ✅ (~220 lines)
+**Path**: `lib/features/parentSide/notifications/pages/parents_notification_Screen.dart`
+
+**UI Enhancements**:
+- ✅ Loading state with CircularProgressIndicator
+- ✅ Error state with retry button
+- ✅ Empty state illustration
+- ✅ Pull-to-refresh (RefreshIndicator)
+- ✅ Swipe-to-delete (Dismissible)
+- ✅ "Mark All Read" button in AppBar
+- ✅ Read/unread visual distinction (opacity + dot indicator)
+- ✅ Blue unread indicator dot on notification icon
+
+#### 6. `driver_notifications_screen.dart` ✅ (~220 lines)
+**Path**: `lib/features/DriverSide/notifications/pages/driver_notifications_screen.dart`
+
+**UI Enhancements**:
+- Same enhancements as parent screen
+- Consistent UI/UX across both roles
+
+#### 7. `notification_button.dart` ✅ (~90 lines)
+**Path**: `lib/features/parentSide/parentHome/widgets/notification_button.dart`
+
+**Added**:
+- Red badge with unread count
+- Reactive updates via `Obx(() => NotificationService.instance.unreadCount)`
+- Badge hidden when count is 0
+
+#### 8. `driver_notification_button.dart` ✅ (~90 lines)
+**Path**: `lib/features/DriverSide/driverHome/widgets/driver_notification_button.dart`
+
+**Added**:
+- Same badge implementation as parent button
+- Red circular badge positioned top-right
+
+#### 9. `parent_notification.dart` ✅
+**Path**: `lib/features/parentSide/notifications/models/parent_notification.dart`
+
+**Changes**:
+- Updated `fromJson()` to parse `$createdAt` for timestamp
+
+#### 10. `driver_notification.dart` ✅
+**Path**: `lib/features/DriverSide/notifications/models/driver_notification.dart`
+
+**Changes**:
+- Updated `fromJson()` to parse `$createdAt` for timestamp
+
+#### 11. `android/app/build.gradle.kts` ✅
+**Path**: `android/app/build.gradle.kts`
+
+**Added for flutter_local_notifications**:
+```kotlin
+android {
+    defaultConfig {
+        multiDexEnabled = true
+    }
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+}
+```
+
+### FCM Topic Subscriptions
+```dart
+class Topics {
+  static const allParents = 'all_parents';
+  static const allDrivers = 'all_drivers';
+  static const tripNotifications = 'trip_notifications';
+  static const serviceRequests = 'service_requests';
+  static const systemAnnouncements = 'system_announcements';
+  static const geofenceAlerts = 'geofence_alerts';
+}
+```
+
+### Android Notification Channels
+```dart
+static const _tripChannel = AndroidNotificationChannel(
+  'trip_updates', 'Trip Updates',
+  importance: Importance.high,
+);
+static const _requestChannel = AndroidNotificationChannel(
+  'service_requests', 'Service Requests',
+  importance: Importance.high,
+);
+static const _messageChannel = AndroidNotificationChannel(
+  'messages', 'Messages',
+  importance: Importance.defaultImportance,
+);
+static const _systemChannel = AndroidNotificationChannel(
+  'system', 'System Notifications',
+  importance: Importance.low,
+);
+```
+
+### Notification Tap Navigation Logic
+```dart
+switch (type) {
+  case 'trip_started':
+  case 'driver_arrived':
+  case 'child_picked':
+  case 'child_dropped':
+    // Navigate to map based on role (parentMap or driverMap)
+    break;
+  case 'request_received':
+    Get.toNamed(AppRoutes.driverMap); // Driver received request
+    break;
+  case 'request_accepted':
+  case 'request_rejected':
+    Get.toNamed(AppRoutes.findDrivers); // Parent sees result
+    break;
+  case 'new_message':
+    // Navigate to chat conversation with roomId from data
+    break;
+  case 'system':
+  default:
+    // Navigate to notifications screen
+    break;
+}
+```
+
+### Lessons Learned
+1. **Appwrite REST API Limitation**: Cannot filter by nullable columns, implemented local filtering as workaround
+2. **Schema Alignment Critical**: Field names must match exactly (`body` not `message`)
+3. **Auto-generated Fields**: Never send `$id`, `$createdAt`, `$updatedAt` - Appwrite generates them
+4. **Core Library Desugaring**: Required for `flutter_local_notifications` on Android (Java 8+ APIs)
+5. **Observable Badge Count**: Using GetX `RxInt` allows reactive UI updates across all screens
+6. **SDK Reserved Column Names**: NEVER name a column `data` - it conflicts with Appwrite SDK's `Row.data` property. The SDK's `Row.fromMap` uses `data: map["data"] ?? map`, so a column named `data` gets assigned to `row.data` instead of the nested map structure. **Renamed to `payload`.**
+7. **Auth User ID vs Profile ID**: The app has TWO ID types per user:
+   - **Auth User ID** (`users.$id`): e.g., `692e7abbae7e562ba007` - returned by `AuthService.currentUser.$id`
+   - **Profile Document ID** (`parents.$id` or `drivers.$id`): e.g., `693431ee237a45488866`
+   
+   **Notifications must use Auth User ID** since that's what `getUserNotifications()` filters by.
+
+---
+
+## 🔧 Critical Bug Fixes - Map Markers Not Showing (December 11, 2025)
+
+### Issue: Map markers not loading - wrong ID mapping
+**Root Cause**: Controllers were using auth `userId` instead of driver/parent document `$id`.
+
+- **Auth userId**: `69305a1fee18fc597894` (from `AuthService.currentUser.$id`)
+- **Driver doc $id**: `69306d6e83e0764ee5a6` (stored in `active_services.driverId`)
+- **Database stores document IDs, not auth userIds** in foreign key relationships
+
+### Task 1: Fix DriverHomeController ID Mapping ✅
+**File**: `lib/features/DriverSide/driverHome/controllers/driver_home_controller.dart`
+
+**Changes**:
+- ✅ Added `DriverService` import
+- ✅ Added `_driverService` field
+- ✅ Modified `loadActiveServices()` to first lookup driver document via `DriverService.getDriver(userId:)`
+- ✅ Now uses `driverProfile.driverId!` (document $id) for `getDriverActiveServices()` call
+
+**Impact**: Driver map now correctly loads active services and child markers.
+
+### Task 2: Fix ParentMapController ID Mapping ✅
+**File**: `lib/features/parentSide/parentHome/controllers/parent_map_controller.dart`
+
+**Changes**:
+- ✅ Added `ParentService` import
+- ✅ Added `_parentService` field
+- ✅ Modified `loadActiveTrips()` to first lookup parent document via `ParentService.getParent(userId:)`
+- ✅ Now uses `parentProfile.parent!.id!` (document $id) for `getParentTrips()` call
+
+**Impact**: Parent map now correctly loads trips and markers.
+
+---
+
+## 🎨 UI Enhancement - Driver Order Tiles (December 11, 2025)
+
+### Task: Show Child Info Instead of Parent Info
+**Request**: "on the driver order screen in the tiles its showing the parent name and avatar image so change it to child name and avatar"
+
+### Task 1: Update DriverOrder Model ✅
+**File**: `lib/features/DriverSide/driverHome/models/driver_order.dart`
+
+**Changes**:
+- ✅ Added `childAvatarUrl` field to model
+- ✅ Updated `fromJson()` to parse `childAvatarUrl`
+
+### Task 2: Update DriverOrdersController ✅
+**File**: `lib/features/DriverSide/driverHome/controllers/driver_orders_controller.dart`
+
+**Changes**:
+- ✅ Modified `_enrichTripData()` to fetch child's `photoUrl` from ChildService
+- ✅ Added `enriched['childAvatarUrl'] = childResult.child!.photoUrl;`
+
+### Task 3: Update DriverOrderTile Widget ✅
+**File**: `lib/features/DriverSide/driverHome/widgets/driver_order_tile.dart`
+
+**Changes**:
+- ✅ Changed `_Avatar` widget to use `data.childName` and `data.childAvatarUrl` instead of parent info
+- ✅ Changed name display from `data.parentName` to `data.childName`
+
+**Impact**: Driver order tiles now show child's name and avatar instead of parent's.
+
+---
+
+## 🗺️ Phase 5 & 7: Maps + Notifications Implementation (Previous)
+
+### Task 1.1: ParentMapController - Real-time Trip Tracking ✅
+**Date**: December 10, 2025  
+**File**: `lib/features/parentSide/parentHome/controllers/parent_map_controller.dart`
+
+**Changes**:
+- ✅ Removed demo/static data (demoHomeLocation, demoSchoolLocation, demoDriverLocation)
+- ✅ Added backend service integration (TripService, TripTrackingService, AuthService)
+- ✅ Implemented `loadActiveTrips()` to fetch trips from Appwrite database
+- ✅ Implemented `_loadMarkersFromTrips()` for dynamic marker creation
+- ✅ Implemented `subscribeToTripUpdates()` for Appwrite Realtime subscriptions
+- ✅ Implemented `updateDriverMarker()` for real-time driver location updates
+- ✅ Implemented `updateTripStatus()` for trip status changes
+- ✅ Added error handling and user-friendly status messages
+- ✅ Added subscription cleanup in onClose()
+- ✅ All compile errors resolved
+
+**Impact**: Parent map now shows real-time driver locations and trip updates instead of static demo data.
+
+### Task 1.2: ParentMapScreen UI Enhancements ✅
+**Date**: December 10, 2025  
+**File**: `lib/features/parentSide/parentHome/pages/parent_map_screen.dart`
+
+**Changes**:
+- ✅ Added loading overlay with "Loading trips..." message
+- ✅ Added error message banner (dismissible)
+- ✅ Added empty state card when no trips exist
+- ✅ Created `_TripStatusCard` widget (bottom sheet) with:
+  - Status badge with color coding
+  - Child name and trip type
+  - Driver name and vehicle type
+  - Pickup and dropoff locations display
+- ✅ Created `_RoutePoint` widget for route display
+- ✅ Added refresh button (top-right)
+- ✅ Status color coding for all trip states
+- ✅ All compile errors resolved
+
+**Impact**: Parent map now has complete UI with trip details, loading states, and error handling.
+
+### Task 2.1: DriverHomeController - Backend Integration ✅
+**Date**: December 10, 2025  
+**File**: `lib/features/DriverSide/driverHome/controllers/driver_home_controller.dart`
+
+**Changes**:
+- ✅ Removed demo children data
+- ✅ Added backend service integration (ActiveServiceService, ChildService, AuthService)
+- ✅ Implemented `loadActiveServices()` to fetch driver's active services
+- ✅ Implemented `_loadChildrenFromServices()` to load child details
+- ✅ Integrated SchoolsLoader for school details and locations
+- ✅ Proper coordinate handling ([lng, lat] to LatLng)
+- ✅ Updated `refreshMarkers()` to reload from backend
+- ✅ Added error state management
+- ✅ All compile errors resolved
+
+**Impact**: Driver map now loads real enrolled children from active services instead of demo data.
+
+### Task 2.2: DriverMapScreen UI Enhancements ✅
+**Date**: December 10, 2025  
+**File**: `lib/features/DriverSide/driverHome/pages/driver_map_screen.dart`
+
+**Changes**:
+- ✅ Added loading overlay with "Loading active services..." message
+- ✅ Added error message banner (dismissible)
+- ✅ Added empty state card when no active services
+- ✅ Added refresh button (bottom-right)
+- ✅ Updated `_RoundFab` widget with loading state support
+- ✅ Improved button positioning (refresh: right, location: left)
+- ✅ All compile errors resolved
+
+**Impact**: Driver map now has complete UI with loading states and error handling, showing real backend data.
+
+### Task 2.3: Fix Parent Map Coordinate Order ✅
+**Date**: December 10, 2025  
+**File**: `lib/features/parentSide/parentHome/controllers/parent_map_controller.dart`
+
+**Changes**:
+- ✅ Fixed coordinate order for `pickupLocation` (was [lat, lng], now [lng, lat])
+- ✅ Fixed coordinate order for `dropoffLocation` (was [lat, lng], now [lng, lat])
+- ✅ Fixed coordinate order for `currentDriverLocation` (was [lat, lng], now [lng, lat])
+- ✅ Added comments explaining Appwrite point format: [lng, lat]
+- ✅ All compile errors resolved
+
+**Impact**: Parent map now correctly displays pickup, dropoff, and driver markers at proper GPS coordinates.
+
+### Task 3.1: Create NotificationService ✅
+**Date**: December 10, 2025  
+**File**: `lib/services/appwrite/notification_service.dart`
+
+**Implementation**:
+- ✅ Created singleton service following Appwrite service patterns
+- ✅ Integrated Firebase Cloud Messaging (FCM) for push notifications
+- ✅ Integrated flutter_local_notifications for in-app notifications
+- ✅ Implemented FCM token registration with Appwrite topics
+- ✅ Created Android notification channels (trip_updates, service_requests, messages, system)
+- ✅ Implemented foreground, background, and terminated message handlers
+- ✅ Implemented notification CRUD operations (create, get, mark read, delete, clear)
+- ✅ Implemented Appwrite Realtime subscriptions for live notifications
+- ✅ Implemented notification tap navigation routing
+- ✅ Implemented geofence notification support
+- ✅ Added unread count tracking
+- ✅ Added topic subscriptions (user-specific, role-specific, general topics)
+- ✅ Total: 700+ lines of code
+
+**Features**:
+- **FCM Integration**: Token registration, topic subscriptions, message handlers
+- **Local Notifications**: Android channels, iOS settings, notification display
+- **Database Operations**: Full CRUD with TablesDB API
+- **Realtime Updates**: Live notification subscriptions via Appwrite Realtime
+- **Navigation**: Smart routing based on notification type
+- **Geofence Support**: Special handling for driver approaching/arrived events
+
+**Impact**: Complete notification infrastructure ready for geofence events, trip updates, service requests, and chat messages.
+
+---
+
+## 🔧 ID Handling Fixes (Previous)
 
 ### Issue: Appwrite auto-generates `$id`, `$createdAt`, `$updatedAt`
 Models must handle `$id` in `fromJson()` for documents retrieved from Appwrite.
@@ -274,10 +1038,12 @@ Models must handle `$id` in `fromJson()` for documents retrieved from Appwrite.
 | `driverId` | - | ⚠️ | Set at API level |
 | `childId` | `childId` | ✅ | |
 | `status` | `status` | ✅ | `pending`/`accepted`/`rejected`/`cancelled` |
-| `requestType` | `requestType` | ✅ | `pickup`/`dropoff`/`both` |
-| `message` | `message` | ✅ | |
 | `proposedPrice` | `proposedPrice` | ✅ | Integer (PKR) |
 | `$createdAt` | `createdAt` | ✅ | |
+
+**Removed Fields**:
+- ~~`requestType`~~ — All services are "both" now
+- ~~`message`~~ — Simplified UI, no message field
 
 **Extra Fields (denormalized for display)**:
 - `parentName`, `childName`, `avatarUrl`, `schoolName`, `pickPoint`, `dropPoint`
@@ -1265,7 +2031,14 @@ All models correctly implement:
 | Item | Status |
 |------|--------|
 | 10 Appwrite Functions | Defined in TODO, not deployed |
-| Flutter Services Layer | Not created |
-| Development Phases 1-9 | Not started |
+| Phase 1: Parents Module | ✅ Complete |
+| Phase 2: Children Module | ✅ Complete |
+| Phase 3: Drivers Module | ✅ Complete |
+| Phase 4: Service Requests | ✅ Complete |
+| Phase 5: Maps & Tracking | ✅ Complete |
+| Phase 6: Chat | ⏳ Pending |
+| Phase 7: Push Notifications | ✅ Complete (Dec 15, 2025) |
+| Phase 8: Ratings & Reports | ⏳ Pending |
+| Phase 9: Additional Features | ⏳ Pending |
 
 ---

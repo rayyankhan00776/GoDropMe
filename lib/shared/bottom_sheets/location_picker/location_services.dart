@@ -22,6 +22,7 @@ class LocationServices {
   /// Returns current high-accuracy position or throws.
   static Future<LatLng> currentPosition() async {
     final pos = await Geolocator.getCurrentPosition(
+      // ignore: deprecated_member_use
       desiredAccuracy: LocationAccuracy.high,
     );
     return LatLng(pos.latitude, pos.longitude);

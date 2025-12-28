@@ -1,0 +1,14 @@
+{
+  "name": "match-drivers",
+  "version": "1.0.0",
+  "description": "Appwrite function to match available drivers for a child",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "prettier": "^3.0.0"
+  }
+}

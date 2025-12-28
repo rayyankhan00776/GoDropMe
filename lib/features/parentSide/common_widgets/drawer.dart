@@ -11,6 +11,7 @@ import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/features/parentSide/common_widgets/drawer widgets/drawer_header.dart';
 import 'package:godropme/features/parentSide/common_widgets/drawer widgets/drawer_card.dart';
+import 'package:godropme/features/parentSide/common_widgets/parent_drawer_controller.dart';
 import 'package:godropme/shared/widgets/drawer_button.dart';
 import 'package:godropme/shared/widgets/drawer_version_label.dart';
 import 'package:godropme/features/parentSide/common_widgets/drawer widgets/profile_tile.dart';
@@ -107,17 +108,14 @@ class ParentDrawer extends StatelessWidget {
 
   // (No local helpers; composition uses DrawerCard, DrawerTile, ProfileTile,
   void _navigateFromDrawer(BuildContext context, String route) {
-    // // Close the drawer first
-    // if (Navigator.of(context).canPop()) {
-    //   Navigator.of(context).pop();
-    // } else {
-    //   // Fallback for GetX-managed drawers
-    //   Get.back(closeOverlays: true);
-    // }
+    final drawerCtrl = Get.find<ParentDrawerController>();
+    
+    // Always close the drawer first
+    drawerCtrl.close();
 
     // If already on the same route, do nothing further
     if (Get.currentRoute == route) {
-      return Scaffold.of(context).closeDrawer();
+      return;
     }
 
     // Navigate to the requested route

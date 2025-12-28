@@ -89,4 +89,9 @@ final List<GetPage<dynamic>> driverRoutes = [
     name: AppRoutes.driverRejected,
     page: () => const DriverRejectedScreen(),
   ),
+  // Driver Active Services
+  GetPage(
+    name: AppRoutes.driverActiveServices,
+    page: () => const DriverActiveServicesScreen(),
+  ),
 ];

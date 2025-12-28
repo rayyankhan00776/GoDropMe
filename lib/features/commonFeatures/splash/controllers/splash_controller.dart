@@ -3,13 +3,18 @@ import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/services/appwrite/auth_service.dart';
 import 'package:godropme/services/appwrite/database_constants.dart';
+import 'package:godropme/services/appwrite/notification_service.dart';
 import 'package:godropme/sharedPrefs/local_storage.dart';
 
 /// Controller for the splash screen that handles:
-/// 1. Check if first-time user (show onboarding)
-/// 2. Check if user has active session (auto-login)
-/// 3. Navigate to appropriate screen
+/// 1. Request notification permission (better UX - during splash)
+/// 2. Check if first-time user (show onboarding)
+/// 3. Check if user has active session (auto-login)
+/// 4. Navigate to appropriate screen
 class SplashController extends GetxController {
+  // Observable for permission request status
+  final isRequestingPermission = false.obs;
+  
   @override
   void onInit() {
     super.onInit();
@@ -18,8 +23,19 @@ class SplashController extends GetxController {
 
   /// Initialize app and determine navigation
   Future<void> _initializeApp() async {
-    // Small delay for splash screen visibility
-    await Future.delayed(const Duration(milliseconds: 1500));
+    // Request notification permission during splash (better UX)
+    // This happens while splash screen is showing, so user sees the dialog
+    // before any app content loads
+    isRequestingPermission.value = true;
+    final hasPermission = await NotificationService.instance.hasNotificationPermission();
+    if (!hasPermission) {
+      debugPrint('🔔 Requesting notification permission...');
+      await NotificationService.instance.requestNotificationPermission();
+    }
+    isRequestingPermission.value = false;
+    
+    // Small delay for splash screen visibility (reduced since permission took some time)
+    await Future.delayed(const Duration(milliseconds: 800));
 
     // Check if user has seen onboarding
     final hasSeenOnboarding = await LocalStorage.getString(StorageKeys.hasSeenOnboarding);
@@ -41,8 +57,10 @@ class SplashController extends GetxController {
       return;
     }
 
-    // User has active session - navigate based on role
+    // User has active session - register for push notifications
     debugPrint('✅ Active session found - role: ${sessionResult.userRole}, status: ${sessionResult.status}, hasDriverProfile: ${sessionResult.hasDriverProfile}');
+    await NotificationService.instance.registerForPushNotifications();
+    
     await _navigateToHome(
       sessionResult.userRole, 
       sessionResult.status,

@@ -7,6 +7,7 @@ import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
 import 'package:godropme/common_widgets/custom_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Screen shown to drivers whose account has been suspended.
 /// Displays suspension reason and contact info for support.
@@ -155,18 +156,27 @@ class DriverSuspendedScreen extends StatelessWidget {
 
               // Contact support button (outlined)
               OutlinedButton.icon(
-                onPressed: () {
-                  // TODO: Open email client or support chat
-                  // For now, just show a snackbar
-                  Get.snackbar(
-                    'Contact Support',
-                    'Email us at support@godropme.com',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: AppColors.primary.withOpacity(0.9),
-                    colorText: Colors.white,
-                    margin: const EdgeInsets.all(16),
-                    borderRadius: 12,
+                onPressed: () async {
+                  final Uri emailUri = Uri(
+                    scheme: 'mailto',
+                    path: 'services@rayonixsolutions.com',
+                    queryParameters: {
+                      'subject': 'Account Suspension Appeal',
+                      'body': 'Hello,\n\nI would like to appeal my account suspension.\n\nReason provided: $reason\n\nPlease review my case.\n\nThank you.',
+                    },
                   );
+                  if (await canLaunchUrl(emailUri)) {
+                    await launchUrl(emailUri);
+                  } else {
+                    Get.snackbar(
+                      'Contact Support',
+                      'Email us at services@rayonixsolutions.com',
+                      backgroundColor: AppColors.primary.withOpacity(0.9),
+                      colorText: Colors.white,
+                      margin: const EdgeInsets.all(16),
+                      borderRadius: 12,
+                    );
+                  }
                 },
                 icon: const Icon(Icons.email_outlined),
                 label: const Text('Contact Support'),

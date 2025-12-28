@@ -49,7 +49,7 @@ class ParentChatMessage {
     senderRole: json['senderRole']?.toString() ?? 'parent',
     messageType: json['messageType']?.toString() ?? 'text',
     text: json['text']?.toString() ?? '',
-    imageFileId: json['imageFileId']?.toString(),
+    imageFileId: json['imageUrl']?.toString() ?? json['imageFileId']?.toString(),
     location: json['location'] is List && (json['location'] as List).length >= 2
         ? [(json['location'][0] as num).toDouble(), (json['location'][1] as num).toDouble()]
         : null,

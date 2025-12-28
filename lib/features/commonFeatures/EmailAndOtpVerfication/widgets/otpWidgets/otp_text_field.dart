@@ -10,8 +10,8 @@ class OtpTextField extends StatefulWidget {
   final FocusNode? focusNode;
   final ValueChanged<String>? onChanged;
   final double size;
-  // No longer support raw key events here to avoid Focus reparenting issues.
-  // Use onChanged to handle navigation between fields.
+  final VoidCallback? onBackspaceEmpty;
+  final ValueChanged<String>? onPaste;
 
   const OtpTextField({
     super.key,
@@ -20,8 +20,9 @@ class OtpTextField extends StatefulWidget {
     this.fieldNumber = 0,
     this.focusNode,
     this.onChanged,
-    // Increase default size a bit to make boxes taller on medium/large screens
     this.size = 64,
+    this.onBackspaceEmpty,
+    this.onPaste,
   });
 
   @override
@@ -31,7 +32,6 @@ class OtpTextField extends StatefulWidget {
 class _OtpTextFieldState extends State<OtpTextField> {
   late FocusNode _focusNode;
   late bool _ownsFocusNode;
-  String _previousText = '';
 
   @override
   void initState() {
@@ -53,8 +53,6 @@ class _OtpTextFieldState extends State<OtpTextField> {
     super.dispose();
   }
 
-  // Removed raw key handling to avoid FocusNode reparenting errors.
-
   @override
   Widget build(BuildContext context) {
     final boxSize = widget.size;
@@ -62,44 +60,61 @@ class _OtpTextFieldState extends State<OtpTextField> {
     return SizedBox(
       width: boxSize,
       height: boxSize,
-      child: TextFormField(
-        controller: widget.controller,
-        focusNode: _focusNode,
-        autofocus: widget.autoFocus,
-        textAlign: TextAlign.center,
-        textAlignVertical: TextAlignVertical.center,
-        keyboardType: TextInputType.number,
-        maxLength: 1,
-        onTapOutside: (event) => FocusScope.of(context).unfocus(),
-        // Scale font size proportionally so the digit fits well on small boxes
-        style: AppTypography.onboardTitle.copyWith(
-          fontSize: (boxSize * 0.39).clamp(14.0, 26.0),
-        ),
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        decoration: InputDecoration(
-          counterText: "",
-          contentPadding: EdgeInsets.zero,
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: AppColors.lightGray, width: 2),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: AppColors.primary, width: 2),
-          ),
-        ),
-        onChanged: (value) {
-          widget.onChanged?.call(value);
-          // If user entered a character, move to next field
-          if (_previousText.isEmpty && value.isNotEmpty) {
-            FocusScope.of(context).nextFocus();
+      child: KeyboardListener(
+        focusNode: FocusNode(), // Separate focus node for keyboard listener
+        onKeyEvent: (event) {
+          // Handle backspace on empty field
+          if (event is KeyDownEvent &&
+              event.logicalKey == LogicalKeyboardKey.backspace &&
+              widget.controller.text.isEmpty) {
+            widget.onBackspaceEmpty?.call();
           }
-          // If user deleted (previous had a char and now empty), move to previous
-          if (_previousText.isNotEmpty && value.isEmpty) {
-            FocusScope.of(context).previousFocus();
-          }
-          _previousText = value;
         },
+        child: TextFormField(
+          controller: widget.controller,
+          focusNode: _focusNode,
+          autofocus: widget.autoFocus,
+          textAlign: TextAlign.center,
+          textAlignVertical: TextAlignVertical.center,
+          keyboardType: TextInputType.number,
+          maxLength: 6, // Allow up to 6 for paste support
+          onTapOutside: (event) => FocusScope.of(context).unfocus(),
+          style: AppTypography.onboardTitle.copyWith(
+            fontSize: (boxSize * 0.39).clamp(14.0, 26.0),
+          ),
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+          ],
+          decoration: InputDecoration(
+            counterText: "",
+            contentPadding: EdgeInsets.zero,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: AppColors.lightGray, width: 2),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
+            ),
+          ),
+          onChanged: (value) {
+            // Handle paste of multiple digits
+            if (value.length > 1) {
+              // Keep only the first digit in this field
+              final firstDigit = value[0];
+              widget.controller.text = firstDigit;
+              widget.controller.selection = TextSelection.fromPosition(
+                TextPosition(offset: 1),
+              );
+              widget.onChanged?.call(firstDigit);
+              // Pass all pasted digits to be distributed across fields
+              widget.onPaste?.call(value);
+              return;
+            }
+
+            widget.onChanged?.call(value);
+          },
+        ),
       ),
     );
   }

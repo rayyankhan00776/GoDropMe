@@ -120,7 +120,6 @@ class SettingsController extends GetxController {
       Get.snackbar(
         'Account Deleted',
         'Your account has been successfully deleted',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppColors.primary.withValues(alpha: 0.9),
         colorText: Colors.white,
         margin: const EdgeInsets.all(16),
@@ -133,7 +132,6 @@ class SettingsController extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to delete account. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.withValues(alpha: 0.9),
         colorText: Colors.white,
         margin: const EdgeInsets.all(16),

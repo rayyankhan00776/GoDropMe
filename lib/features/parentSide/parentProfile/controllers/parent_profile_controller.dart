@@ -108,7 +108,6 @@ class ParentProfileController extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to pick image. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
       );
     }
   }
@@ -137,7 +136,6 @@ class ParentProfileController extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to take photo. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
       );
     }
   }

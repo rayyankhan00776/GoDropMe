@@ -7,14 +7,28 @@ import 'package:godropme/features/parentSide/findDrivers/models/driver_listing.d
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
+import 'package:godropme/common_widgets/appwrite_image.dart';
 
 class DriverListingTile extends StatefulWidget {
   final DriverListing data;
   final bool isRequested;
+  /// Selected child ID for the request
+  final String? selectedChildId;
+  /// Selected child name for display
+  final String? selectedChildName;
+  /// Callback when user sends a request
+  final VoidCallback? onSendRequest;
+  /// Callback when user cancels a request
+  final VoidCallback? onCancelRequest;
+  
   const DriverListingTile({
     super.key,
     required this.data,
     this.isRequested = false,
+    this.selectedChildId,
+    this.selectedChildName,
+    this.onSendRequest,
+    this.onCancelRequest,
   });
 
   @override
@@ -50,28 +64,85 @@ class _DriverListingTileState extends State<DriverListingTile> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               child: Row(
                 children: [
-                  _DriverAvatar(asset: d.photoAsset),
+                  _DriverAvatar(
+                    asset: d.photoAsset,
+                    photoUrl: d.profilePhotoFileId,
+                    name: d.name,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          d.name,
-                          style: AppTypography.optionLineSecondary.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.black,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                d.name,
+                                style: AppTypography.optionLineSecondary.copyWith(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.black,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            // Rating badge
+                            if (d.rating > 0)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.star_rounded,
+                                      color: Colors.amber.shade700,
+                                      size: 14,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      d.rating.toStringAsFixed(1),
+                                      style: AppTypography.helperSmall.copyWith(
+                                        color: Colors.amber.shade800,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${d.vehicle} (${d.vehicleColor})',
-                          style: AppTypography.optionTerms,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.directions_car,
+                              size: 14,
+                              color: AppColors.darkGray,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                d.vehicle.isNotEmpty 
+                                    ? d.vehicle
+                                    : d.type,
+                                style: AppTypography.optionTerms.copyWith(
+                                  color: AppColors.darkGray,
+                                  fontSize: 13,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -96,7 +167,7 @@ class _DriverListingTileState extends State<DriverListingTile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Divider(height: 16),
-                  _DetailLine(label: 'Type', value: d.type),
+                  _DetailLine(label: 'Vehicle Type', value: d.type),
                   _DetailLine(
                     label: 'Seats Available',
                     value: d.seatsAvailable.toString(),
@@ -107,8 +178,8 @@ class _DriverListingTileState extends State<DriverListingTile> {
                   _DetailLine(
                     label: 'Monthly Price',
                     value: 'Rs. ${d.monthlyPricePkr.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}',
+                    highlight: true,
                   ),
-                  _DetailLine(label: 'Extra Notes', value: d.extraNotes),
 
                   SizedBox(height: Responsive.scaleClamped(context, 12, 8, 18)),
 
@@ -119,18 +190,11 @@ class _DriverListingTileState extends State<DriverListingTile> {
                       onPressed: widget.isRequested
                           ? null
                           : () {
-                              Get.snackbar(
-                                'Request',
-                                'Request sent (demo)',
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: Colors.black.withValues(
-                                  alpha: 0.85,
-                                ),
-                                colorText: Colors.white,
-                                margin: const EdgeInsets.all(12),
-                                borderRadius: 12,
-                                duration: const Duration(seconds: 2),
-                              );
+                              if (widget.onSendRequest != null) {
+                                widget.onSendRequest!();
+                              } else {
+                                _handleRequest(context);
+                              }
                             },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: widget.isRequested
@@ -144,7 +208,7 @@ class _DriverListingTileState extends State<DriverListingTile> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(widget.isRequested ? 'Requested' : 'Request'),
+                      child: Text(widget.isRequested ? 'Requested' : 'Request Service'),
                     ),
                   ),
 
@@ -154,18 +218,21 @@ class _DriverListingTileState extends State<DriverListingTile> {
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: () {
-                          Get.snackbar(
-                            'Request',
-                            'Request cancelled (demo)',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.black.withValues(
-                              alpha: 0.85,
-                            ),
-                            colorText: Colors.white,
-                            margin: const EdgeInsets.all(12),
-                            borderRadius: 12,
-                            duration: const Duration(seconds: 2),
-                          );
+                          if (widget.onCancelRequest != null) {
+                            widget.onCancelRequest!();
+                          } else {
+                            Get.snackbar(
+                              'Request',
+                              'Request cancelled',
+                              backgroundColor: Colors.black.withValues(
+                                alpha: 0.85,
+                              ),
+                              colorText: Colors.white,
+                              margin: const EdgeInsets.all(12),
+                              borderRadius: 12,
+                              duration: const Duration(seconds: 2),
+                            );
+                          }
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primary,
@@ -189,14 +256,85 @@ class _DriverListingTileState extends State<DriverListingTile> {
       ),
     );
   }
+
+  void _handleRequest(BuildContext context) {
+    final d = widget.data;
+    
+    // One-click request - just show snackbar confirmation
+    Get.snackbar(
+      'Request Sent',
+      'Your request has been sent to ${d.name}',
+      backgroundColor: AppColors.primary,
+      colorText: Colors.white,
+      margin: const EdgeInsets.all(12),
+      borderRadius: 12,
+      duration: const Duration(seconds: 2),
+    );
+  }
 }
 
 class _DriverAvatar extends StatelessWidget {
   final String asset;
-  const _DriverAvatar({required this.asset});
+  final String? photoUrl;
+  final String name;
+  
+  const _DriverAvatar({
+    required this.asset,
+    this.photoUrl,
+    required this.name,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // Use Appwrite image if available
+    if (photoUrl != null && photoUrl!.isNotEmpty) {
+      return ClipOval(
+        child: AppwriteImage(
+          imageUrl: photoUrl!,
+          width: 52,
+          height: 52,
+          fit: BoxFit.cover,
+          placeholder: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.06),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+          ),
+          errorWidget: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                name.isNotEmpty ? name[0].toUpperCase() : 'D',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    
+    // Fallback to SVG asset
     return Container(
       width: 52,
       height: 52,
@@ -206,7 +344,7 @@ class _DriverAvatar extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: SvgPicture.asset(
-        asset,
+        asset.isNotEmpty ? asset : 'assets/images/svg/person.svg',
         width: 28,
         height: 28,
         color: AppColors.primary,
@@ -218,7 +356,13 @@ class _DriverAvatar extends StatelessWidget {
 class _DetailLine extends StatelessWidget {
   final String label;
   final String value;
-  const _DetailLine({required this.label, required this.value});
+  final bool highlight;
+  
+  const _DetailLine({
+    required this.label,
+    required this.value,
+    this.highlight = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +389,8 @@ class _DetailLine extends StatelessWidget {
               value,
               style: AppTypography.optionLineSecondary.copyWith(
                 fontSize: 14,
-                color: AppColors.black,
+                color: highlight ? AppColors.primary : AppColors.black,
+                fontWeight: highlight ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
           ),

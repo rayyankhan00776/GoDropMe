@@ -263,11 +263,13 @@ final session = await account.createSession(
 | `driverId` | relationship | ✅ | - | Many-to-One → `drivers` |
 | `childId` | relationship | ✅ | - | Many-to-One → `children` |
 | `status` | enum | ✅ | `pending` | Values: `pending`, `accepted`, `rejected`, `cancelled` |
-| `requestType` | enum | ✅ | - | Values: `pickup`, `dropoff`, `both` |
-| `message` | string(500) | ❌ | null | Message to driver |
 | `proposedPrice` | float | ❌ | null | Proposed monthly fee (PKR) |
 | `responseMessage` | string(500) | ❌ | null | Driver's response |
 | `respondedAt` | datetime | ❌ | null | Response timestamp |
+
+**Removed Fields**:
+- ~~`requestType`~~ — All services are "both" now
+- ~~`message`~~ — Simplified UI, no message field
 
 **Indexes**:
 - `parentId` (Key)
@@ -285,9 +287,11 @@ final session = await account.createSession(
 | `parentId` | relationship | ✅ | - | Many-to-One → `parents` |
 | `driverId` | relationship | ✅ | - | Many-to-One → `drivers` |
 | `childId` | relationship | ✅ | - | Many-to-One → `children` |
-| `serviceType` | enum | ✅ | - | Values: `pickup`, `dropoff`, `both` |
 | `monthlyFee` | float | ✅ | - | Agreed monthly fee (PKR) |
 | `startDate` | datetime | ✅ | - | Service start date |
+
+**Removed Fields**:
+- ~~`serviceType`~~ — All services are "both" now
 | `endDate` | datetime | ❌ | null | Service end date |
 | `status` | enum | ✅ | `active` | Values: `active`, `paused`, `ended` |
 

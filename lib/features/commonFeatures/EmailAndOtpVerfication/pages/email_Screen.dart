@@ -73,7 +73,6 @@ class _EmailScreenState extends State<EmailScreen> {
       Get.snackbar(
         'Error',
         _emailController.errorMessage.value,
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade100,
         colorText: Colors.red.shade900,
       );

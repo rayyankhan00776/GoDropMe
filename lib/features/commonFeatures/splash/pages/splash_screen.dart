@@ -16,7 +16,7 @@ class SplashScreen extends StatelessWidget {
     Get.put(SplashController());
 
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -24,13 +24,13 @@ class SplashScreen extends StatelessWidget {
           children: [
             // App Logo
             Image.asset(
-              'assets/images/logo/LoginAndRegister.png',
-              width: 150,
-              height: 150,
+              'assets/images/logo/godropmeLogo.png',
+              width: 180,
+              height: 180,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
-                  width: 150,
-                  height: 150,
+                  width: 180,
+                  height: 180,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),

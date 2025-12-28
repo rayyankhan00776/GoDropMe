@@ -6,17 +6,15 @@ class DriverRequest {
   final String childId; // Reference to children.$id
   final String parentName; // Denormalized for display
   final String childName; // Denormalized for display
+  final int? childAge; // Child's age for display
+  final String? childGender; // Child's gender for display
   final String? avatarUrl; // optional: use initials if null
   final String schoolName;
   final String pickPoint;
   final String dropPoint;
   /// Request status: pending, accepted, rejected, cancelled
   final String status;
-  /// Request type: pickup, dropoff, or both
-  final String requestType;
-  /// Optional message from parent
-  final String? message;
-  /// Proposed monthly fee in PKR (optional)
+  /// Proposed monthly fee in PKR (from driver's registered price)
   final int? proposedPrice;
   /// Request creation timestamp
   final DateTime? createdAt;
@@ -27,13 +25,13 @@ class DriverRequest {
     required this.childId,
     required this.parentName,
     this.childName = '',
+    this.childAge,
+    this.childGender,
     this.avatarUrl,
     required this.schoolName,
     required this.pickPoint,
     required this.dropPoint,
     this.status = 'pending',
-    this.requestType = 'both',
-    this.message,
     this.proposedPrice,
     this.createdAt,
   });
@@ -45,36 +43,52 @@ class DriverRequest {
     'childId': childId,
     'parentName': parentName,
     'childName': childName,
+    'childAge': childAge,
+    'childGender': childGender,
     'avatarUrl': avatarUrl,
     'schoolName': schoolName,
     'pickPoint': pickPoint,
     'dropPoint': dropPoint,
     'status': status,
-    'requestType': requestType,
-    'message': message,
     'proposedPrice': proposedPrice,
     'createdAt': createdAt?.toIso8601String(),
   };
 
   /// Create from backend JSON
-  factory DriverRequest.fromJson(Map<String, dynamic> json) => DriverRequest(
-    id: json['\$id']?.toString() ?? json['id']?.toString() ?? '',
-    parentId: json['parentId']?.toString() ?? '',
-    childId: json['childId']?.toString() ?? '',
-    parentName: json['parentName']?.toString() ?? '',
-    childName: json['childName']?.toString() ?? '',
-    avatarUrl: json['avatarUrl']?.toString(),
-    schoolName: json['schoolName']?.toString() ?? '',
-    pickPoint: json['pickPoint']?.toString() ?? '',
-    dropPoint: json['dropPoint']?.toString() ?? '',
-    status: json['status']?.toString() ?? 'pending',
-    requestType: json['requestType']?.toString() ?? 'both',
-    message: json['message']?.toString(),
-    proposedPrice: (json['proposedPrice'] as num?)?.toInt(),
-    createdAt: json['\$createdAt'] != null || json['createdAt'] != null
-        ? DateTime.tryParse(json['\$createdAt']?.toString() ?? json['createdAt']?.toString() ?? '')
-        : null,
-  );
+  /// Handles both flat JSON and nested relationship data from Appwrite
+  factory DriverRequest.fromJson(Map<String, dynamic> json) {
+    // Extract nested relationship data if available
+    final parentRef = json['parentRef'] as Map<String, dynamic>?;
+    final childRef = json['childRef'] as Map<String, dynamic>?;
+    
+    return DriverRequest(
+      id: json['\$id']?.toString() ?? json['id']?.toString() ?? '',
+      parentId: json['parentId']?.toString() ?? '',
+      childId: json['childId']?.toString() ?? '',
+      // Use relationship data if available, fallback to direct fields
+      parentName: parentRef?['fullName']?.toString() ?? 
+                  json['parentName']?.toString() ?? '',
+      childName: childRef?['name']?.toString() ?? 
+                 json['childName']?.toString() ?? '',
+      childAge: (childRef?['age'] as num?)?.toInt() ?? 
+                (json['childAge'] as num?)?.toInt(),
+      childGender: childRef?['gender']?.toString() ?? 
+                   json['childGender']?.toString(),
+      avatarUrl: parentRef?['profilePhotoUrl']?.toString() ?? 
+                 json['avatarUrl']?.toString(),
+      schoolName: childRef?['schoolId']?.toString() ?? 
+                  json['schoolName']?.toString() ?? '',
+      pickPoint: childRef?['pickPoint']?.toString() ?? 
+                 json['pickPoint']?.toString() ?? '',
+      dropPoint: childRef?['dropPoint']?.toString() ?? 
+                 json['dropPoint']?.toString() ?? '',
+      status: json['status']?.toString() ?? 'pending',
+      proposedPrice: (json['proposedPrice'] as num?)?.toInt(),
+      createdAt: json['\$createdAt'] != null || json['createdAt'] != null
+          ? DateTime.tryParse(json['\$createdAt']?.toString() ?? json['createdAt']?.toString() ?? '')
+          : null,
+    );
+  }
 
   static List<DriverRequest> demo() => [
     DriverRequest(
@@ -83,11 +97,12 @@ class DriverRequest {
       childId: 'child_1',
       parentName: 'Ayesha Khan',
       childName: 'Sara',
+      childAge: 8,
+      childGender: 'Female',
       schoolName: 'Bloomfield School',
       pickPoint: 'Street 12, Sector F-8',
       dropPoint: 'Bloomfield Main Gate',
       status: 'pending',
-      requestType: 'both',
       proposedPrice: 8000,
     ),
     DriverRequest(
@@ -96,11 +111,12 @@ class DriverRequest {
       childId: 'child_2',
       parentName: 'Muhammad Ali',
       childName: 'Hassan',
+      childAge: 10,
+      childGender: 'Male',
       schoolName: 'City Grammar',
       pickPoint: 'House 22, Phase 4',
       dropPoint: 'City Grammar Gate 2',
       status: 'pending',
-      requestType: 'both',
       proposedPrice: 7500,
     ),
   ];

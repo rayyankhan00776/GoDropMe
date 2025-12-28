@@ -1,0 +1,16 @@
+{
+    "name": "generate-morning-trips",
+    "version": "1.0.0",
+    "description": "CRON function to generate morning trips at 5:00 AM PKT",
+    "type": "module",
+    "main": "src/main.js",
+    "scripts": {
+        "format": "prettier --write ."
+    },
+    "dependencies": {
+        "node-appwrite": "^21.0.0"
+    },
+    "devDependencies": {
+        "prettier": "^3.0.0"
+    }
+}

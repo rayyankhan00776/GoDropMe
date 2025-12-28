@@ -6,7 +6,7 @@
     <!-- Permission for camera access used by image_picker -->
     <uses-permission android:name="android.permission.CAMERA" />
     <application
-        android:label="Go Drop Me"
+        android:label="GoDropMe"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -51,6 +51,10 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Required to launch phone dialer -->
+        <intent>
+            <action android:name="android.intent.action.DIAL"/>
         </intent>
     </queries>
 </manifest>

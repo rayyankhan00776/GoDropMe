@@ -49,6 +49,32 @@ class _OtpScreenState extends State<OtpScreen> {
     super.dispose();
   }
 
+  /// Handle paste of multiple digits - distribute across fields starting from startIndex
+  void _handlePaste(String pastedText, int startIndex) {
+    // Extract only digits
+    final digits = pastedText.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.isEmpty) return;
+
+    // First digit is already set by the text field itself, so skip it
+    // and distribute remaining digits to subsequent fields
+    for (int i = 1; i < digits.length && (startIndex + i) < 6; i++) {
+      final fieldIndex = startIndex + i;
+      _codeControllers[fieldIndex].text = digits[i];
+      _otpController.setDigit(fieldIndex, digits[i]);
+    }
+
+    // Also ensure the first digit is properly registered in the controller
+    _otpController.setDigit(startIndex, digits[0]);
+
+    // Move focus to the next empty field after the last filled, or last field
+    final lastFilledIndex = (startIndex + digits.length - 1).clamp(0, 5);
+    if (lastFilledIndex < 5) {
+      _focusNodes[lastFilledIndex + 1].requestFocus();
+    } else {
+      _focusNodes[5].requestFocus();
+    }
+  }
+
   void _submitOtp() async {
     if (!_otpController.allFilled.value) {
       showDialog(
@@ -64,15 +90,15 @@ class _OtpScreenState extends State<OtpScreen> {
 
     // Verify OTP via Appwrite
     final success = await _otpController.verifyOtp();
-    
+
     if (!success && mounted) {
       // Show error dialog
       showDialog(
         context: context,
         builder: (_) => OtpErrorDialog(
           title: AppStrings.error,
-          message: _otpController.errorMessage.value.isNotEmpty 
-              ? _otpController.errorMessage.value 
+          message: _otpController.errorMessage.value.isNotEmpty
+              ? _otpController.errorMessage.value
               : 'Verification failed. Please try again.',
           buttonText: AppStrings.ok,
         ),
@@ -84,29 +110,19 @@ class _OtpScreenState extends State<OtpScreen> {
   void _resendOtp() async {
     final email = _emailController.email.value.trim();
     if (email.isEmpty) return;
-    
+
     // Clear current OTP fields
     for (final c in _codeControllers) {
       c.clear();
     }
     _focusNodes[0].requestFocus();
-    
+
     final success = await _otpController.resendOtp(email);
-    
+
     if (success && mounted) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Text('OTP sent to $email'),
-      //     backgroundColor: AppColors.primary,
-      //     behavior: SnackBarBehavior.floating,
-      //     margin: const EdgeInsets.all(16),
-      //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      //   ),
-      // );
       Get.snackbar(
         'Success',
         'OTP sent to $email',
-        snackPosition: SnackPosition.TOP,
         backgroundColor: AppColors.primary.withValues(alpha: 0.1),
         colorText: AppColors.primaryDark,
       );
@@ -171,16 +187,41 @@ class _OtpScreenState extends State<OtpScreen> {
                           focusNode: _focusNodes[i],
                           fieldNumber: i,
                           size: boxSize,
-                          onChanged: (val) => _otpController.setDigit(i, val),
+                          onChanged: (val) {
+                            _otpController.setDigit(i, val);
+                            // Move to next field if digit entered
+                            if (val.isNotEmpty && i < 5) {
+                              _focusNodes[i + 1].requestFocus();
+                            }
+                            // Move to previous field if digit deleted
+                            if (val.isEmpty && i > 0) {
+                              _focusNodes[i - 1].requestFocus();
+                            }
+                          },
+                          onBackspaceEmpty: () {
+                            // Move to previous field on backspace when current is empty
+                            if (i > 0) {
+                              _focusNodes[i - 1].requestFocus();
+                              // Also clear and select the previous field for quick deletion
+                              if (_codeControllers[i - 1].text.isNotEmpty) {
+                                _codeControllers[i - 1].clear();
+                                _otpController.setDigit(i - 1, '');
+                              }
+                            }
+                          },
+                          onPaste: (pastedText) {
+                            // Handle paste of multiple digits
+                            _handlePaste(pastedText, i);
+                          },
                         ),
                       );
                     }),
                   );
                 },
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Resend OTP section
               Center(
                 child: Obx(() {
@@ -200,7 +241,9 @@ class _OtpScreenState extends State<OtpScreen> {
                               ? null
                               : () => _resendOtp(),
                           child: Text(
-                            _otpController.isResending.value ? 'Sending...' : 'Resend',
+                            _otpController.isResending.value
+                                ? 'Sending...'
+                                : 'Resend',
                             style: AppTypography.helperSmall.copyWith(
                               color: _otpController.isResending.value
                                   ? AppColors.darkGray
@@ -271,8 +314,12 @@ class _OtpScreenState extends State<OtpScreen> {
                 () => OtpActions(
                   onNext: _otpController.isLoading.value ? () {} : _submitOtp,
                   height: Responsive.scaleClamped(context, 64, 48, 80),
-                  enabled: _otpController.allFilled.value && !_otpController.isLoading.value,
-                  buttonText: _otpController.isLoading.value ? 'Verifying...' : AppStrings.otpverify,
+                  enabled:
+                      _otpController.allFilled.value &&
+                      !_otpController.isLoading.value,
+                  buttonText: _otpController.isLoading.value
+                      ? 'Verifying...'
+                      : AppStrings.otpverify,
                 ),
               ),
               SizedBox(height: Responsive.scaleClamped(context, 24, 16, 32)),

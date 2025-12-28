@@ -7,6 +7,7 @@ import 'package:godropme/features/DriverSide/driverHome/pages/driver_requests_sc
 import 'package:godropme/features/DriverSide/driverHome/pages/driver_orders_screen.dart';
 import 'package:godropme/features/DriverSide/driverHome/pages/driver_map_screen.dart';
 import 'package:godropme/features/DriverSide/driverChat/pages/driver_chat_screen.dart';
+import 'package:godropme/features/DriverSide/common_widgets/driver_drawer_controller.dart';
 import 'package:godropme/constants/app_strings.dart';
 
 class DriverHomeScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class DriverHomeScreen extends StatefulWidget {
 
 class _DriverHomeScreenState extends State<DriverHomeScreen> {
   int _currentIndex = 2; // Default to Maps tab
+  late final DriverDrawerController _drawerCtrl;
 
   late final List<Widget> _pages;
 
@@ -29,6 +31,9 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize the shared drawer controller
+    _drawerCtrl = Get.put(DriverDrawerController(), permanent: true);
+    
     // Read optional deep-link argument to select a tab (0..3). Fallback to Maps (2).
     try {
       final args = Get.arguments;
@@ -49,6 +54,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       DriverMapScreen(),
       DriverChatScreen(),
     ];
+  }
+  
+  void _onTabSelected(int index) {
+    // Close drawer when switching tabs
+    _drawerCtrl.close();
+    setState(() => _currentIndex = index);
   }
 
   @override
@@ -75,7 +86,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         ),
         child: NavigationBar(
           selectedIndex: _currentIndex,
-          onDestinationSelected: (i) => setState(() => _currentIndex = i),
+          onDestinationSelected: _onTabSelected,
           surfaceTintColor: Colors.transparent,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: const [

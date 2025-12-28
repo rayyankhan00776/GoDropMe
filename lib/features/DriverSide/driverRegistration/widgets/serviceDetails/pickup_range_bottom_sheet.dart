@@ -71,6 +71,7 @@ class _PickupRangeSheetState extends State<_PickupRangeSheet> {
         final ok = await _ensureLocationPermission();
         if (ok) {
           final pos = await Geolocator.getCurrentPosition(
+            // ignore: deprecated_member_use
             desiredAccuracy: LocationAccuracy.best,
           );
           _center = LatLng(pos.latitude, pos.longitude);
