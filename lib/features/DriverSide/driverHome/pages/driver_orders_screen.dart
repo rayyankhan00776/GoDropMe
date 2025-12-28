@@ -6,6 +6,8 @@ import 'package:godropme/features/DriverSide/driverHome/widgets/driver_order_til
 import 'package:godropme/theme/colors.dart';
 import 'package:godropme/utils/app_typography.dart';
 import 'package:godropme/utils/responsive.dart';
+import 'package:godropme/services/appwrite/chat_service.dart';
+import 'package:godropme/routes.dart';
 
 class DriverOrdersScreen extends StatelessWidget {
   const DriverOrdersScreen({super.key});
@@ -179,14 +181,12 @@ class DriverOrdersScreen extends StatelessWidget {
                       child: ListView.separated(
                         physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: items.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (context, i) {
                           final ord = items[i];
                           return DriverOrderTile(
                             data: ord,
-                            onChat: () {
-                              // TODO: navigate to chat screen with this parent
-                            },
+                            onChat: () => _openChatWithParent(context, ctrl, ord),
                             onPicked: () => ctrl.markPicked(ord.id),
                             onDropped: () => ctrl.markDropped(ord.id),
                             onAbsent: () => ctrl.markAbsent(ord.id),
@@ -202,5 +202,50 @@ class DriverOrdersScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Open chat with parent for a trip order
+  Future<void> _openChatWithParent(BuildContext context, DriverOrdersController ctrl, dynamic order) async {
+    final driverId = ctrl.driverId.value;
+    final parentId = order.parentId;
+    final parentName = order.parentName.isNotEmpty ? order.parentName : 'Parent';
+    
+    if (driverId == null || parentId.isEmpty) {
+      Get.snackbar('Error', 'Unable to start chat. Please try again.');
+      return;
+    }
+
+    // Show loading indicator
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
+
+    try {
+      // Get or create chat room
+      final result = await ChatService.instance.getOrCreateChatRoom(
+        parentId: parentId,
+        driverId: driverId,
+      );
+
+      Get.back(); // Close loading dialog
+
+      if (result.success) {
+        // Navigate to conversation screen
+        Get.toNamed(
+          AppRoutes.driverConversation,
+          arguments: {
+            'contactId': result.chatRoomId,
+            'name': parentName,
+            'avatarUrl': order.avatarUrl,
+          },
+        );
+      } else {
+        Get.snackbar('Error', result.message);
+      }
+    } catch (e) {
+      Get.back(); // Close loading dialog
+      Get.snackbar('Error', 'Failed to start chat. Please try again.');
+    }
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:godropme/features/DriverSide/driverHome/models/driver_order.dart';
@@ -74,8 +73,8 @@ class DriverOrdersController extends GetxController {
   /// Load today's trips from backend
   Future<void> loadTodayTrips() async {
     if (driverId.value == null) {
-      // Fallback to demo data if driver ID not available
-      _loadDemoOrders();
+      // No driver ID - show empty state
+      _allOrders.clear();
       _filterOrdersByWindow();
       return;
     }
@@ -102,15 +101,15 @@ class DriverOrdersController extends GetxController {
         debugPrint('✅ Loaded ${_allOrders.length} trips from backend');
       } else {
         errorMessage.value = result.message;
-        // Fallback to demo data
-        _loadDemoOrders();
+        // Failed to load - show empty state
+        _allOrders.clear();
         _filterOrdersByWindow();
       }
     } catch (e) {
       debugPrint('❌ Load trips error: $e');
       errorMessage.value = 'Failed to load trips';
-      // Fallback to demo data
-      _loadDemoOrders();
+      // Error - show empty state
+      _allOrders.clear();
       _filterOrdersByWindow();
     } finally {
       isLoading.value = false;
@@ -170,44 +169,6 @@ class DriverOrdersController extends GetxController {
     }
 
     return enriched;
-  }
-
-  /// Fallback demo data for development/testing
-  void _loadDemoOrders() {
-    _allOrders.assignAll([
-      DriverOrder(
-        id: 'trip_morning_1',
-        activeServiceId: 'svc_1',
-        parentId: 'parent_1',
-        childId: 'child_1',
-        parentName: 'Sara Ahmed',
-        childName: 'Ali',
-        schoolName: 'Allied School',
-        pickPoint: 'Block A-3, Gulberg',
-        dropPoint: 'Allied School Gate 1',
-        tripDirection: 'home_to_school',
-        tripType: 'morning',
-        status: DriverOrderStatus.scheduled,
-        windowStartTime: '05:00',
-        windowEndTime: '09:00',
-      ),
-      DriverOrder(
-        id: 'trip_afternoon_1',
-        activeServiceId: 'svc_1',
-        parentId: 'parent_1',
-        childId: 'child_1',
-        parentName: 'Sara Ahmed',
-        childName: 'Ali',
-        schoolName: 'Allied School',
-        pickPoint: 'Allied School Gate 1',
-        dropPoint: 'Block A-3, Gulberg',
-        tripDirection: 'school_to_home',
-        tripType: 'afternoon',
-        status: DriverOrderStatus.scheduled,
-        windowStartTime: '11:00',
-        windowEndTime: '15:00',
-      ),
-    ]);
   }
 
   /// Filter orders to show only current window's trips

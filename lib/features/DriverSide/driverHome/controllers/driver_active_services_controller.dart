@@ -44,7 +44,8 @@ class DriverActiveServicesController extends GetxController {
   /// Load active services from backend
   Future<void> loadActiveServices() async {
     if (driverId.value == null) {
-      services.assignAll(DriverActiveService.demo());
+      // No driver ID - show empty state
+      services.clear();
       return;
     }
 
@@ -151,17 +152,19 @@ class DriverActiveServicesController extends GetxController {
         services.assignAll(enrichedServices);
         debugPrint('✅ Loaded ${services.length} active services (enriched)');
       } else {
-        services.assignAll(DriverActiveService.demo());
+        // Failed to load - show empty state
+        services.clear();
       }
     } catch (e) {
       debugPrint('❌ Load active services error: $e');
-      services.assignAll(DriverActiveService.demo());
+      services.clear();
     } finally {
       isLoading.value = false;
     }
   }
 
   /// Refresh services
+  @override
   Future<void> refresh() => loadActiveServices();
 
   /// End an active service

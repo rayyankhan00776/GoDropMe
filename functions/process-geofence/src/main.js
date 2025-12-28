@@ -31,14 +31,20 @@ import { Client, TablesDB, Messaging, ID, Query } from 'node-appwrite';
  */
 
 /**
- * Extract row ID from Tables DB event string
- * Event format: databases.{dbId}.tables.{tableId}.rows.{rowId}.{action}
+ * Extract row/document ID from event string
+ * Supports BOTH:
+ * - Tables DB format: databases.{dbId}.tables.{tableId}.rows.{rowId}.{action}
+ * - Collections format: databases.{dbId}.collections.{collId}.documents.{docId}.{action}
  * @param {string} event - The event string
- * @returns {string|null} - The row ID or null if not found
+ * @returns {string|null} - The row/document ID or null if not found
  */
 function extractRowIdFromEvent(event) {
-    // Match pattern: rows.{rowId}.update or rows.{rowId}.create
-    const match = event.match(/rows\.([^.]+)\.(update|create|delete)/);
+    // Try Tables DB format first: rows.{rowId}.update
+    let match = event.match(/rows\.([^.]+)\.(update|create|delete)/);
+    if (match) return match[1];
+    
+    // Try Collections format: documents.{docId}.update
+    match = event.match(/documents\.([^.]+)\.(update|create|delete)/);
     return match ? match[1] : null;
 }
 
@@ -61,15 +67,19 @@ export default async ({ req, res, log, error }) => {
     log(`[DEBUG] Project ID: ${process.env.APPWRITE_FUNCTION_PROJECT_ID}`);
 
     try {
-        // Parse the event from request headers (Tables DB format)
+        // Parse the event from request headers
         const event = req.headers['x-appwrite-event'] || '';
         log(`[DEBUG] Event: ${event}`);
 
-        // Only process trip update events (Tables DB format)
-        if (!event.includes('tables.trips.rows') || !event.includes('.update')) {
-            log('[INFO] Not a trips table row update event, exiting');
+        // Only process trip update events (supports both Tables DB and Collections formats)
+        const isTablesDBEvent = event.includes('tables.trips.rows') && event.includes('.update');
+        const isCollectionsEvent = event.includes('collections.trips.documents') && event.includes('.update');
+        
+        if (!isTablesDBEvent && !isCollectionsEvent) {
+            log('[INFO] Not a trips update event, exiting');
             return res.json({ skipped: true, reason: 'Not a trips update event' });
         }
+        log(`[DEBUG] Event format: ${isTablesDBEvent ? 'TablesDB' : 'Collections'}`);
 
         // Extract row ID from event (Tables DB doesn't send body data)
         const tripId = extractRowIdFromEvent(event);

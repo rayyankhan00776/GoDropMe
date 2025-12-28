@@ -53,7 +53,7 @@
             "name": "match-drivers",
             "enabled": true,
             "logging": true,
-            "runtime": "node-18.0",
+            "runtime": "node-22",
             "scopes": [
                 "databases.read",
                 "databases.write",
@@ -80,11 +80,29 @@
             "name": "generate-morning-trips",
             "enabled": true,
             "logging": true,
-            "runtime": "node-18.0",
+            "runtime": "node-22",
             "scopes": [
                 "databases.read",
                 "databases.write",
+                "policies.read",
+                "policies.write",
+                "archives.read",
+                "archives.write",
+                "restorations.read",
+                "restorations.write",
+                "tables.read",
+                "collections.read",
+                "tables.write",
+                "collections.write",
+                "columns.read",
+                "attributes.read",
+                "columns.write",
+                "attributes.write",
+                "indexes.read",
+                "indexes.write",
+                "rows.read",
                 "documents.read",
+                "rows.write",
                 "documents.write"
             ],
             "events": [],
@@ -101,7 +119,7 @@
             "name": "generate-afternoon-trips",
             "enabled": true,
             "logging": true,
-            "runtime": "node-18.0",
+            "runtime": "node-22",
             "scopes": [
                 "databases.read",
                 "databases.write",
@@ -122,10 +140,10 @@
             "name": "process-geofence",
             "enabled": true,
             "logging": true,
-            "runtime": "node-18.0",
+            "runtime": "node-22",
             "scopes": [],
             "events": [
-                "databases.godropme_db.tables.trips.rows.*.update"
+                "databases.godropme_db.collections.trips.documents.*.update"
             ],
             "schedule": "",
             "timeout": 15,
@@ -140,18 +158,18 @@
             "name": "notify-service-request",
             "enabled": true,
             "logging": true,
-            "runtime": "node-18.0",
+            "runtime": "node-22",
             "scopes": [],
             "events": [
-                "databases.godropme_db.tables.service_requests.rows.*.create",
-                "databases.godropme_db.tables.service_requests.rows.*.update"
+                "databases.godropme_db.collections.service_requests.documents.*.create",
+                "databases.godropme_db.collections.service_requests.documents.*.update"
             ],
             "schedule": "",
             "timeout": 15,
             "entrypoint": "src/main.js",
             "commands": "",
             "specification": "s-0.5vcpu-512mb",
-            "path": "functions/Notify Service Request"
+            "path": "functions/notify-service-request"
         },
         {
             "$id": "notify-trip-status",
@@ -159,17 +177,53 @@
             "name": "notify-trip-status",
             "enabled": true,
             "logging": true,
-            "runtime": "node-18.0",
+            "runtime": "node-22",
             "scopes": [],
             "events": [
-                "databases.godropme_db.tables.trips.rows.*.update"
+                "databases.godropme_db.collections.trips.documents.*.update"
             ],
             "schedule": "",
             "timeout": 15,
             "entrypoint": "src/main.js",
             "commands": "",
             "specification": "s-0.5vcpu-512mb",
-            "path": "functions/Notify Trip Status"
+            "path": "functions/notify-trip-status"
+        },
+        {
+            "$id": "notify-application-status",
+            "execute": [],
+            "name": "notify-application-status",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
+            "scopes": [],
+            "events": [
+                "databases.godropme_db.collections.users.documents.*.update"
+            ],
+            "schedule": "",
+            "timeout": 15,
+            "entrypoint": "src/main.js",
+            "commands": "",
+            "specification": "s-0.5vcpu-512mb",
+            "path": "functions/notify-application-status"
+        },
+        {
+            "$id": "notify-new-message",
+            "execute": [],
+            "name": "notify-new-message",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
+            "scopes": [],
+            "events": [
+                "databases.godropme_db.collections.messages.documents.*.create"
+            ],
+            "schedule": "",
+            "timeout": 15,
+            "entrypoint": "src/main.js",
+            "commands": "",
+            "specification": "s-0.5vcpu-512mb",
+            "path": "functions/notify-new-message"
         }
     ],
     "tablesDB": [

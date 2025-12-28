@@ -133,7 +133,7 @@ class _DriverListingTileState extends State<DriverListingTile> {
                               child: Text(
                                 d.vehicle.isNotEmpty 
                                     ? d.vehicle
-                                    : '${d.type}',
+                                    : d.type,
                                 style: AppTypography.optionTerms.copyWith(
                                   color: AppColors.darkGray,
                                   fontSize: 13,
@@ -223,8 +223,7 @@ class _DriverListingTileState extends State<DriverListingTile> {
                           } else {
                             Get.snackbar(
                               'Request',
-                              'Request cancelled (demo)',
-                              snackPosition: SnackPosition.BOTTOM,
+                              'Request cancelled',
                               backgroundColor: Colors.black.withValues(
                                 alpha: 0.85,
                               ),
@@ -265,7 +264,6 @@ class _DriverListingTileState extends State<DriverListingTile> {
     Get.snackbar(
       'Request Sent',
       'Your request has been sent to ${d.name}',
-      snackPosition: SnackPosition.BOTTOM,
       backgroundColor: AppColors.primary,
       colorText: Colors.white,
       margin: const EdgeInsets.all(12),

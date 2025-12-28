@@ -9,6 +9,8 @@ import 'package:godropme/services/appwrite/parent_service.dart';
 import 'package:godropme/services/appwrite/child_service.dart';
 import 'package:godropme/utils/schools_loader.dart';
 import 'package:flutter/foundation.dart';
+import 'package:godropme/features/parentSide/parentChat/controllers/parent_chat_controller.dart';
+import 'package:godropme/features/parentSide/parentProfile/controllers/parent_profile_controller.dart';
 
 /// Controller for Parent Home/Map screen with real-time trip tracking.
 class ParentMapController extends GetxController {
@@ -38,12 +40,48 @@ class ParentMapController extends GetxController {
   void onInit() {
     super.onInit();
     loadActiveTrips();
+    _preloadChatRooms();
   }
 
   @override
   void onClose() {
     _trackingService.unsubscribe();
     super.onClose();
+  }
+
+  /// Preload chat rooms in background for faster chat screen loading
+  Future<void> _preloadChatRooms() async {
+    try {
+      // Wait a bit for profile to load first
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // Ensure parent profile is loaded
+      if (Get.isRegistered<ParentProfileController>()) {
+        final profileCtrl = Get.find<ParentProfileController>();
+        // Wait for profile to finish loading if in progress
+        while (profileCtrl.isLoading.value) {
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+        // If parentId still null, try loading profile
+        if (profileCtrl.parentId == null) {
+          await profileCtrl.loadProfile();
+        }
+      }
+      
+      // Now create chat controller
+      if (!Get.isRegistered<ParentChatController>()) {
+        Get.put(ParentChatController(), permanent: true);
+        debugPrint('✅ Chat rooms preloaded for parent');
+      } else {
+        // If already registered but has no data, refresh
+        final chatCtrl = Get.find<ParentChatController>();
+        if (chatCtrl.contacts.isEmpty && chatCtrl.parentId == null) {
+          await chatCtrl.refreshChatRooms();
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Chat preload failed (non-critical): $e');
+    }
   }
 
   void setMapReady(bool v) => isMapReady.value = v;
@@ -364,7 +402,6 @@ class ParentMapController extends GetxController {
         Get.snackbar(
           'Location Services Disabled',
           'Please enable location services',
-          snackPosition: SnackPosition.BOTTOM,
         );
         return null;
       }
@@ -377,7 +414,6 @@ class ParentMapController extends GetxController {
           Get.snackbar(
             'Permission Denied',
             'Location permission is required',
-            snackPosition: SnackPosition.BOTTOM,
           );
           return null;
         }
@@ -387,13 +423,13 @@ class ParentMapController extends GetxController {
         Get.snackbar(
           'Permission Denied',
           'Please enable location permission in settings',
-          snackPosition: SnackPosition.BOTTOM,
         );
         return null;
       }
 
       // Get current position
       Position position = await Geolocator.getCurrentPosition(
+        // ignore: deprecated_member_use
         desiredAccuracy: LocationAccuracy.high,
       );
       
@@ -403,7 +439,6 @@ class ParentMapController extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to get location: $e',
-        snackPosition: SnackPosition.BOTTOM,
       );
       return null;
     } finally {

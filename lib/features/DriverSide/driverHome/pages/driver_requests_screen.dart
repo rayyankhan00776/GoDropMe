@@ -56,7 +56,7 @@ class DriverRequestsScreen extends StatelessWidget {
                       child: ListView.separated(
                         physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: items.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (context, i) {
                           final req = items[i];
                           return DriverRequestTile(

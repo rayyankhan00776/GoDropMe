@@ -67,7 +67,9 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
       Position? pos;
       try {
         pos = await Geolocator.getCurrentPosition(
+          // ignore: deprecated_member_use
           desiredAccuracy: LocationAccuracy.high,
+          // ignore: deprecated_member_use
           timeLimit: const Duration(seconds: 8),
         );
       } on TimeoutException {

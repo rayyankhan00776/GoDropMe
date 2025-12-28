@@ -10,6 +10,8 @@ import 'package:godropme/features/parentSide/findDrivers/widgets/active_service_
 import 'package:godropme/features/parentSide/findDrivers/models/active_service.dart';
 import 'package:godropme/features/parentSide/findDrivers/controllers/find_drivers_controller.dart';
 import 'package:godropme/common_widgets/appwrite_image.dart';
+import 'package:godropme/services/appwrite/chat_service.dart';
+import 'package:godropme/routes.dart';
 
 class FindDriversScreen extends StatefulWidget {
   const FindDriversScreen({super.key});
@@ -423,7 +425,7 @@ class _FindDriversScreenState extends State<FindDriversScreen> {
         onRefresh: _controller.loadAvailableDrivers,
         child: ListView.separated(
           itemCount: _controller.availableDrivers.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          separatorBuilder: (_, _) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
             final driver = _controller.availableDrivers[index];
             return DriverListingTile(
@@ -471,7 +473,7 @@ class _FindDriversScreenState extends State<FindDriversScreen> {
         onRefresh: _controller.loadPendingRequests,
         child: ListView.separated(
           itemCount: _controller.pendingRequests.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          separatorBuilder: (_, _) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
             final request = _controller.pendingRequests[index];
             final listing = _requestToListing(request);
@@ -525,17 +527,60 @@ class _FindDriversScreenState extends State<FindDriversScreen> {
         onRefresh: _controller.loadActiveServices,
         child: ListView.separated(
           itemCount: _controller.activeServices.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          separatorBuilder: (_, _) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
             final service = _controller.activeServices[index];
             return ActiveServiceTile(
               data: service,
               onEndService: () => _showEndServiceDialog(service),
+              onChat: () => _openChatWithDriver(service),
             );
           },
         ),
       );
     });
+  }
+
+  /// Open chat with driver for an active service
+  Future<void> _openChatWithDriver(ActiveService service) async {
+    final parentId = _controller.parentId.value;
+    if (parentId == null) {
+      Get.snackbar('Error', 'Unable to start chat. Please try again.');
+      return;
+    }
+
+    // Show loading indicator
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
+
+    try {
+      // Get or create chat room
+      final result = await ChatService.instance.getOrCreateChatRoom(
+        parentId: parentId,
+        driverId: service.driverId,
+      );
+
+      Get.back(); // Close loading dialog
+
+      if (result.success) {
+        // Navigate to conversation screen
+        Get.toNamed(
+          AppRoutes.parentConversation,
+          arguments: {
+            'contactId': result.chatRoomId,
+            'name': service.driverName,
+            'avatarUrl': service.driverPhotoUrl,
+          },
+        );
+      } else {
+        Get.snackbar('Error', result.message);
+      }
+    } catch (e) {
+      Get.back(); // Close loading dialog
+      Get.snackbar('Error', 'Failed to start chat. Please try again.');
+    }
   }
 
   Future<void> _handleSendRequest(DriverListing driver) async {

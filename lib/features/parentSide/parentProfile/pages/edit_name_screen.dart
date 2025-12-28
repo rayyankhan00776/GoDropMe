@@ -65,7 +65,6 @@ class _EditNameScreenState extends State<EditNameScreen> {
       Get.snackbar(
         'Success',
         'Name updated successfully',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppColors.primary.withValues(alpha: 0.9),
         colorText: Colors.white,
         margin: const EdgeInsets.all(16),

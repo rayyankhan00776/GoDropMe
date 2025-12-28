@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -18,7 +19,6 @@ import 'package:godropme/routes.dart';
 /// - Register FCM token with Appwrite Messaging
 /// - Handle foreground, background, and terminated push notifications
 /// - Display local notifications for geofence events
-/// - Subscribe to Appwrite Realtime for live notification updates
 /// - CRUD operations for notifications table
 /// - Navigate to appropriate screen on notification tap
 class NotificationService {
@@ -28,7 +28,6 @@ class NotificationService {
 
   final TablesDB _tablesDB = AppwriteClient.tablesDBService();
   final Messaging _messaging = AppwriteClient.messagingService();
-  final Realtime _realtime = AppwriteClient.realtimeService();
   final _authService = AuthService.instance;
 
   // Firebase Messaging instance
@@ -37,12 +36,6 @@ class NotificationService {
   // Local Notifications plugin
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
-
-  // Realtime subscription
-  RealtimeSubscription? _notificationSubscription;
-
-  // Callback for new notifications (used by UI to update badge count)
-  Function(Map<String, dynamic>)? onNotificationReceived;
 
   // Unread count observable for badge
   final RxInt unreadCount = 0.obs;
@@ -106,111 +99,7 @@ class NotificationService {
     }
   }
 
-  /// Start app-wide realtime subscription for notifications
-  /// 
-  /// Call this after successful login or session restore to enable
-  /// live notification updates throughout the app (not just on notification pages).
-  /// 
-  /// ```dart
-  /// // After login or session restore
-  /// await NotificationService.instance.registerForPushNotifications();
-  /// NotificationService.instance.startRealtimeSubscription();
-  /// ```
-  /// 
-  /// This creates a persistent subscription to the notifications collection
-  /// that:
-  /// - Shows local notifications when new notifications arrive
-  /// - Updates the unread count badge
-  /// - Triggers callbacks for any registered listeners
-  void startRealtimeSubscription() {
-    try {
-      final user = _authService.currentUser;
-      if (user == null) {
-        debugPrint('⚠️ Cannot start realtime subscription: no user logged in');
-        return;
-      }
 
-      // Don't create duplicate subscriptions
-      if (_notificationSubscription != null) {
-        debugPrint('ℹ️ Realtime subscription already active');
-        return;
-      }
-
-      // Subscribe to notifications collection changes
-      final channel =
-          'databases.${AppwriteConfig.databaseId}.collections.${Collections.notifications}.documents';
-
-      _notificationSubscription = _realtime.subscribe([channel]);
-
-      _notificationSubscription!.stream.listen((event) {
-        debugPrint('📨 [Global] Realtime notification event: ${event.events}');
-
-        // Check if it's a create event for current user
-        if (event.events.any((e) => e.contains('.create'))) {
-          final eventPayload = event.payload;
-
-          // Check if it's for current user
-          if (eventPayload['userId'] == user.$id) {
-            debugPrint('🔔 New notification received via Realtime');
-            
-            // Parse payload JSON if exists
-            Map<String, dynamic>? parsedData;
-            if (eventPayload['payload'] != null &&
-                eventPayload['payload'].toString().isNotEmpty) {
-              try {
-                parsedData = jsonDecode(eventPayload['payload'] as String);
-              } catch (_) {}
-            }
-
-            final notification = {
-              'id': eventPayload['\$id'],
-              'userId': eventPayload['userId'],
-              'targetRole': eventPayload['targetRole'],
-              'title': eventPayload['title'],
-              'body': eventPayload['body'],
-              'type': eventPayload['type'],
-              'data': parsedData,
-              'isRead': eventPayload['isRead'] ?? false,
-              'createdAt': eventPayload['\$createdAt'],
-            };
-
-            // Update unread count
-            refreshUnreadCount();
-
-            // Show local notification (app may be in background)
-            _showLocalNotification(
-              title: notification['title'] as String,
-              body: notification['body'] as String,
-              payload: {
-                'type': notification['type'],
-                'notificationId': notification['id'],
-                ...?parsedData,
-              },
-            );
-
-            // Notify any registered callbacks (e.g., notification page if open)
-            if (onNotificationReceived != null) {
-              onNotificationReceived!(notification);
-            }
-          }
-        }
-      });
-
-      debugPrint('✅ Global realtime subscription started for user: ${user.$id}');
-    } catch (e) {
-      debugPrint('❌ Start realtime subscription error: $e');
-    }
-  }
-
-  /// Stop app-wide realtime subscription
-  /// 
-  /// Call this when user logs out to clean up subscription
-  void stopRealtimeSubscription() {
-    _notificationSubscription?.close();
-    _notificationSubscription = null;
-    onNotificationReceived = null;
-    debugPrint('✅ Global realtime subscription stopped');
-  }
 
   /// Initialize local notifications plugin
   Future<void> _initializeLocalNotifications() async {
@@ -243,34 +132,49 @@ class NotificationService {
   }
 
   /// Create Android notification channels
+  /// 
+  /// IMPORTANT: Channel settings (including importance) are LOCKED once created.
+  /// If heads-up notifications don't work, user should uninstall and reinstall the app
+  /// to recreate channels with the correct importance level.
   Future<void> _createAndroidChannels() async {
     const tripChannel = AndroidNotificationChannel(
       'trip_updates',
       'Trip Updates',
       description: 'Notifications about trip status and driver location',
-      importance: Importance.high,
+      importance: Importance.max,  // MAX for heads-up notifications
       sound: RawResourceAndroidNotificationSound('notification'),
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
     );
 
     const serviceChannel = AndroidNotificationChannel(
       'service_requests',
       'Service Requests',
       description: 'Notifications about service requests and acceptances',
-      importance: Importance.high,
+      importance: Importance.max,  // MAX for heads-up notifications
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
     );
 
     const messageChannel = AndroidNotificationChannel(
       'messages',
       'Messages',
       description: 'New chat messages',
-      importance: Importance.high,
+      importance: Importance.max,  // MAX for heads-up notifications
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
     );
 
     const systemChannel = AndroidNotificationChannel(
       'system',
       'System Notifications',
       description: 'System announcements and alerts',
-      importance: Importance.defaultImportance,
+      importance: Importance.high,  // High for system notifications
+      playSound: true,
+      enableVibration: true,
     );
 
     await _localNotifications
@@ -602,19 +506,27 @@ class NotificationService {
     debugPrint('   Body: ${message.notification?.body}');
     debugPrint('   Data: ${message.data}');
 
+    // Skip empty/null notifications (sometimes FCM sends empty pings)
+    final title = message.notification?.title;
+    final body = message.notification?.body;
+    if ((title == null || title.isEmpty) && 
+        (body == null || body.isEmpty) && 
+        message.data.isEmpty) {
+      debugPrint('   ⚠️ Skipping empty notification');
+      return;
+    }
+
     // Show local notification
     await _showLocalNotification(
-      title: message.notification?.title ?? 'New Notification',
-      body: message.notification?.body ?? '',
+      title: title ?? 'New Notification',
+      body: body ?? '',
       payload: message.data,
     );
 
     // Save to database if not already saved
     if (message.data.containsKey('notificationId')) {
-      // Already saved by backend, just notify UI
-      if (onNotificationReceived != null) {
-        onNotificationReceived!(message.data);
-      }
+      // Already saved by backend
+      debugPrint('   ℹ️ Notification already saved by backend');
     } else {
       // Save to database
       await _saveNotificationFromFCM(message);
@@ -648,9 +560,6 @@ class NotificationService {
 
       if (result.success) {
         await refreshUnreadCount();
-        if (onNotificationReceived != null) {
-          onNotificationReceived!(result.notification!);
-        }
       }
     } catch (e) {
       debugPrint('❌ Save FCM notification error: $e');
@@ -704,6 +613,9 @@ class NotificationService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   /// Show a local notification
+  /// 
+  /// Uses Importance.max and Priority.max to ensure heads-up (overlay) display.
+  /// Per Android docs: https://developer.android.com/guide/topics/ui/notifiers/notifications.html#Heads-up
   Future<void> _showLocalNotification({
     required String title,
     required String body,
@@ -713,14 +625,23 @@ class NotificationService {
     final channelId = _getChannelId(type);
     final channelName = _getChannelName(channelId);
 
+    // Strong vibration pattern: [delay, vibrate, pause, vibrate, pause, vibrate]
+    // Similar to FCM default vibration
+    final vibrationPattern = Int64List.fromList([0, 500, 200, 500, 200, 500]);
+
     final androidDetails = AndroidNotificationDetails(
       channelId,
       channelName,
       channelDescription: 'GoDropMe notifications',
-      importance: Importance.high,
-      priority: Priority.high,
+      importance: Importance.max,  // MAX importance for heads-up
+      priority: Priority.max,      // MAX priority for heads-up
       showWhen: true,
       icon: '@mipmap/ic_launcher',
+      playSound: true,
+      enableVibration: true,
+      vibrationPattern: vibrationPattern,
+      category: AndroidNotificationCategory.message,
+      visibility: NotificationVisibility.public,
     );
 
     const iosDetails = DarwinNotificationDetails(
@@ -797,9 +718,17 @@ class NotificationService {
   /// Handle notification tap (local notifications)
   void _onNotificationTapped(NotificationResponse response) {
     if (response.payload != null) {
-      // Parse payload and navigate
       debugPrint('🔔 Local notification tapped: ${response.payload}');
-      // TODO: Parse payload and navigate appropriately
+      try {
+        // Parse the JSON payload
+        final data = jsonDecode(response.payload!) as Map<String, dynamic>;
+        // Use the existing navigation handler
+        _handleNotificationTap(data);
+      } catch (e) {
+        debugPrint('❌ Error parsing notification payload: $e');
+        // Fallback: navigate to notifications screen
+        Get.toNamed(AppRoutes.parentNotifications);
+      }
     }
   }
 
@@ -889,51 +818,35 @@ class NotificationService {
 
       debugPrint('📬 getUserNotifications: Fetching for user $targetUserId');
 
-      // Fetch all and filter locally (REST API query issues)
-      late final result;
+      // Build queries for server-side filtering
+      final queries = <String>[
+        Query.equal('userId', targetUserId),  // Filter by userId on server (indexed)
+        Query.orderDesc('\$createdAt'),       // Newest first
+        Query.limit(limit),                   // Apply limit on server
+      ];
+
+      // Add isRead filter if specified
+      if (isRead != null) {
+        queries.add(Query.equal('isRead', isRead));
+      }
+
+      late final RowList result;
       try {
         result = await _tablesDB.listRows(
           databaseId: AppwriteConfig.databaseId,
           tableId: Collections.notifications,
+          queries: queries,
         );
       } catch (listError) {
         debugPrint('❌ listRows error: $listError');
         return NotificationListResult.failure('Failed to fetch notifications');
       }
 
-      debugPrint('📬 Fetched ${result.rows.length} total notifications');
-
-      // Filter by userId - now works correctly since column renamed from 'data' to 'payload'
-      var filtered = result.rows.where((row) {
-        return row.data['userId'] == targetUserId;
-      }).toList();
-
-      debugPrint(
-        '📬 Filtered to ${filtered.length} notifications for user: $targetUserId',
-      );
-
-      // Filter by isRead if specified
-      if (isRead != null) {
-        filtered = filtered.where((row) {
-          return row.data['isRead'] == isRead;
-        }).toList();
-      }
-
-      // Sort by createdAt descending
-      filtered.sort((a, b) {
-        final aTime = DateTime.parse(a.$createdAt);
-        final bTime = DateTime.parse(b.$createdAt);
-        return bTime.compareTo(aTime);
-      });
-
-      // Apply limit
-      if (filtered.length > limit) {
-        filtered = filtered.sublist(0, limit);
-      }
+      debugPrint('📬 Fetched ${result.rows.length} notifications for user: $targetUserId');
 
       // Build notification objects with parsed payload
       final notifications = <Map<String, dynamic>>[];
-      for (final row in filtered) {
+      for (final row in result.rows) {
         try {
           Map<String, dynamic>? parsedData;
           final payload = row.data['payload'];
@@ -1082,100 +995,6 @@ class NotificationService {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // REALTIME SUBSCRIPTIONS
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  /// Subscribe to real-time notifications for current user
-  ///
-  /// ```dart
-  /// NotificationService.instance.subscribeToNotifications(
-  ///   onNotification: (notification) {
-  ///     print('New notification: ${notification['title']}');
-  ///   },
-  /// );
-  /// ```
-  void subscribeToNotifications({
-    required Function(Map<String, dynamic>) onNotification,
-  }) {
-    try {
-      final user = _authService.currentUser;
-      if (user == null) {
-        debugPrint('⚠️ Cannot subscribe: no user logged in');
-        return;
-      }
-
-      // Subscribe to notifications collection changes
-      final channel =
-          'databases.${AppwriteConfig.databaseId}.collections.${Collections.notifications}.documents';
-
-      _notificationSubscription = _realtime.subscribe([channel]);
-
-      _notificationSubscription!.stream.listen((event) {
-        debugPrint('📨 Realtime notification event: ${event.events}');
-
-        // Check if it's a create event
-        if (event.events.any((e) => e.contains('.create'))) {
-          final eventPayload = event.payload;
-
-          // Check if it's for current user
-          if (eventPayload['userId'] == user.$id) {
-            // Parse payload JSON if exists (column renamed from 'data' to 'payload')
-            Map<String, dynamic>? parsedData;
-            if (eventPayload['payload'] != null &&
-                eventPayload['payload'].toString().isNotEmpty) {
-              try {
-                parsedData = jsonDecode(eventPayload['payload'] as String);
-              } catch (_) {}
-            }
-
-            final notification = {
-              'id': eventPayload['\$id'],
-              'userId': eventPayload['userId'],
-              'targetRole': eventPayload['targetRole'],
-              'title': eventPayload['title'],
-              'body': eventPayload['body'],
-              'type': eventPayload['type'],
-              'data': parsedData,
-              'isRead': eventPayload['isRead'] ?? false,
-              'createdAt': eventPayload['\$createdAt'],
-            };
-
-            // Update unread count
-            refreshUnreadCount();
-
-            // Show local notification
-            _showLocalNotification(
-              title: notification['title'] as String,
-              body: notification['body'] as String,
-              payload: {
-                'type': notification['type'],
-                'notificationId': notification['id'],
-              },
-            );
-
-            // Notify callback
-            onNotification(notification);
-          }
-        }
-      });
-
-      // Store callback for FCM messages too
-      onNotificationReceived = onNotification;
-
-      debugPrint('✅ Subscribed to notifications for user: ${user.$id}');
-    } catch (e) {
-      debugPrint('❌ Subscribe to notifications error: $e');
-    }
-  }
-
-  /// Unsubscribe from notifications
-  void unsubscribe() {
-    _notificationSubscription?.close();
-    _notificationSubscription = null;
-    debugPrint('✅ Unsubscribed from notifications');
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
   // APPWRITE MESSAGING - SUBSCRIBER MANAGEMENT
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1261,20 +1080,21 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   debugPrint('   Body: ${message.notification?.body}');
   debugPrint('   Data: ${message.data}');
 
-  // If there's a notification payload, the system will show it automatically
-  // for "notification" messages. For "data-only" messages, we show manually.
-  if (message.notification == null && message.data.isNotEmpty) {
-    // Data-only message - show local notification manually
-    await _showBackgroundLocalNotification(
-      title: message.data['title'] ?? 'New Notification',
-      body: message.data['body'] ?? '',
-      payload: message.data,
-    );
-  } else if (message.notification != null) {
-    // Notification message - system handles display on Android
-    // But on iOS in background, we might need to show it
-    debugPrint('   ✅ System will display notification automatically');
+  // Skip empty/null notifications (sometimes FCM sends empty pings)
+  final title = message.notification?.title ?? message.data['title'];
+  final body = message.notification?.body ?? message.data['body'];
+  if ((title == null || title.isEmpty) && 
+      (body == null || body.isEmpty) && 
+      message.data.isEmpty) {
+    debugPrint('   ⚠️ Skipping empty background notification');
+    return;
   }
+  
+  await _showBackgroundLocalNotification(
+    title: title ?? 'New Notification',
+    body: body ?? '',
+    payload: message.data,
+  );
 }
 
 /// Show local notification from background handler
@@ -1305,7 +1125,7 @@ Future<void> _showBackgroundLocalNotification({
     // Determine channel based on notification type
     final type = payload?['type'] as String? ?? 'system';
     String channelId = 'system';
-    String channelName = 'System';
+    String channelName = 'System Notifications';
 
     if (type.contains('trip') || type.contains('arrived') || 
         type.contains('picked') || type.contains('dropped')) {
@@ -1319,14 +1139,22 @@ Future<void> _showBackgroundLocalNotification({
       channelName = 'Messages';
     }
 
+    // Strong vibration pattern: [delay, vibrate, pause, vibrate, pause, vibrate]
+    final vibrationPattern = Int64List.fromList([0, 500, 200, 500, 200, 500]);
+
     final androidDetails = AndroidNotificationDetails(
       channelId,
       channelName,
       channelDescription: 'GoDropMe notifications',
-      importance: Importance.high,
-      priority: Priority.high,
+      importance: Importance.max,   // MAX importance for heads-up
+      priority: Priority.max,       // MAX priority for heads-up
       showWhen: true,
       icon: '@mipmap/ic_launcher',
+      playSound: true,
+      enableVibration: true,
+      vibrationPattern: vibrationPattern,
+      category: AndroidNotificationCategory.message,
+      visibility: NotificationVisibility.public,
     );
 
     const iosDetails = DarwinNotificationDetails(
@@ -1348,7 +1176,7 @@ Future<void> _showBackgroundLocalNotification({
       payload: payload != null ? jsonEncode(payload) : null,
     );
 
-    debugPrint('   ✅ Background local notification shown');
+    debugPrint('   ✅ Background local notification shown (heads-up)');
   } catch (e) {
     debugPrint('   ❌ Background notification error: $e');
   }

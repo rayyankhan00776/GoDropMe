@@ -1,7 +1,6 @@
 /// Appwrite Database Constants for GoDropMe
 ///
 /// Contains all collection IDs, bucket IDs, and database configuration.
-/// Reference: docs/TODO.md for full schema documentation.
 library;
 
 /// Appwrite Cloud Configuration

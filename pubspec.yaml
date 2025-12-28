@@ -51,6 +51,7 @@ dependencies:
   firebase_analytics: ^12.0.4
   flutter_local_notifications: ^19.5.0
   flutter_cache_manager: ^3.4.1
+  path: ^1.9.1
 
   # Product Specific Packages
   # add to be when needed

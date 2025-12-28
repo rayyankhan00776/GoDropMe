@@ -176,25 +176,53 @@ class DriverOrderTile extends StatelessWidget {
                 ),
               ],
             ),
-            // Second row: Absent button (only show if callback provided and not finalized/picked)
-            if (onAbsent != null && !hideAbsent) ...[
+            // Second row: Absent button or "Marked Absent" indicator
+            if (onAbsent != null) ...[
               const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: onAbsent,
-                  icon: const Icon(Icons.person_off_outlined, size: 18),
-                  label: const Text('Mark Absent'),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.grey),
-                    foregroundColor: Colors.grey.shade700,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              if (absent) ...[
+                // Show "Marked Absent" indicator when trip is already absent
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.person_off, size: 18, color: Colors.red.shade700),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Marked Absent',
+                        style: TextStyle(
+                          color: Colors.red.shade700,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else if (!hideAbsent) ...[
+                // Show "Mark Absent" button only if not finalized/picked
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: onAbsent,
+                    icon: const Icon(Icons.person_off_outlined, size: 18),
+                    label: const Text('Mark Absent'),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.grey),
+                      foregroundColor: Colors.grey.shade700,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ],
           ],
         ),

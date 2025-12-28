@@ -9,7 +9,6 @@ void showLocationSnack(
   Get.snackbar(
     'Notice',
     msg,
-    snackPosition: SnackPosition.BOTTOM,
     backgroundColor: Colors.black.withValues(alpha: 0.85),
     colorText: Colors.white,
     margin: const EdgeInsets.all(12),

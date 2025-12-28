@@ -46,8 +46,8 @@ class DriverRequestsController extends GetxController {
   /// Load pending requests from backend
   Future<void> loadRequests() async {
     if (driverId.value == null) {
-      // Fallback to demo data if driver ID not available
-      requests.assignAll(DriverRequest.demo());
+      // No driver ID - show empty state
+      requests.clear();
       return;
     }
 
@@ -124,18 +124,19 @@ class DriverRequestsController extends GetxController {
         requests.assignAll(enrichedRequests);
         debugPrint('✅ Loaded ${requests.length} pending requests (enriched)');
       } else {
-        // Fallback to demo data
-        requests.assignAll(DriverRequest.demo());
+        // Failed to load - show empty state
+        requests.clear();
       }
     } catch (e) {
       debugPrint('❌ Load requests error: $e');
-      requests.assignAll(DriverRequest.demo());
+      requests.clear();
     } finally {
       isLoading.value = false;
     }
   }
 
   /// Refresh requests
+  @override
   Future<void> refresh() => loadRequests();
 
   Future<void> accept(String id, {double? monthlyFee}) async {

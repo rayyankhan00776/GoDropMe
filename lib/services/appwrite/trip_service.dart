@@ -121,6 +121,49 @@ class TripService {
     }
   }
 
+  /// Get today's trips for a specific child
+  /// 
+  /// Returns all trips for today where childId matches.
+  /// Useful for marking a child absent for the day.
+  Future<TripListResult> getChildTodayTrips({
+    required String childId,
+    String? status,
+  }) async {
+    try {
+      final now = DateTime.now();
+      final todayStart = DateTime(now.year, now.month, now.day);
+      final tomorrowStart = todayStart.add(const Duration(days: 1));
+
+      final queries = <String>[
+        Query.equal('childId', childId),
+        Query.greaterThanEqual('scheduledDate', todayStart.toIso8601String()),
+        Query.lessThan('scheduledDate', tomorrowStart.toIso8601String()),
+        Query.orderAsc('windowStartTime'),
+      ];
+
+      if (status != null) {
+        queries.add(Query.equal('status', status));
+      }
+
+      final result = await _tablesDB.listRows(
+        databaseId: AppwriteConfig.databaseId,
+        tableId: Collections.trips,
+        queries: queries,
+      );
+
+      return TripListResult.success(
+        trips: result.rows.map((row) => {'id': row.$id, ...row.data}).toList(),
+        total: result.total,
+      );
+    } on AppwriteException catch (e) {
+      debugPrint('❌ Get child trips error: ${e.message}');
+      return TripListResult.failure(_parseError(e));
+    } catch (e) {
+      debugPrint('❌ Get child trips error: $e');
+      return TripListResult.failure('Failed to get trips');
+    }
+  }
+
   /// Get a single trip by ID
   Future<TripResult> getTrip(String tripId) async {
     try {

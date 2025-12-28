@@ -12,8 +12,6 @@ class DriverNotificationsController extends GetxController {
   void onInit() {
     super.onInit();
     loadNotifications();
-    // Subscribe to realtime notifications
-    _subscribeToNotifications();
   }
 
   /// Load notifications from backend
@@ -40,18 +38,6 @@ class DriverNotificationsController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-
-  /// Subscribe to realtime notification updates
-  void _subscribeToNotifications() {
-    NotificationService.instance.subscribeToNotifications(
-      onNotification: (data) {
-        // Add new notification to top of list
-        final item = DriverNotificationItem.fromJson(data);
-        notifications.insert(0, item);
-        debugPrint('📨 New notification received: ${item.title}');
-      },
-    );
   }
 
   /// Mark notification as read
@@ -102,11 +88,6 @@ class DriverNotificationsController extends GetxController {
   }
 
   /// Refresh notifications
-  Future<void> refresh() => loadNotifications();
-
   @override
-  void onClose() {
-    NotificationService.instance.unsubscribe();
-    super.onClose();
-  }
+  Future<void> refresh() => loadNotifications();
 }

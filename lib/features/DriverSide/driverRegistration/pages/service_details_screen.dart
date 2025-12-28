@@ -198,7 +198,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             Get.snackbar(
                               'Registration Failed',
                               result.message ?? 'Please try again',
-                              snackPosition: SnackPosition.BOTTOM,
                               backgroundColor: Colors.red.shade100,
                               colorText: Colors.red.shade900,
                               duration: const Duration(seconds: 4),
@@ -213,7 +212,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           Get.snackbar(
                             'Error',
                             'Something went wrong. Please try again.',
-                            snackPosition: SnackPosition.BOTTOM,
                             backgroundColor: Colors.red.shade100,
                             colorText: Colors.red.shade900,
                           );

@@ -1,0 +1,10 @@
+{
+  "name": "notify-new-message",
+  "version": "1.0.0",
+  "description": "Notify parent or driver when they receive a new chat message",
+  "main": "src/main.js",
+  "type": "module",
+  "dependencies": {
+    "node-appwrite": "^21.0.0"
+  }
+}

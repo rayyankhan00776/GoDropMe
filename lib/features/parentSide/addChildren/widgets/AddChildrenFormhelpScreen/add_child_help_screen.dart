@@ -88,12 +88,12 @@ class _AddChildHelpScreenState extends State<AddChildHelpScreen> {
         Get.snackbar(
           'Saved Offline',
           'Changes saved locally. Will sync when online.',
-          snackPosition: SnackPosition.BOTTOM,
           backgroundColor: AppColors.warning,
           colorText: AppColors.black,
           duration: const Duration(seconds: 3),
         );
         
+        // ignore: use_build_context_synchronously
         Navigator.of(context).pop();
       }
     } catch (e) {
@@ -146,12 +146,12 @@ class _AddChildHelpScreenState extends State<AddChildHelpScreen> {
         Get.snackbar(
           'Saved Offline',
           'Child saved locally. Will sync when online.',
-          snackPosition: SnackPosition.BOTTOM,
           backgroundColor: AppColors.warning,
           colorText: AppColors.black,
           duration: const Duration(seconds: 3),
         );
         
+        // ignore: use_build_context_synchronously
         Navigator.of(context).pop();
       }
     } catch (e) {

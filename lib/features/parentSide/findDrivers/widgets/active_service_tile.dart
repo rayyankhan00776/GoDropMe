@@ -11,11 +11,13 @@ import 'package:url_launcher/url_launcher.dart';
 class ActiveServiceTile extends StatelessWidget {
   final ActiveService data;
   final VoidCallback onEndService;
+  final VoidCallback? onChat;
 
   const ActiveServiceTile({
     super.key,
     required this.data,
     required this.onEndService,
+    this.onChat,
   });
 
   @override
@@ -158,6 +160,25 @@ class ActiveServiceTile extends StatelessWidget {
             // Action buttons
             Row(
               children: [
+                // Chat button
+                if (onChat != null)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onChat,
+                      icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                      label: const Text('Chat'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary, width: 1.2),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (onChat != null)
+                  const SizedBox(width: 10),
                 // Call driver button (phone visible for active services)
                 if (data.driverPhone != null && data.driverPhone!.isNotEmpty)
                   Expanded(

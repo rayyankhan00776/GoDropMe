@@ -7,11 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:godropme/features/parentSide/common_widgets/drawer.dart';
 import 'package:godropme/features/parentSide/common_widgets/drawer_button.dart';
 import 'package:godropme/features/parentSide/common_widgets/notification_button.dart';
+import 'package:godropme/features/parentSide/common_widgets/parent_drawer_controller.dart';
 import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/utils/responsive.dart';
 
-class ParentDrawerShell extends StatefulWidget {
+class ParentDrawerShell extends StatelessWidget {
   final Widget body;
   final bool showNotificationButton;
 
@@ -22,23 +23,15 @@ class ParentDrawerShell extends StatefulWidget {
   });
 
   @override
-  State<ParentDrawerShell> createState() => _ParentDrawerShellState();
-}
-
-class _ParentDrawerShellState extends State<ParentDrawerShell> {
-  bool _isOpen = false;
-
-  void _toggle() => setState(() => _isOpen = !_isOpen);
-  void _close() => setState(() => _isOpen = false);
-
-  @override
   Widget build(BuildContext context) {
+    // Get or create the shared drawer controller
+    final drawerCtrl = Get.put(ParentDrawerController(), permanent: true);
     final drawerWidth = Responsive.wp(context, 85);
 
     return Stack(
       children: [
         // Main content remains full width/height regardless of drawer state
-        Positioned.fill(child: widget.body),
+        Positioned.fill(child: body),
 
         // Top-left drawer button
         SafeArea(
@@ -49,13 +42,13 @@ class _ParentDrawerShellState extends State<ParentDrawerShell> {
                 left: Responsive.scaleClamped(context, 12, 12, 12),
                 top: Responsive.scaleClamped(context, 12, 12, 12),
               ),
-              child: GlassDrawerButton(onPressed: _toggle),
+              child: GlassDrawerButton(onPressed: drawerCtrl.toggle),
             ),
           ),
         ),
 
         // Optional top-right notifications button
-        if (widget.showNotificationButton)
+        if (showNotificationButton)
           SafeArea(
             child: Align(
               alignment: Alignment.topRight,
@@ -71,31 +64,35 @@ class _ParentDrawerShellState extends State<ParentDrawerShell> {
             ),
           ),
 
-        // Overlay drawer (no animation). When open, show drawer on the left,
-        // overlaying content. Content is not resized or moved.
-        if (_isOpen) ...[
-          // Optional invisible tap area to close when tapping outside the drawer
-          Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: _close,
-              child: const SizedBox.shrink(),
-            ),
-          ),
-
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Material(
-              elevation: 8,
-              color: Colors.transparent,
-              child: SizedBox(
-                width: drawerWidth,
-                height: double.infinity,
-                child: const ParentDrawer(),
+        // Overlay drawer - uses Obx for reactive updates
+        Obx(() {
+          if (!drawerCtrl.isOpen.value) return const SizedBox.shrink();
+          return Stack(
+            children: [
+              // Optional invisible tap area to close when tapping outside the drawer
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: drawerCtrl.close,
+                  child: const SizedBox.shrink(),
+                ),
               ),
-            ),
-          ),
-        ],
+
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Material(
+                  elevation: 8,
+                  color: Colors.transparent,
+                  child: SizedBox(
+                    width: drawerWidth,
+                    height: double.infinity,
+                    child: const ParentDrawer(),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }),
       ],
     );
   }

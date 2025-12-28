@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:godropme/routes.dart';
 import 'package:godropme/features/DriverSide/driverProfile/controllers/driver_profile_controller.dart';
 import 'package:godropme/services/appwrite/auth_service.dart';
-import 'package:godropme/services/appwrite/notification_service.dart';
 import 'package:godropme/services/appwrite/driver_service.dart';
 import 'package:godropme/services/appwrite/appwrite_client.dart';
 import 'package:godropme/services/appwrite/database_constants.dart';
@@ -36,9 +35,6 @@ class DriverSettingsController extends GetxController {
     isLoading.value = true;
 
     try {
-      // Stop realtime subscription before logout
-      NotificationService.instance.stopRealtimeSubscription();
-      
       // Logout from Appwrite (delete session)
       await AuthService.instance.logout();
       debugPrint('✅ Logged out from Appwrite');
@@ -116,7 +112,6 @@ class DriverSettingsController extends GetxController {
       Get.snackbar(
         'Account Deleted',
         'Your account has been successfully deleted',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppColors.primary.withValues(alpha: 0.9),
         colorText: Colors.white,
         margin: const EdgeInsets.all(16),
@@ -129,7 +124,6 @@ class DriverSettingsController extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to delete account. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.withValues(alpha: 0.9),
         colorText: Colors.white,
         margin: const EdgeInsets.all(16),

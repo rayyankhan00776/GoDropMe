@@ -1,29 +1,25 @@
-import { Client, Databases, ID, Query } from 'node-appwrite';
+import { Client, TablesDB, ID, Query } from 'node-appwrite';
 /**
  * Generate Afternoon Trips - Appwrite Function
  * 
- * Trigger: CRON (Daily at 11:00 AM PKT - `0 11 * * *` in Asia/Karachi)
+ * Trigger: CRON (Daily at 11:00 AM PKT - `0 6 * * *` UTC)
  * Purpose: Create AFTERNOON trip records from active services
  * 
  * Afternoon trips = School → Home
  * - pickupLocation = school (dropLocation from children table)
  * - dropLocation = child's home (pickLocation from children table)
  * 
- * Note: Generated at 11 AM to allow parents to mark children absent
- * before afternoon trip is created.
+ * IMPORTANT: Skips generating afternoon trip if morning trip was marked 'absent'
  * 
- * NOTE: driver_services table columns:
- * - driverId, serviceCategory, serviceAreaCenter, serviceAreaRadiusKm, 
- * - serviceAreaPolygon, serviceAreaAddress, monthlyPricePkr, extraNotes, schoolIds
- * - NO operatingDays, serviceWindow, or time window columns
+ * NOTE: Uses TablesDB API (not the old Databases API)
  */
 
 // Default operating days (Mon-Sat, skip Sunday)
 const DEFAULT_OPERATING_DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-// Default time windows for trips
-const DEFAULT_AFTERNOON_START = '11:00';
-const DEFAULT_AFTERNOON_END = '15:00';
+// Default time windows for trips (PKT - Pakistan Standard Time)
+const DEFAULT_AFTERNOON_START = '11:00 AM';
+const DEFAULT_AFTERNOON_END = '3:00 PM';
 
 export default async ({ req, res, log, error }) => {
     log('='.repeat(60));
@@ -35,7 +31,9 @@ export default async ({ req, res, log, error }) => {
         .setEndpoint(process.env.APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1')
         .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
         .setKey(process.env.APPWRITE_API_KEY);
-    const databases = new Databases(client);
+    
+    // Use TablesDB instead of Databases
+    const tablesDB = new TablesDB(client);
     const databaseId = 'godropme_db';
     
     log(`[DEBUG] Database ID: ${databaseId}`);
@@ -68,16 +66,16 @@ export default async ({ req, res, log, error }) => {
             });
         }
         
-        // Get all active services
+        // Get all active services using TablesDB
         log('[DEBUG] Fetching active services...');
-        const activeServices = await databases.listDocuments(
-            databaseId,
-            'active_services',
-            [Query.equal('status', 'active'), Query.limit(500)]
-        );
+        const activeServices = await tablesDB.listRows({
+            databaseId: databaseId,
+            tableId: 'active_services',
+            queries: [Query.equal('status', 'active'), Query.limit(500)]
+        });
         
         log(`[INFO] Found ${activeServices.total} active services`);
-        log(`[DEBUG] Active services IDs: ${activeServices.documents.map(s => s.$id).join(', ')}`);
+        log(`[DEBUG] Active services IDs: ${activeServices.rows.map(s => s.$id).join(', ')}`);
         
         if (activeServices.total === 0) {
             log('[WARN] No active services found, nothing to generate');
@@ -93,7 +91,9 @@ export default async ({ req, res, log, error }) => {
         const errors = [];
         const createdTripIds = [];
         
-        for (const service of activeServices.documents) {
+        let absentSkipped = 0;
+        
+        for (const service of activeServices.rows) {
             log(`[DEBUG] Processing service: ${service.$id}`);
             log(`[DEBUG] Service details - driverId: ${service.driverId}, childId: ${service.childId}, parentId: ${service.parentId}`);
             
@@ -101,8 +101,12 @@ export default async ({ req, res, log, error }) => {
                 // Get child data for pickup/drop locations
                 let child;
                 try {
-                    log(`[DEBUG] Fetching child document: ${service.childId}`);
-                    child = await databases.getDocument(databaseId, 'children', service.childId);
+                    log(`[DEBUG] Fetching child row: ${service.childId}`);
+                    child = await tablesDB.getRow({
+                        databaseId: databaseId,
+                        tableId: 'children',
+                        rowId: service.childId
+                    });
                     log(`[DEBUG] Child found: ${child.name}`);
                     log(`[DEBUG] Child pickLocation (Home): ${JSON.stringify(child.pickLocation)}`);
                     log(`[DEBUG] Child dropLocation (School): ${JSON.stringify(child.dropLocation)}`);
@@ -132,34 +136,50 @@ export default async ({ req, res, log, error }) => {
                 
                 log(`[DEBUG] Checking for existing trips from ${todayStart.toISOString()} to ${tomorrowStart.toISOString()}`);
                 
-                const existingTrips = await databases.listDocuments(
-                    databaseId,
-                    'trips',
-                    [
+                // FIRST: Check if morning trip was marked absent - skip afternoon if so
+                const morningTrips = await tablesDB.listRows({
+                    databaseId: databaseId,
+                    tableId: 'trips',
+                    queries: [
+                        Query.equal('activeServiceId', service.$id),
+                        Query.equal('tripType', 'morning'),
+                        Query.equal('status', 'absent'),
+                        Query.greaterThanEqual('scheduledDate', todayStart.toISOString()),
+                        Query.lessThan('scheduledDate', tomorrowStart.toISOString()),
+                        Query.limit(1)
+                    ]
+                });
+                
+                if (morningTrips.total > 0) {
+                    log(`[INFO] Morning trip marked absent for service ${service.$id} - skipping afternoon trip`);
+                    absentSkipped++;
+                    continue;
+                }
+                
+                // Check if afternoon trip already exists for today
+                const existingTrips = await tablesDB.listRows({
+                    databaseId: databaseId,
+                    tableId: 'trips',
+                    queries: [
                         Query.equal('activeServiceId', service.$id),
                         Query.equal('tripType', 'afternoon'),
                         Query.greaterThanEqual('scheduledDate', todayStart.toISOString()),
                         Query.lessThan('scheduledDate', tomorrowStart.toISOString()),
                         Query.limit(1)
                     ]
-                );
+                });
                 
                 if (existingTrips.total > 0) {
-                    log(`[INFO] Afternoon trip already exists for service ${service.$id}, trip ID: ${existingTrips.documents[0].$id}`);
+                    log(`[INFO] Afternoon trip already exists for service ${service.$id}, trip ID: ${existingTrips.rows[0].$id}`);
                     skipped++;
                     continue;
                 }
                 
-                // Get child's school time windows if available, otherwise use defaults
-                // For afternoon: Use school's close time as reference
-                const windowStartTime = child.schoolOffTime || DEFAULT_AFTERNOON_START;
+                // Use default time windows for afternoon trips (PKT)
+                const windowStartTime = DEFAULT_AFTERNOON_START;
+                const windowEndTime = DEFAULT_AFTERNOON_END;
                 
-                // Calculate end time: ~4 hours after start
-                let endHour = parseInt(windowStartTime.split(':')[0]) + 4;
-                if (endHour > 23) endHour = 23;
-                const windowEndTime = `${endHour.toString().padStart(2, '0')}:00`;
-                
-                log(`[DEBUG] Time window: ${windowStartTime} - ${windowEndTime}`);
+                log(`[DEBUG] Time window (PKT): ${windowStartTime} - ${windowEndTime}`);
                 
                 // Create afternoon trip (School → Home)
                 // Note: Locations are SWAPPED compared to morning
@@ -186,7 +206,12 @@ export default async ({ req, res, log, error }) => {
                 
                 log(`[DEBUG] Creating trip with data: ${JSON.stringify(tripData)}`);
                 
-                const createdTrip = await databases.createDocument(databaseId, 'trips', ID.unique(), tripData);
+                const createdTrip = await tablesDB.createRow({
+                    databaseId: databaseId,
+                    tableId: 'trips',
+                    rowId: ID.unique(),
+                    data: tripData
+                });
                 tripsCreated++;
                 createdTripIds.push(createdTrip.$id);
                 
@@ -201,7 +226,7 @@ export default async ({ req, res, log, error }) => {
         
         log('='.repeat(60));
         log(`[SUMMARY] Afternoon trip generation complete`);
-        log(`[SUMMARY] Created: ${tripsCreated}, Skipped: ${skipped}, Errors: ${errors.length}`);
+        log(`[SUMMARY] Created: ${tripsCreated}, Skipped (existing): ${skipped}, Skipped (absent): ${absentSkipped}, Errors: ${errors.length}`);
         log(`[SUMMARY] Created trip IDs: ${createdTripIds.join(', ')}`);
         if (errors.length > 0) {
             log(`[SUMMARY] Error details: ${JSON.stringify(errors)}`);
@@ -216,6 +241,7 @@ export default async ({ req, res, log, error }) => {
             tripsCreated: tripsCreated,
             createdTripIds: createdTripIds,
             skipped: skipped,
+            skippedDueToAbsent: absentSkipped,
             errors: errors.length,
             errorDetails: errors.slice(0, 10),
         });

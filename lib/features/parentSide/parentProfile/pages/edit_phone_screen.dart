@@ -75,7 +75,6 @@ class _EditPhoneScreenState extends State<EditPhoneScreen> {
       Get.snackbar(
         'Success',
         phone.isEmpty ? 'Phone removed' : 'Phone updated successfully',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppColors.primary.withValues(alpha: 0.9),
         colorText: Colors.white,
         margin: const EdgeInsets.all(16),

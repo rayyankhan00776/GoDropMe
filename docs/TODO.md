@@ -4,12 +4,474 @@
 > **Backend**: Appwrite Cloud (fra.cloud.appwrite.io)  
 > **Project ID**: `68ed397e000f277c6936`  
 > **Created**: November 27, 2025  
-> **Last Updated**: December 9, 2025  
-> **Status**: Phase 5 Trips & Geofencing ✅ COMPLETE | Phase 4 ✅ COMPLETE
+> **Last Updated**: December 21, 2025  
+> **Status**: Phase 9 Notification Functions ✅ COMPLETE | Phase 8 ✅ COMPLETE | Phase 6.5 ✅ COMPLETE
 
 ---
 
-## 🎯 Latest Session: Phase 5 Trips & Geofencing (Dec 9, 2025)
+## 🎯 Latest Session: Phase 9 Notification Functions (Dec 21, 2025)
+
+### ✅ New Appwrite Functions Created
+
+Two new serverless functions for push notifications and emails.
+
+#### 1️⃣ `notify-application-status` Function
+
+| Property | Value |
+|----------|-------|
+| **Trigger** | Event: `databases.godropme_db.tables.users.rows.*.update` |
+| **Purpose** | Notify driver when admin changes application status |
+| **Notification Type** | `system` |
+
+**Status Changes Handled:**
+
+| Status Change | Notification | Email |
+|---------------|--------------|-------|
+| `pending` → `active` | 🎉 Application Approved! | Welcome email with next steps |
+| `pending` → `rejected` | ❌ Application Not Approved | Rejection email with reason |
+| `active` → `suspended` | ⚠️ Account Suspended | Suspension email with reason |
+
+**Features:**
+- Creates notification in `notifications` table
+- Sends FCM push notification via Appwrite Messaging
+- Sends email via Appwrite Messaging (uses email target)
+- Includes `statusReason` from users table in notifications
+- Fetches driver name from `drivers` table for personalized messages
+
+**Files:**
+```
+functions/notify-application-status/
+├── package.json
+├── package-lock.json
+└── src/main.js (~280 lines)
+```
+
+#### 2️⃣ `notify-new-message` Function
+
+| Property | Value |
+|----------|-------|
+| **Trigger** | Event: `databases.godropme_db.tables.messages.rows.*.create` |
+| **Purpose** | Notify parent/driver when they receive a new chat message |
+| **Notification Type** | `new_message` |
+
+**Message Flow:**
+
+| Sender | Recipient | Notification |
+|--------|-----------|--------------|
+| Parent sends message | Driver | 💬 {Parent Name}: {preview} |
+| Driver sends message | Parent | 💬 {Driver Name}: {preview} |
+
+**Message Type Previews:**
+
+| Type | Preview |
+|------|---------|
+| `text` | First 50 chars of message |
+| `image` | 📷 Sent an image |
+| `location` | 📍 Shared a location |
+
+**Features:**
+- Fetches chat room to determine parent/driver relationship
+- Gets sender name from respective table (parents/drivers)
+- Maps table row IDs to user IDs for FCM targeting
+- Creates notification with `chatRoomId` and `messageId` in payload
+- Enables direct navigation to conversation on tap
+
+**Files:**
+```
+functions/notify-new-message/
+├── package.json
+├── package-lock.json
+└── src/main.js (~270 lines)
+```
+
+### 📊 Complete Notification System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      USER REGISTRATION & AUTH                           │
+├─────────────────────────────────────────────────────────────────────────┤
+│  1. Appwrite Account (Auth)     - Phone-based authentication            │
+│  2. users table (row)           - email, role, status, fcmToken         │
+│  3. parents/drivers table (row) - Profile data with userId reference    │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         NOTIFICATION TRIGGERS                           │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌────────────────────┐  ┌────────────────────┐  ┌──────────────────┐  │
+│  │ notify-application │  │ notify-new-message │  │ notify-service-  │  │
+│  │ -status            │  │                    │  │ request          │  │
+│  ├────────────────────┤  ├────────────────────┤  ├──────────────────┤  │
+│  │ Trigger: users     │  │ Trigger: messages  │  │ Trigger: service │  │
+│  │ table update       │  │ table create       │  │ _requests create │  │
+│  ├────────────────────┤  ├────────────────────┤  ├──────────────────┤  │
+│  │ • approved         │  │ • text message     │  │ • request_received│ │
+│  │ • rejected         │  │ • image shared     │  │ • request_accepted│ │
+│  │ • suspended        │  │ • location shared  │  │ • request_rejected│ │
+│  └────────────────────┘  └────────────────────┘  └──────────────────┘  │
+│                                                                         │
+│  ┌────────────────────┐  ┌────────────────────┐  ┌──────────────────┐  │
+│  │ notify-trip-status │  │ process-geofence   │  │ generate-trips   │  │
+│  ├────────────────────┤  ├────────────────────┤  ├──────────────────┤  │
+│  │ Trigger: trips     │  │ Trigger: trips     │  │ Trigger: CRON    │  │
+│  │ table update       │  │ location update    │  │ 5AM / 11AM PKT   │  │
+│  ├────────────────────┤  ├────────────────────┤  ├──────────────────┤  │
+│  │ • trip_started     │  │ • driver_arrived   │  │ Creates daily    │  │
+│  │ • child_picked     │  │ • approaching      │  │ trips            │  │
+│  │ • child_dropped    │  │ • left_geofence    │  │                  │  │
+│  └────────────────────┘  └────────────────────┘  └──────────────────┘  │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          DELIVERY CHANNELS                              │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐     │
+│  │  notifications  │    │   FCM Push      │    │   Email         │     │
+│  │  table (DB)     │    │   (Messaging)   │    │   (Messaging)   │     │
+│  ├─────────────────┤    ├─────────────────┤    ├─────────────────┤     │
+│  │ • In-app list   │    │ • Background    │    │ • Application   │     │
+│  │ • Badge count   │    │ • Foreground    │    │   status only   │     │
+│  │ • Realtime sub  │    │ • Data payload  │    │ • SMTP provider │     │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘     │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### 📋 All Appwrite Functions Summary
+
+| Function | Trigger | Events | Status |
+|----------|---------|--------|--------|
+| `generate-morning-trips` | CRON 5AM PKT | - | ✅ Working |
+| `generate-afternoon-trips` | CRON 11AM PKT | - | ✅ Working |
+| `process-geofence` | Event | trips update (location) | ✅ Working |
+| `notify-service-request` | Event | service_requests create/update | ✅ Working |
+| `notify-trip-status` | Event | trips update (status) | ✅ Working |
+| `notify-application-status` | Event | users update (status) | ✅ NEW |
+| `notify-new-message` | Event | messages create | ✅ NEW |
+
+### 🗄️ Database Schema Reference
+
+#### `users` Table (Status Management)
+
+| Column | Type | Values/Description |
+|--------|------|-------------------|
+| `email` | string | User email address |
+| `role` | enum | `parent`, `driver` |
+| `status` | enum | `pending`, `active`, `suspended`, `rejected` |
+| `statusReason` | string | Admin-provided reason for status change |
+| `fcmToken` | string | Firebase Cloud Messaging token |
+| `isProfileComplete` | boolean | Profile completion flag |
+
+#### `notifications` Table
+
+| Column | Type | Values/Description |
+|--------|------|-------------------|
+| `userId` | string | Target user (users table row ID) |
+| `targetRole` | enum | `parent`, `driver` |
+| `title` | string | Notification title (100 chars) |
+| `body` | string | Notification body (500 chars) |
+| `type` | enum | `trip_started`, `driver_arrived`, `child_picked`, `child_dropped`, `request_received`, `request_accepted`, `request_rejected`, `new_message`, `system` |
+| `payload` | string | JSON payload with action data |
+| `isRead` | boolean | Read status (default: false) |
+
+### 🚀 Deployment Instructions
+
+```bash
+# 1. Navigate to function directory
+cd functions/notify-application-status
+
+# 2. Ensure package-lock.json exists (already done)
+npm install
+
+# 3. Deploy via Appwrite CLI or Console
+# In Appwrite Console:
+# - Create new function
+# - Runtime: Node.js 18.0
+# - Entrypoint: src/main.js
+# - Build command: npm install
+# - Event trigger: databases.godropme_db.tables.users.rows.*.update
+
+# Repeat for notify-new-message with trigger:
+# databases.godropme_db.tables.messages.rows.*.create
+```
+
+### 🔑 Required Environment Variables
+
+Both functions require these environment variables in Appwrite:
+
+| Variable | Description |
+|----------|-------------|
+| `APPWRITE_ENDPOINT` | `https://fra.cloud.appwrite.io/v1` |
+| `APPWRITE_FUNCTION_PROJECT_ID` | Auto-set by Appwrite |
+| `APPWRITE_API_KEY` | Server API key with appropriate scopes |
+
+---
+
+## 📌 Previous Session: Phase 8 Ratings & Reports (Dec 20, 2025)
+
+### ✅ Ratings & Reports Module - Complete Implementation
+
+Comprehensive implementation of ratings and reports system for both parent and driver sides.
+
+#### Files Created
+
+| File | Lines | Description |
+|------|-------|-------------|
+| `lib/services/appwrite/rating_service.dart` | ~550 | Complete rating service with CRUD operations |
+| `lib/services/appwrite/report_service.dart` | ~500 | Complete report service with file uploads |
+
+#### RatingService Methods
+
+| Method | Description |
+|--------|-------------|
+| `rateDriver()` | Submit rating (1-5) with optional review |
+| `getDriverRatings()` | Paginated list of driver ratings |
+| `getDriverAverageRating()` | Calculate average + distribution |
+| `canRate()` | Check eligibility (30-day cooldown) |
+| `getParentRatings()` | Ratings given by a parent |
+| `deleteRating()` | Delete a rating |
+| `_updateDriverAverageRating()` | Update driver's averageRating field |
+
+#### ReportService Methods
+
+| Method | Description |
+|--------|-------------|
+| `submitReport()` | Create report with optional attachments |
+| `getUserReports()` | Get reports by user ID |
+| `getReportsByType()` | Filter reports by type |
+| `updateReportStatus()` | Admin: Update report status |
+| `addAdminNotes()` | Admin: Add notes to report |
+| `uploadAttachment()` | Upload file to report_attachments bucket |
+
+#### Database Tables (Verified via MCP)
+
+| Table | Columns | Status |
+|-------|---------|--------|
+| `ratings` | driverId (req), parentId (req), tripId, rating (int 1-5 req), review (1000), createdAt (req), driver, parent, trip | ✅ Verified |
+| `reports` | reporterId (req), reporterRole (enum), reportedUserId, tripId, reportType (7 enums), title (150 req), description (2000 req), attachmentUrls (string[]), status (4 enums, default: pending), adminNotes (1000), resolvedAt | ✅ Verified |
+
+#### Report Types (Enum Values)
+```
+safety_concern, behavior, delay, no_show, damage, payment, other
+```
+
+#### Report Status (Enum Values)
+```
+pending (default), under_review, resolved, dismissed
+```
+
+#### Controller Updates
+
+| Controller | Changes |
+|------------|---------|
+| `parent_report_controller.dart` | Added `DriverOption` model, `availableDrivers`, `selectedDriver`, `loadDrivers()` from active_services, `selectDriver()`, backend integration |
+| `driver_report_controller.dart` | Backend integration with ReportService |
+
+#### Screen Redesigns
+
+| Screen | Features |
+|--------|----------|
+| `parent_report_screen.dart` | Modern header, tab bar (Create/My Reports), report type chips, **driver selection dropdown**, title/description fields, attachment picker, status badges |
+| `driver_report_screen.dart` | Same modern UI as parent side |
+
+#### New UI Components
+
+- `_ReportTypeChip` - Selectable chip for report type
+- `_ReportTile` - Report card with status badge, time formatting
+- `_AttachmentCard` - Preview card for attached files
+- Driver selection dropdown with avatar, name, child name
+
+#### Bug Fixes
+
+| Issue | Solution |
+|-------|----------|
+| `DriverReportController is not a subtype` TypeError | Fixed import path case sensitivity (`DriverSide` → `driverSide`) |
+| `Permissions must be one of: (any, users, user:...)` error | Removed `Role.label('admin')` - client SDK can't set admin permissions |
+
+### 📊 Rating Flow Explained
+
+```
+                    ┌──────────────────────────────────┐
+                    │     Parent has Active Service    │
+                    │     with Driver                  │
+                    └──────────────────────────────────┘
+                                    │
+                                    ▼
+                    ┌──────────────────────────────────┐
+                    │   canRate() checks:              │
+                    │   1. Service exists?             │
+                    │   2. Rated in last 30 days?      │
+                    └──────────────────────────────────┘
+                                    │
+                        ┌───────────┴───────────┐
+                        ▼                       ▼
+                    Can Rate               Cannot Rate
+                        │                  (30-day cooldown)
+                        ▼
+                    ┌──────────────────────────────────┐
+                    │   rateDriver() creates rating:   │
+                    │   - driverId, parentId           │
+                    │   - rating (1-5 stars)           │
+                    │   - review (optional)            │
+                    │   - tripId (optional)            │
+                    │   - createdAt timestamp          │
+                    └──────────────────────────────────┘
+                                    │
+                                    ▼
+                    ┌──────────────────────────────────┐
+                    │   _updateDriverAverageRating()   │
+                    │   Recalculates driver average    │
+                    │   Updates drivers.averageRating  │
+                    └──────────────────────────────────┘
+                                    │
+                                    ▼
+                    ┌──────────────────────────────────┐
+                    │   Driver Profile shows:          │
+                    │   ⭐ 4.5 (120 ratings)           │
+                    │   Rating distribution bar        │
+                    └──────────────────────────────────┘
+```
+
+**Key Features:**
+- 30-day cooldown between ratings for same driver
+- Rating range validated (1-5)
+- Auto-updates driver's `averageRating` field
+- Rating distribution calculation (5★: 80, 4★: 30, ...)
+- Reviews are optional but encouraged
+
+---
+
+## 📌 Previous Session: Phase 6.5 Chat UI Improvements (Dec 20, 2025)
+
+### ✅ Chat Module UI Overhaul
+
+Comprehensive UI improvements for the entire chat module including chat initiation, list screens, and conversation screens.
+
+#### Chat Initiation - Added Missing Functionality
+
+| File | Changes |
+|------|---------|
+| `active_service_tile.dart` | Added `onChat` callback parameter for chat button |
+| `find_drivers_screen.dart` | Added `_openChatWithDriver()` method to initiate chats |
+| `driver_orders_screen.dart` | Implemented `_openChatWithParent()` method (was empty TODO) |
+
+**Chat Flow:**
+```
+Parent Side: ActiveServiceTile → Chat Button → ChatService.getOrCreateChatRoom() → Navigate to conversation
+Driver Side: DriverOrderTile → Chat Icon → ChatService.getOrCreateChatRoom() → Navigate to conversation
+```
+
+#### Chat List Screens - Complete Rewrite
+
+| Screen | Improvements |
+|--------|-------------|
+| `ParentChatScreen` | Modern header with refresh, avatars with AppwriteImage, unread badges, time formatting, empty/error states |
+| `DriverChatScreen` | Same improvements as parent side |
+
+**New UI Components:**
+- `_ChatListTile` - Modern tile with avatar, name, last message, time, unread count badge
+- `_ContactAvatar` - Handles AppwriteImage profile photos with initials fallback
+- Empty state with illustration
+- Error state with retry button
+- Pull-to-refresh functionality
+
+#### Conversation Screens - Complete Rewrite
+
+| Screen | Improvements |
+|--------|-------------|
+| `ParentConversationScreen` | New app bar with avatar, modern input area, date separators, improved bubbles |
+| `DriverConversationScreen` | Same improvements as parent side |
+
+**New Features:**
+- App bar with contact avatar and name/role
+- `_DateSeparator` widget showing Today/Yesterday/Day name/Full date
+- Modern `_MessageBubble` with:
+  - Asymmetric border radius (WhatsApp style)
+  - Read receipts with double checkmarks (blue when read)
+  - Improved image viewer with close button
+  - Better location sharing card
+- `_AttachmentOption` widget for share bottom sheet
+- Modern share sheet with Gallery/Camera/Location icons
+- Multi-line text input with max height constraint
+- Loading indicator in send button
+
+#### Schema Verification
+
+Verified chat module against Appwrite tables:
+
+| Table | Columns | Status |
+|-------|---------|--------|
+| `chat_rooms` | parentId, driverId, lastMessage, lastMessageAt, parentUnreadCount, driverUnreadCount, parentRef, driverRef, messages | ✅ Verified |
+| `messages` | chatRoomId, senderId, senderRole (enum: parent/driver), messageType (enum: text/image/location), text, imageUrl, location (point), isRead, chatRoom | ✅ Verified |
+
+---
+
+## 📌 Previous Session: Phase 6 Chat Implementation (Dec 17, 2025)
+
+### ✅ Chat Feature - Complete Implementation
+
+Real-time chat system between parents and drivers with support for text, images, and location sharing.
+
+#### Files Created/Modified
+
+| File | Type | Description |
+|------|------|-------------|
+| `lib/services/appwrite/chat_service.dart` | NEW | Complete chat service with CRUD, realtime |
+| `parent_chat_controller.dart` | MODIFIED | Backend integration, realtime |
+| `parent_conversation_controller.dart` | MODIFIED | Messages, pagination, realtime |
+| `driver_chat_controller.dart` | MODIFIED | Backend integration, realtime |
+| `driver_conversation_controller.dart` | MODIFIED | Messages, pagination, realtime |
+| `parent_conversation_screen.dart` | MODIFIED | Image/location support, modern UI |
+| `driver_conversation_screen.dart` | MODIFIED | Image/location support, modern UI |
+
+#### ChatService Methods
+
+| Method | Description |
+|--------|-------------|
+| `getOrCreateChatRoom()` | Get existing or create new chat room |
+| `getParentChatRooms()` | List all chat rooms for a parent |
+| `getDriverChatRooms()` | List all chat rooms for a driver |
+| `sendTextMessage()` | Send text message |
+| `sendImageMessage()` | Upload image & send message |
+| `sendLocationMessage()` | Send GPS location |
+| `getMessages()` | Fetch messages with pagination |
+| `markMessagesAsRead()` | Mark messages as read |
+| `subscribeToMessages()` | Realtime message subscription |
+| `subscribeToChatRooms()` | Realtime chat room updates |
+
+#### Features Implemented
+
+- ✅ Text messages with timestamps
+- ✅ Image messages (upload to chat_attachments bucket)
+- ✅ Location sharing (opens in Google Maps)
+- ✅ Real-time message delivery via Appwrite Realtime
+- ✅ Pagination for loading older messages
+- ✅ Read receipts and unread counts
+- ✅ Chat room list with last message preview
+- ✅ Auto-scroll and modern UI
+
+#### Database Tables
+
+| Table | Fields | Purpose |
+|-------|--------|---------|
+| `chat_rooms` | parentId, driverId, lastMessage, lastMessageAt, parentUnreadCount, driverUnreadCount | Chat room metadata |
+| `messages` | chatRoomId, senderId, senderRole, messageType, text, imageUrl, location, isRead | Individual messages |
+
+#### Realtime Channels
+
+```
+databases.godropme_db.tables.messages.rows (for new messages)
+databases.godropme_db.tables.chat_rooms.rows (for chat list updates)
+```
+
+---
+
+## 📌 Previous Session: Phase 5 Trips & Geofencing (Dec 9, 2025)
 
 ### ✅ Appwrite Functions - Fixed & Tested
 
@@ -4243,7 +4705,7 @@ class ParentTripsService {
 
 
 
-### Phase 6: Real-time Chat 💬 (Delayed For MVP)
+### Phase 6: Real-time Chat 💬 ✅ Completed
 > **Priority**: MEDIUM | **Estimated**: 3-4 days
 
 - [ ] **6.1** Create `chat_rooms` collection ✅ (already exists)
@@ -4383,7 +4845,7 @@ Topics.geofenceAlerts       // 'geofence_alerts'
   - [ ] `uploadAttachment(file)`
 - [ ] **8.7** Update `ParentReportScreen`
 - [ ] **8.8** Update `DriverReportScreen`
-- [ ] **8.9** Add rating prompt after trip completion
+- [ ] **8.9** show rating prompt after a month service completion
 - [ ] **8.10** Display driver ratings on listing
 
 ---

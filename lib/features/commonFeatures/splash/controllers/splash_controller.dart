@@ -61,10 +61,6 @@ class SplashController extends GetxController {
     debugPrint('✅ Active session found - role: ${sessionResult.userRole}, status: ${sessionResult.status}, hasDriverProfile: ${sessionResult.hasDriverProfile}');
     await NotificationService.instance.registerForPushNotifications();
     
-    // Start app-wide realtime subscription for live notification updates
-    // This ensures notifications work even when not on notification page
-    NotificationService.instance.startRealtimeSubscription();
-    
     await _navigateToHome(
       sessionResult.userRole, 
       sessionResult.status,

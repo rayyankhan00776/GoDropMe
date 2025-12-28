@@ -115,7 +115,6 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
                                             Get.snackbar(
                                               'Synced',
                                               'All children synced to cloud',
-                                              snackPosition: SnackPosition.BOTTOM,
                                             );
                                           } else {
                                             Get.snackbar(
@@ -123,7 +122,6 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
                                               _ctrl.errorMessage.value.isNotEmpty 
                                                   ? _ctrl.errorMessage.value 
                                                   : 'Some children failed to sync',
-                                              snackPosition: SnackPosition.BOTTOM,
                                             );
                                           }
                                         },
@@ -133,42 +131,52 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
                           ),
                         ),
                         Expanded(
-                          child: ListView.separated(
-                            itemCount: _ctrl.children.length,
-                            separatorBuilder: (_, __) => SizedBox(
-                              height: Responsive.scaleClamped(
-                                context,
-                                10,
-                                8,
-                                16,
-                              ),
-                            ),
-                            itemBuilder: (context, index) {
-                              final c = _ctrl.children[index];
-                              return ChildTile(
-                                childData: c,
-                                onEdit: () async {
-                                  // Navigate to edit screen with child data
-                                  await Get.toNamed(
-                                    AppRoutes.addChildHelp,
-                                    arguments: {'childData': c, 'index': index},
-                                  );
-                                  await _ctrl.loadChildren();
-                                },
-                                onDelete: () async {
-                                  await _ctrl.deleteChild(index);
-                                },
-                                isAbsentToday: _ctrl.isAbsentToday(index),
-                                onMarkAbsent: () async {
-                                  // Toggle absent status
-                                  if (_ctrl.isAbsentToday(index)) {
-                                    await _ctrl.clearAbsent(index);
-                                  } else {
-                                    await _ctrl.markAbsentToday(index);
-                                  }
-                                },
-                              );
+                          child: RefreshIndicator(
+                            onRefresh: () async {
+                              await _ctrl.loadChildren();
+                              await _ctrl.loadChildTripStates();
                             },
+                            child: ListView.separated(
+                              // Access tripStatesVersion to trigger rebuild when trip states change
+                              key: ValueKey('children_list_${_ctrl.tripStatesVersion}'),
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              itemCount: _ctrl.children.length,
+                              separatorBuilder: (_, _) => SizedBox(
+                                height: Responsive.scaleClamped(
+                                  context,
+                                  10,
+                                  8,
+                                  16,
+                                ),
+                              ),
+                              itemBuilder: (context, index) {
+                                final c = _ctrl.children[index];
+                                // Get the current state (this also accesses tripStatesVersion internally)
+                                final absentState = _ctrl.getAbsentButtonState(index);
+                                return ChildTile(
+                                  childData: c,
+                                  onEdit: () async {
+                                    // Navigate to edit screen with child data
+                                    await Get.toNamed(
+                                      AppRoutes.addChildHelp,
+                                      arguments: {'childData': c, 'index': index},
+                                    );
+                                    await _ctrl.loadChildren();
+                                  },
+                                  onDelete: () async {
+                                    await _ctrl.deleteChild(index);
+                                  },
+                                  isAbsentToday: _ctrl.isAbsentToday(index),
+                                  absentButtonState: absentState,
+                                  onMarkAbsent: () async {
+                                    // Only mark absent if state allows
+                                    if (absentState == AbsentButtonState.canMarkAbsent) {
+                                      await _ctrl.markAbsentToday(index);
+                                    }
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ],

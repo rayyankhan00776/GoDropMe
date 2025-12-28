@@ -11,11 +11,13 @@ import 'package:godropme/common_widgets/appwrite_image.dart';
 class DriverActiveServiceTile extends StatelessWidget {
   final DriverActiveService data;
   final VoidCallback onEndService;
+  final VoidCallback? onChat;
 
   const DriverActiveServiceTile({
     super.key,
     required this.data,
     required this.onEndService,
+    this.onChat,
   });
 
   @override
@@ -152,22 +154,44 @@ class DriverActiveServiceTile extends StatelessWidget {
 
             const SizedBox(height: 14),
 
-            // End service button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: onEndService,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            // Action buttons row
+            Row(
+              children: [
+                // Chat button
+                if (onChat != null)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onChat,
+                      icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                      label: const Text('Chat'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
                   ),
-                  elevation: 0,
+                if (onChat != null) const SizedBox(width: 12),
+                // End service button
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onEndService,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text('End Service'),
+                  ),
                 ),
-                child: const Text('End Service'),
-              ),
+              ],
             ),
           ],
         ),

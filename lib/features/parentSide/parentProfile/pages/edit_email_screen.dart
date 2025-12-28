@@ -65,7 +65,6 @@ class _EditEmailScreenState extends State<EditEmailScreen> {
       Get.snackbar(
         'Success',
         'Email updated successfully',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppColors.primary.withValues(alpha: 0.9),
         colorText: Colors.white,
         margin: const EdgeInsets.all(16),

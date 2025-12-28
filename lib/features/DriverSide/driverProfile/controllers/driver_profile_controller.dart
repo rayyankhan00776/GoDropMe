@@ -174,7 +174,6 @@ class DriverProfileController extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to pick image. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.withValues(alpha: 0.9),
         colorText: Colors.white,
       );
@@ -198,7 +197,6 @@ class DriverProfileController extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to take photo. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.withValues(alpha: 0.9),
         colorText: Colors.white,
       );
@@ -214,7 +212,6 @@ class DriverProfileController extends GetxController {
       Get.snackbar(
         'Saved Locally',
         'Photo saved. Will upload when online.',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppColors.primary.withValues(alpha: 0.9),
         colorText: AppColors.white,
       );
@@ -242,7 +239,6 @@ class DriverProfileController extends GetxController {
         Get.snackbar(
           'Success',
           'Profile photo updated',
-          snackPosition: SnackPosition.BOTTOM,
           backgroundColor: AppColors.primary.withValues(alpha: 0.9),
           colorText: AppColors.white,
         );
@@ -257,7 +253,6 @@ class DriverProfileController extends GetxController {
       Get.snackbar(
         'Saved Locally',
         'Could not upload. Photo saved locally.',
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.amber.withValues(alpha: 0.9),
         colorText: Colors.black,
       );

@@ -159,7 +159,6 @@ class DriverRejectedScreen extends StatelessWidget {
                   Get.snackbar(
                     'Contact Support',
                     'Email us at support@godropme.com',
-                    snackPosition: SnackPosition.BOTTOM,
                     backgroundColor: AppColors.primary.withOpacity(0.9),
                     colorText: Colors.white,
                     margin: const EdgeInsets.all(16),

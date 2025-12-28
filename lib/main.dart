@@ -9,16 +9,16 @@ import 'package:godropme/routes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Appwrite client
   AppwriteClient.instance;
-  
+
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
+
   // Initialize notification service (FCM + local notifications)
   await NotificationService.instance.initialize();
-  
+
   runApp(const GoDropMe());
 }
 
